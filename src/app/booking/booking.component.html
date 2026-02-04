@@ -1,0 +1,249 @@
+<nav class="navbar navbar-dark bg-primary sticky-top">
+  <div class="container-fluid">
+    <button class="btn btn-outline-light" [routerLink]="['/tour-details', trekId]">←</button>
+    <span class="navbar-brand mx-auto fw-semibold">Book Your Trek</span>
+  </div>
+</nav>
+
+<!-- Progress Steps -->
+<div class="py-2 border-bottom progress-steps">
+  <div class="container d-flex justify-content-center align-items-center gap-3">
+    <div class="text-center">
+      <div class="rounded-circle border fw-bold px-3 py-2" [class.bg-primary]="currentStep >= 1"
+        [class.text-white]="currentStep >= 1">
+        1
+      </div>
+      <small>Details</small>
+    </div>
+    <div class="flex-grow-1 border-top"></div>
+    <div class="text-center">
+      <div class="rounded-circle border fw-bold px-3 py-2" [class.bg-primary]="currentStep >= 2"
+        [class.text-white]="currentStep >= 2">
+        2
+      </div>
+      <small>Info</small>
+    </div>
+    <div class="flex-grow-1 border-top"></div>
+    <div class="text-center">
+      <div class="rounded-circle border fw-bold px-3 py-2" [class.bg-primary]="currentStep >= 3"
+        [class.text-white]="currentStep >= 3">
+        3
+      </div>
+      <small>Review</small>
+    </div>
+  </div>
+</div>
+
+<!-- Trek Summary -->
+<div class="container tour-summary py-3" *ngIf="trek">
+  <h3 class="fw-bold">{{ trek.name }}</h3>
+  <p class="text-muted mb-0">
+    <i class="bi bi-geo-alt"></i> {{ trek.location }}
+  </p>
+</div>
+
+<!-- Loading State -->
+<div class="container text-center py-5" *ngIf="isLoading">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+  <p class="mt-3">Loading trek details...</p>
+</div>
+
+<!-- STEP 1: Select Date & Participants -->
+<div class="container booking-step py-3" *ngIf="currentStep === 1 && !isLoading">
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title mb-3">Select Batch & Participants</h5>
+
+      <div class="row">
+        <div class="mb-3 col-sm-12">
+          <label class="form-label">Select Batch *</label>
+          <select class="form-select" [(ngModel)]="booking.batchId" (change)="onBatchSelect(booking.batchId)">
+            <option value="0" disabled>Select Batch</option>
+            <option *ngFor="let batch of batches" [value]="batch.batchId"
+              [disabled]="batch.status !== 'active' || batch.availableSlots === 0">
+              {{ batch.startDate | date:'MMM dd' }} - {{ batch.endDate | date:'MMM dd, yyyy' }}
+              ({{ batch.duration }}) - ₹{{ batch.price }}
+              {{ batch.availableSlots === 0 ? ' (Full)' : ' (' + batch.availableSlots + ' slots)' }}
+            </option>
+          </select>
+        </div>
+        <div class="mb-3 col-sm-6" *ngIf="selectedBatch">
+          <label class="form-label">Number of Participants *</label>
+
+          <input type="number" class="form-control" [value]="booking.participants" min="1"
+            (input)="onParticipantsInput($event)" />
+
+          <small class="text-muted">
+            Max: {{ selectedBatch.availableSlots }} available
+          </small>
+        </div>
+
+
+        <div class="mb-3 col-sm-6" *ngIf="selectedBatch">
+          <label class="form-label">Price per Person</label>
+          <input type="text" class="form-control" [value]="'₹' + selectedBatch.price" readonly />
+        </div>
+      </div>
+
+      <h6 class="mt-4">Add-ons (Optional)</h6>
+      <div class="form-check mb-2" *ngFor="let addon of addOns">
+        <input class="form-check-input" type="checkbox" [(ngModel)]="addon.selected" [id]="'addon-' + addon.id" />
+        <label class="form-check-label" [for]="'addon-' + addon.id">
+          {{ addon.name }} — ₹{{ addon.price }}
+        </label>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 2: Personal Information -->
+<div class="container booking-step py-3" *ngIf="currentStep === 2">
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title mb-3">Personal Information</h5>
+
+      <div class="row">
+        <div class="mb-3 col-md-6">
+          <label class="form-label">Full Name *</label>
+          <input class="form-control" [(ngModel)]="booking.name" placeholder="Enter full name" />
+        </div>
+
+        <div class="mb-3 col-md-6">
+          <label class="form-label">Email *</label>
+          <input type="email" class="form-control" [(ngModel)]="booking.email" placeholder="your@email.com" />
+        </div>
+
+        <div class="mb-3 col-md-6">
+          <label class="form-label">Phone *</label>
+          <input type="tel" class="form-control" [(ngModel)]="booking.phone" placeholder="+91 XXXXX XXXXX"
+            minlength="10" maxlength="10" />
+        </div>
+
+        <div class="mb-3 col-md-6">
+          <label class="form-label">Emergency Contact *</label>
+          <input type="tel" class="form-control" [(ngModel)]="booking.emergencyContact" placeholder="+91 XXXXX XXXXX"
+            minlength="10" maxlength="10" />
+        </div>
+
+        <div class="mb-3 col-12">
+          <label class="form-label">Special Requests / Medical Info</label>
+          <textarea class="form-control" rows="3" [(ngModel)]="booking.specialRequests"
+            placeholder="Any allergies, dietary restrictions, or special requirements..."></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 3: Review Booking -->
+<div class="container booking-step py-3" *ngIf="currentStep === 3">
+  <div class="card mb-3">
+    <div class="card-body">
+      <h5 class="card-title">Review Your Booking</h5>
+
+      <div class="row">
+        <div class="col-md-6">
+          <h6 class="mt-3">Trek Details</h6>
+          <ul class="list-group mb-3">
+            <li class="list-group-item">
+              <strong>Trek:</strong> {{ trek.name }}
+            </li>
+            <li class="list-group-item">
+              <strong>Dates:</strong> {{ selectedBatch?.startDate | date:'MMM dd' }} -
+              {{ selectedBatch?.endDate | date:'MMM dd, yyyy' }}
+            </li>
+            <li class="list-group-item">
+              <strong>Duration:</strong> {{ selectedBatch?.duration }}
+            </li>
+            <li class="list-group-item">
+              <strong>Participants:</strong> {{ booking.participants }}
+            </li>
+          </ul>
+        </div>
+
+        <div class="col-md-6">
+          <h6 class="mt-3">Personal Details</h6>
+          <ul class="list-group mb-3">
+            <li class="list-group-item">
+              <strong>Name:</strong> {{ booking.name }}
+            </li>
+            <li class="list-group-item">
+              <strong>Email:</strong> {{ booking.email }}
+            </li>
+            <li class="list-group-item">
+              <strong>Phone:</strong> {{ booking.phone }}
+            </li>
+            <li class="list-group-item">
+              <strong>Emergency:</strong> {{ booking.emergencyContact }}
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <h6 class="mt-3">Price Breakdown</h6>
+      <ul class="list-group">
+        <li class="list-group-item d-flex justify-content-between">
+          <span>Trek ({{ booking.participants }} × ₹{{ selectedBatch?.price }})</span>
+          <strong>₹{{ basePrice }}</strong>
+        </li>
+        <ng-container *ngFor="let addon of addOns">
+          <li class="list-group-item d-flex justify-content-between" *ngIf="addon.selected">
+            <span>{{ addon.name }}</span>
+            <strong>₹{{ addon.price }}</strong>
+          </li>
+        </ng-container>
+        <li class="list-group-item d-flex justify-content-between bg-light">
+          <strong>Total Amount</strong>
+          <strong class="text-primary">₹{{ totalPrice }}</strong>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="form-check mb-4">
+    <input class="form-check-input" type="checkbox" id="terms" />
+    <label class="form-check-label" for="terms">
+      I agree to <a routerLink="/terms">Terms & Conditions</a> and
+      <a routerLink="/cancellation">Cancellation Policy</a>
+    </label>
+  </div>
+</div>
+
+<!-- Bottom Action Bar -->
+<div class="fixed-bottom bg-light border-top p-3">
+  <div class="container d-flex align-items-center gap-2">
+    <button *ngIf="currentStep > 1" class="btn btn-outline-secondary" (click)="prevStep()">
+      ← Back
+    </button>
+
+    <div class="ms-auto fw-bold text-primary">
+      Total: ₹{{ totalPrice }}
+    </div>
+
+    <button *ngIf="currentStep < 3" class="btn btn-primary" (click)="nextStep()">
+      Continue →
+    </button>
+
+    <button *ngIf="currentStep === 3" class="btn btn-success" [disabled]="isSubmitting" (click)="proceedToPayment()">
+
+      {{ isSubmitting ? 'Processing...' : 'Proceed to Payment 💳' }}
+    </button>
+
+  </div>
+</div>
+
+<div class="container mt-3">
+
+  <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show">
+    {{ successMessage }}
+    <button type="button" class="btn-close" (click)="successMessage = ''"></button>
+  </div>
+
+  <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show">
+    {{ errorMessage }}
+    <button type="button" class="btn-close" (click)="errorMessage = ''"></button>
+  </div>
+
+</div>

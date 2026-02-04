@@ -1,0 +1,42 @@
+/* Import Bootstrap and center Ionic modal content vertically and constrain width */
+.custom-center .modal-wrapper {
+	height: 100vh !important;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.custom-center .modal-wrapper .modal-content {
+	width: 100%;
+	max-width: 520px;
+	margin: 0 16px;
+	border-radius: 12px;
+}
+
+/* Backdrop blur for modal */
+.modal-backdrop, .modal-wrapper::backdrop {
+	backdrop-filter: blur(6px);
+	background: rgba(0,0,0,0.32) !important;
+}
+
+/* Ensure modal inner page containers also constrained */
+.custom-center .modal-wrapper .modal-page,
+.custom-center .modal-wrapper .modal-inner,
+.custom-center .modal-wrapper .modal-content {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+/* When component renders only card inside modal, ensure no extra padding */
+.login-modal-content, .register-modal-content {
+	width: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0 !important;
+	background: transparent !important;
+}
+
+
+

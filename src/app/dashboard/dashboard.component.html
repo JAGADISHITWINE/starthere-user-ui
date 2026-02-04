@@ -1,0 +1,83 @@
+<div *ngIf="!isLoading">
+  <!-- HERO SECTION -->
+  <section class="hero-section">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <h1>Upcoming Treks in Karnataka</h1>
+      <p>Discover the Western Ghats with expert guides</p>
+
+      <button class="hero-button" routerLink="upcomingtours">
+        Explore Treks →
+      </button>
+    </div>
+  </section>
+
+  <!-- FILTERS -->
+  <section class="filter-section">
+    <button *ngFor="let filter of filters" (click)="setFilter(filter.id)" [class.active]="selectedFilter === filter.id">
+      {{ filter.label }}
+    </button>
+  </section>
+
+  <!-- TREK CARDS -->
+  <section class="trek-grid"  *ngIf="!isLoading && filteredTreks?.length">
+    <div class="trek-card" *ngFor="let trek of filteredTreks">
+      <!-- Image -->
+      <div class="trek-image-container">
+        <img [src]="trek.image" [alt]="trek.name" />
+        <span class="difficulty-badge">
+          {{ trek.difficulty }}
+        </span>
+      </div>
+
+      <!-- Header -->
+      <div class="trek-header">
+        <h3>{{ trek.name }}</h3>
+        <p class="location">📍 {{ trek.location }}</p>
+      </div>
+
+      <!-- Content -->
+      <div class="trek-content">
+        <div class="trek-details">
+          <span>⭐ {{ trek.rating }}</span>
+          <span>⏱ {{ trek.duration }}</span>
+          <span>👥 {{ trek.groupSize }}</span>
+        </div>
+
+        <div class="trek-date">
+          📅 {{ trek.date }}
+        </div>
+
+        <div class="highlights">
+          <span class="chip" *ngFor="let h of trek.highlights">
+            {{ h }}
+          </span>
+        </div>
+
+        <div class="trek-footer">
+          <div class="price">
+            <span class="price-amount">{{ trek.price }}</span>
+            <span class="price-label">/person</span>
+          </div>
+
+          <button class="book-btn" (click)="viewDetails(trek)">
+            Book Now →
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- Loading State -->
+<div *ngIf="isLoading" class="d-flex justify-content-center align-items-center loader-wrapper" style="min-height: 80vh">
+  <div class="text-center">
+   <img src="../../assets/assets/Bus vehicle.gif" width="180" alt="Loading" />
+    <p class="mt-3 text-muted text-center">Loading trek details...</p>
+  </div>
+</div>
+
+<div *ngIf="!isLoading && (!filteredTreks || !filteredTreks.length)" class="text-center py-5">
+  <h4>No Data found</h4>
+  <p class="text-muted">Try changing filters</p>
+</div>
