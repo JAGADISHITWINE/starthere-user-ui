@@ -4,6 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { TourDetails } from './tour-details';
+import { AuthModalService } from '../auth/auth-modal.service';
 
 
 interface Activity {
@@ -94,9 +95,10 @@ export class TourDetailsComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private tourDetailsService: TourDetails
+    private tourDetailsService: TourDetails,
+    private authModal: AuthModalService
 
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.route.paramMap.subscribe(params => {
@@ -206,8 +208,25 @@ export class TourDetailsComponent implements OnInit {
     return `${this.baseUrl}${path}`;
   }
 
+
+
   bookTrek(tour: any): void {
-    console.log('Booking tour:', tour.name);
-    this.router.navigate(['/booking', tour.id]);
+    const token = sessionStorage.getItem('token');
+    if (!token) {
+      this.openLoginPanel();
+      return;
+    }
+    else {
+      this.router.navigate(['/booking', tour.id]);
+    }
+  }
+
+  async openLoginPanel() {
+    try {
+      const res = await this.authModal.openLogin();
+      console.log('[Header] login resolved ->', res);
+    } catch (err) {
+      console.error('Failed to open login modal', err);
+    }
   }
 }

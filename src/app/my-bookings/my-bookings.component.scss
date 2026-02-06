@@ -1,0 +1,274 @@
+/* ---------------- ROOT ---------------- */
+.dashboard-container {
+  background: #f6f8fb;
+  min-height: 100%;
+  padding-bottom: 2rem;
+}
+
+/* ---------------- STATS ---------------- */
+.stats-section {
+  padding: 1.5rem 0;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.stat-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 1.2rem;
+
+  &.upcoming { background: #0d6efd; }
+  &.completed { background: #198754; }
+  &.total { background: #6f42c1; }
+  &.spent { background: #fd7e14; }
+}
+
+.stat-content {
+  .stat-value {
+    font-size: 1.4rem;
+    font-weight: 700;
+  }
+  .stat-label {
+    font-size: 0.85rem;
+    color: #6c757d;
+  }
+}
+
+/* ---------------- TABS ---------------- */
+.tabs-section {
+  background: #fff;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.tabs-wrapper {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+}
+
+.tab-button {
+  background: none;
+  border: none;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  color: #6c757d;
+  border-bottom: 3px solid transparent;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  white-space: nowrap;
+
+  &.active {
+    color: #0d6efd;
+    border-color: #0d6efd;
+  }
+}
+
+.tab-badge {
+  background: #0d6efd;
+  color: #fff;
+  font-size: 0.7rem;
+  padding: 0.2rem 0.45rem;
+  border-radius: 10px;
+}
+
+/* ---------------- LOADING / ERROR ---------------- */
+.loading-container,
+.error-container {
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+/* ---------------- BOOKINGS ---------------- */
+.booking-card {
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.06);
+}
+
+/* Header */
+.booking-header {
+  position: relative;
+
+  .trek-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+  }
+
+  &-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    color: #fff;
+  }
+}
+
+.booking-reference {
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.booking-badges .badge {
+  margin-left: 0.4rem;
+}
+
+/* Body */
+.booking-body {
+  padding: 1.2rem;
+}
+
+.trek-name {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.trek-location {
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+/* Details */
+.booking-details {
+  margin-top: 1rem;
+}
+
+.detail-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 0.8rem;
+}
+
+.detail-item {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+
+  i {
+    font-size: 1.1rem;
+  }
+}
+
+.detail-label {
+  font-size: 0.75rem;
+  color: #6c757d;
+}
+
+.detail-value {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* Payment */
+.payment-info {
+  border-top: 1px dashed #dee2e6;
+  padding-top: 1rem;
+  margin-top: 1rem;
+}
+
+.payment-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+}
+
+/* Add-ons */
+.addons-section {
+  margin-top: 1rem;
+}
+
+.addon-tag {
+  background: #f1f3f5;
+  padding: 0.3rem 0.6rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  margin-right: 0.4rem;
+  display: inline-block;
+}
+
+/* Cancellation */
+.cancellation-warning {
+  margin-top: 1rem;
+  background: #fff3cd;
+  color: #664d03;
+  padding: 0.8rem;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  display: flex;
+}
+
+/* Actions */
+.booking-actions {
+  padding: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  border-top: 1px solid #e9ecef;
+}
+
+/* ---------------- EMPTY ---------------- */
+.empty-state {
+  text-align: center;
+  padding: 4rem 1rem;
+  color: #6c757d;
+
+  .empty-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+}
+
+/* ---------------- RESPONSIVE ---------------- */
+@media (max-width: 992px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 576px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-row {
+    grid-template-columns: 1fr;
+  }
+
+  .booking-header .trek-image {
+    height: 160px;
+  }
+
+  .booking-actions {
+    flex-direction: column;
+
+    button {
+      width: 100%;
+    }
+  }
+}

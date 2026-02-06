@@ -1,0 +1,293 @@
+
+/* Add these styles to your component CSS */
+.cancel-modal-content {
+  max-height: 70vh; /* 80% of viewport height */
+  overflow-y: auto; /* Enable vertical scrolling */
+  padding: 20px;
+}
+
+/* Keep action buttons fixed at bottom */
+.modal-actions {
+  bottom: 0;
+  background: white;
+  padding: 20px;
+  border-top: 2px solid #e0e0e0;
+  margin: 0 -20px -20px -20px; /* Negative margin to extend full width */
+  box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1;
+}
+
+.section-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+.required {
+  color: #dc3545;
+}
+
+/* Booking Summary */
+.booking-summary-card {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.summary-label {
+  font-size: 0.85rem;
+  color: #666;
+  margin-bottom: 0.25rem;
+}
+
+.summary-value {
+  font-weight: 600;
+  color: #333;
+}
+
+/* Refund Card */
+.refund-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.refund-card .section-title {
+  color: white;
+}
+
+.refund-breakdown {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+}
+
+.refund-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+}
+
+.refund-row.highlight {
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 0.75rem 0;
+  margin: 0.5rem 0;
+}
+
+.refund-value.success {
+  color: #28a745;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.refund-value.danger {
+  color: #ff6b6b;
+}
+
+.refund-info {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.75rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+}
+
+/* Policy Card */
+.policy-card {
+  background: white;
+  border: 2px solid #e9ecef;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.policy-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.policy-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.95rem;
+}
+
+.policy-item i {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.days-remaining {
+  background: #fff3cd;
+  padding: 0.75rem;
+  border-radius: 6px;
+  text-align: center;
+  color: #856404;
+}
+
+/* Reason Card */
+.reason-card {
+  background: white;
+  border: 2px solid #e9ecef;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+/* Terms Card */
+.terms-card {
+  background: #fff3cd;
+  border: 2px solid #ffc107;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.terms-checkbox {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  align-items: flex-start;
+}
+
+.terms-checkbox input {
+  margin-top: 0.25rem;
+  width: 20px;
+  height: 20px;
+}
+
+.terms-list {
+  margin: 0;
+  padding-left: 2rem;
+  font-size: 0.9rem;
+  color: #856404;
+}
+
+.terms-list li {
+  margin-bottom: 0.5rem;
+}
+
+/* Modal Actions */
+.modal-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.modal-actions .btn {
+  flex: 1;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-actions {
+    flex-direction: column-reverse;
+  }
+
+  .modal-actions .btn {
+    width: 100%;
+  }
+}
+
+.success-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.success-icon {
+  font-size: 80px;
+  color: #28a745;
+  margin-bottom: 20px;
+  animation: scaleIn 0.5s ease-out;
+}
+
+.success-screen h2 {
+  color: #2c3e50;
+  margin-bottom: 30px;
+  font-size: 28px;
+}
+
+.success-details {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 30px;
+  margin: 20px 0;
+  max-width: 500px;
+}
+
+.refund-info {
+  font-size: 24px;
+  color: #28a745;
+  margin-bottom: 20px;
+}
+
+.refund-info strong {
+  display: block;
+  font-size: 14px;
+  color: #6c757d;
+  margin-bottom: 5px;
+}
+
+.processing-info,
+.method-info {
+  color: #495057;
+  margin: 15px 0;
+  font-size: 14px;
+}
+
+.closing-message {
+  color: #6c757d;
+  font-size: 12px;
+  margin-top: 30px;
+  font-style: italic;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}

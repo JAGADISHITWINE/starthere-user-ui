@@ -1,3 +1,4 @@
+import { CancleBookingsComponent } from '../../cancle-bookings/cancle-bookings.component';
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
@@ -8,18 +9,19 @@ import { AuthModalService } from '../../auth/auth-modal.service';
 @Component({
   selector: 'app-auth-modal',
   standalone: true,
-  imports: [CommonModule, LoginComponent, RegisterComponent],
+  imports: [CommonModule, LoginComponent, RegisterComponent, CancleBookingsComponent],
   template: `
     <div class="auth-modal-backdrop" *ngIf="visible" (click)="onBackdropClick()"></div>
 
-    <div class="auth-modal" *ngIf="visible" role="dialog" aria-modal="true">
-      <div class="auth-modal-dialog">
+    <div class="auth-modal " *ngIf="visible" role="dialog" aria-modal="true">
+      <div class="auth-modal-dialog ">
         <div class="auth-modal-content">
           <div class="auth-modal-body p-3">
 
             <ng-container [ngSwitch]="view">
               <app-login *ngSwitchCase="'login'" [embedded]="true" (authSuccess)="onAuthSuccess($event)" (cancel)="close()" (switchToRegisterRequested)="switchToRegister()"></app-login>
               <app-register *ngSwitchCase="'register'" [embedded]="true" (authSuccess)="onAuthSuccess($event)" (cancel)="close()" (switchToLoginRequested)="switchToLogin()"></app-register>
+              <app-cancle-bookings *ngSwitchCase="'cancle'" [booking]="booking" (modalClosed)="onCancelModalClosed($event)"></app-cancle-bookings>
             </ng-container>
           </div>
         </div>
@@ -86,7 +88,8 @@ import { AuthModalService } from '../../auth/auth-modal.service';
 })
 export class AuthModalComponent implements OnDestroy {
   visible = false;
-  view: 'login' | 'register' | null = null;
+  view: 'login' | 'register' | 'cancle' | null = null;
+  booking: any = null;
 
   private sub: Subscription;
 
@@ -94,6 +97,7 @@ export class AuthModalComponent implements OnDestroy {
     this.sub = this.authModal.state$.subscribe(s => {
       this.visible = s.open;
       this.view = s.view;
+      this.booking = (s as any).payload || null;
     });
   }
 
@@ -104,6 +108,14 @@ export class AuthModalComponent implements OnDestroy {
   onAuthSuccess(payload: any) {
     // forward to service which will resolve the pending promise
     this.authModal.resolve(payload);
+  }
+
+  onCancelModalClosed(cancelled: boolean) {
+    if (cancelled) {
+      this.authModal.resolve({ cancelled: true, booking: this.booking });
+    } else {
+      this.close();
+    }
   }
 
   close() {

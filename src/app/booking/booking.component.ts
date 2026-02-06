@@ -21,6 +21,7 @@ export class BookingComponent implements OnInit {
   trekId: number = 0;
   currentStep: number = 1;
   isLoading: boolean = true;
+  termsAccepted: boolean = false; 
 
   // Trek data from API
   trek: any = null;
@@ -216,10 +217,19 @@ export class BookingComponent implements OnInit {
     this.successMessage = '';
     this.errorMessage = '';
     this.isSubmitting = true;
-    const userData = sessionStorage.getItem('userData');
-    if (userData) {
-      const user = JSON.parse(userData);
-      this.userId = user.id;
+
+    const token = sessionStorage.getItem("token");
+
+    let user: any = {};
+
+    if (token) {
+      try {
+        user = JSON.parse(atob(token.split(".")[1]));
+        this.userId = user.id
+      } catch (e) {
+        console.error("Invalid JWT", e);
+        user = {};
+      }
     }
 
     const bookingData: BookingData = {
@@ -262,7 +272,6 @@ export class BookingComponent implements OnInit {
           this.resetBooking();
           this.errorMessage = ''
           this.isSubmitting = false;
-          this.router.navigateByUrl('')
         }, 1500)
       }
     });

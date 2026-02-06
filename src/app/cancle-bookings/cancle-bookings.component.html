@@ -1,0 +1,181 @@
+<div class="cancel-modal-content">
+  <div *ngIf="!showSuccessScreen">
+
+    <!-- Booking Summary -->
+    <div class="booking-summary-card">
+      <h3 class="section-title">
+        <i class="bi bi-info-circle me-2"></i>
+        Booking Details
+      </h3>
+      <div class="summary-grid">
+        <div class="summary-item">
+          <span class="summary-label">Trek:</span>
+          <span class="summary-value">{{ booking?.trek_name }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Reference:</span>
+          <span class="summary-value">{{ booking?.booking_reference }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Trek Date:</span>
+          <span class="summary-value">{{ booking?.start_date | date:'MMM dd, yyyy' }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Participants:</span>
+          <span class="summary-value">{{ booking?.participants }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Refund Calculation -->
+    <div class="refund-card">
+      <h3 class="section-title">
+        <i class="bi bi-cash-coin me-2"></i>
+        Refund Calculation
+      </h3>
+
+      <div class="refund-breakdown">
+        <div class="refund-row">
+          <span class="refund-label">Total Amount Paid:</span>
+          <span class="refund-value">₹{{ booking?.total_amount | number:'1.0-0' }}</span>
+        </div>
+
+        <div class="refund-row highlight">
+          <span class="refund-label">
+            Refund Amount ({{ refundPercentage }}%):
+          </span>
+          <span class="refund-value success">₹{{ refundAmount | number:'1.0-0' }}</span>
+        </div>
+
+        <div class="refund-row" *ngIf="cancellationFee > 0">
+          <span class="refund-label">Cancellation Fee:</span>
+          <span class="refund-value danger">- ₹{{ cancellationFee | number:'1.0-0' }}</span>
+        </div>
+      </div>
+
+      <div class="refund-info">
+        <i class="bi bi-clock-history me-2"></i>
+        <span>Refund will be processed within 7-10 business days</span>
+      </div>
+    </div>
+
+    <!-- Cancellation Policy -->
+    <div class="policy-card">
+      <h3 class="section-title">
+        <i class="bi bi-shield-exclamation me-2"></i>
+        Cancellation Policy
+      </h3>
+
+      <div class="policy-list">
+        <div class="policy-item">
+          <i class="bi bi-check-circle text-success"></i>
+          <span>30+ days before trek: <strong>100% refund</strong></span>
+        </div>
+        <div class="policy-item">
+          <i class="bi bi-check-circle text-info"></i>
+          <span>15-29 days before trek: <strong>75% refund</strong></span>
+        </div>
+        <div class="policy-item">
+          <i class="bi bi-check-circle text-warning"></i>
+          <span>7-14 days before trek: <strong>50% refund</strong></span>
+        </div>
+        <div class="policy-item">
+          <i class="bi bi-x-circle text-danger"></i>
+          <span>Less than 7 days: <strong>No refund</strong></span>
+        </div>
+      </div>
+
+      <div class="days-remaining">
+        <i class="bi bi-hourglass-split me-2"></i>
+        <strong>{{ getDaysUntilTrek() }} days</strong> until your trek
+      </div>
+    </div>
+
+    <!-- Cancellation Reason -->
+    <div class="reason-card">
+      <h3 class="section-title">
+        <i class="bi bi-pencil-square me-2"></i>
+        Reason for Cancellation <span class="required">*</span>
+      </h3>
+
+      <select class="form-select mb-3" [(ngModel)]="cancellationReason">
+        <option value="" disabled selected>Select a reason</option>
+        <option *ngFor="let reason of cancellationReasons" [value]="reason">
+          {{ reason }}
+        </option>
+      </select>
+
+      <textarea *ngIf="cancellationReason === 'Other'" class="form-control" rows="3" [(ngModel)]="cancellationReason"
+        placeholder="Please specify your reason..."></textarea>
+    </div>
+
+    <!-- Terms & Conditions -->
+    <div class="terms-card">
+      <div class="terms-checkbox">
+        <input type="checkbox" id="acceptTerms" [(ngModel)]="acceptedTerms" class="form-check-input" />
+        <label for="acceptTerms" class="form-check-label">
+          I understand and accept the cancellation policy. I acknowledge that:
+        </label>
+      </div>
+
+      <ul class="terms-list">
+        <li>The refund will be processed as per the cancellation policy stated above</li>
+        <li>Refund will be credited to the original payment method</li>
+        <li>Processing may take 7-10 business days</li>
+        <li>This action cannot be undone once confirmed</li>
+        <li>Any add-ons purchased will also be cancelled</li>
+      </ul>
+    </div>
+
+    <!-- Error Message -->
+    <div class="alert alert-danger" *ngIf="errorMessage">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i>
+      {{ errorMessage }}
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="modal-actions">
+      <button class="btn btn-secondary" (click)="closeModal()" [disabled]="isSubmitting">
+        <i class="bi bi-arrow-left me-2"></i>
+        Keep Booking
+      </button>
+
+      <button class="btn btn-danger" (click)="submitCancellation()" [disabled]="!canSubmit">
+        <span *ngIf="!isSubmitting">
+          <i class="bi bi-x-circle me-2"></i>
+          Confirm Cancellation
+        </span>
+        <span *ngIf="isSubmitting">
+          <ion-spinner name="dots"></ion-spinner>
+          Cancelling...
+        </span>
+      </button>
+    </div>
+
+
+  </div>
+
+  <div *ngIf="showSuccessScreen" class="success-screen">
+    <div class="success-icon">
+      <i class="bi bi-check-circle-fill"></i>
+    </div>
+    <h2>Cancellation Successful!</h2>
+    <div class="success-details">
+      <p class="refund-info">
+        <strong>Refund Amount:</strong> ₹{{ refundAmount | number:'1.2-2' }}
+      </p>
+      <p class="processing-info">
+        <i class="bi bi-clock-history me-2"></i>
+        Refund will be processed within 7-10 business days
+      </p>
+      <p class="method-info">
+        <i class="bi bi-credit-card me-2"></i>
+        Amount will be credited to your original payment method
+      </p>
+    </div>
+    <p class="closing-message">
+      This window will close automatically...
+    </p>
+  </div>
+
+</div>

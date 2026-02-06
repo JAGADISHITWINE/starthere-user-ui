@@ -3,7 +3,6 @@ import { Component, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { Dashboard } from './dashboard';
-import { AuthModalService } from '../auth/auth-modal.service';
 
 interface Filter {
   id: string;
@@ -19,7 +18,7 @@ interface Filter {
 })
 export class DashboardComponent implements OnInit {
 
-  constructor(private router: Router, private dashboardService: Dashboard, private authModal: AuthModalService) { }
+  constructor(private router: Router, private dashboardService: Dashboard) { }
 
   treks: any[] = []; // Changed to array
   selectedFilter: string = 'all';
@@ -131,23 +130,6 @@ export class DashboardComponent implements OnInit {
   }
 
   viewDetails(trek: any): void {
-    const token = sessionStorage.getItem('token');
-    if (!token) {
-      this.openLoginPanel();
-      return;
-    }
-    else {
       this.router.navigate(['/tour-details', trek.id]);
-    }
   }
-
-  async openLoginPanel() {
-    try {
-      const res = await this.authModal.openLogin();
-      console.log('[Header] login resolved ->', res);
-    } catch (err) {
-      console.error('Failed to open login modal', err);
-    }
-  }
-
 }

@@ -1,6 +1,5 @@
-<div *ngIf="tour && !isLoading">
   <!-- Header -->
-  <nav class="navbar navbar-dark bg-primary sticky-top">
+  <nav class="navbar navbar-dark bg-primary">
     <div class="container-fluid">
       <a class="btn btn-outline-light" routerLink="">
         <i>←</i>
@@ -10,7 +9,7 @@
       <!-- Spacer for centering -->
     </div>
   </nav>
-
+<div *ngIf="tour && !isLoading">
   <!-- Hero Image -->
   <div class="hero-image">
     <img [src]="getImageUrl(tour.image)" [alt]="tour.name" class="img-fluid w-100"

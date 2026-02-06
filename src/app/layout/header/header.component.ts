@@ -14,50 +14,114 @@ import { AuthModalService } from 'src/app/auth/auth-modal.service';
   imports: [IonicModule, RouterLink, CommonModule, FormsModule]
 })
 export class HeaderComponent implements OnInit {
-  showLogin = true;
-  showLogout = false;
-  showLoginPanel = false;
-  showRegisterPanel = false;
 
-  constructor(private routes: Router, private authService: Auth, private authModal: AuthModalService) { }
+  // Auth state
+  isLoggedIn = false;
+
+  // UI state
+  isUserDropdownOpen = false;
+  isMobileMenuOpen = false;
+
+  // User data
+  userName = '';
+  userEmail = '';
+  profilePicture: string | null = null;
+
+  constructor(
+    private routes: Router,
+    private authService: Auth,
+    private authModal: AuthModalService
+  ) {}
 
   ngOnInit() {
     this.authService.authStatus$.subscribe(isLoggedIn => {
-      this.showLogin = !isLoggedIn;
-      this.showLogout = isLoggedIn;
+      this.isLoggedIn = isLoggedIn;
+
+      if (isLoggedIn) {
+        const token = sessionStorage.getItem('token');
+          let user: any = {};
+          if (token) {
+            try {
+              user = JSON.parse(atob(token.split('.')[1]));
+            } catch (e) {
+              user = {};
+            }
+          }
+          this.userName = user.name || 'User';
+          this.userEmail = user.email || '';
+
+      } else {
+        this.resetUserData();
+      }
     });
   }
 
+  /* ---------------- AUTH ---------------- */
+
   async openLoginPanel() {
-    try {
-      const res = await this.authModal.openLogin();
-    } catch (err) {
-    }
+    await this.authModal.openLogin();
   }
 
   async openRegisterPanel() {
-    try {
-      const res = await this.authModal.openRegister();
-    } catch (err) {
-    }
+    await this.authModal.openRegister();
   }
 
-  onAuthSuccess(event: any) {
-    // auth service already updated state by components
-    this.showLoginPanel = false;
-    this.showRegisterPanel = false;
-  }
-
-  onCancelPanel() {
-    this.showLoginPanel = false;
-    this.showRegisterPanel = false;
-  }
-
-  Logout() {
+  logout() {
     sessionStorage.removeItem('token');
     sessionStorage.removeItem('userData');
-    this.routes.navigateByUrl('')
-    this.showLogin = true;
-    this.showLogout = false;
+
+    this.resetUserData();
+
+    this.closeUserDropdown();
+    this.closeMobileMenu();
+
+    this.routes.navigateByUrl('/');
+  }
+
+  /* ---------------- USER UI ---------------- */
+
+  toggleUserDropdown() {
+    this.isUserDropdownOpen = !this.isUserDropdownOpen;
+  }
+
+  closeUserDropdown() {
+    this.isUserDropdownOpen = false;
+  }
+
+  getUserInitials(): string {
+    if (!this.userName) return 'U';
+    return this.userName
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase();
+  }
+
+  /* ---------------- MOBILE ---------------- */
+
+  toggleMobileMenu() {
+    this.isMobileMenuOpen = !this.isMobileMenuOpen;
+  }
+
+  closeMobileMenu() {
+    this.isMobileMenuOpen = false;
+  }
+
+  /* ---------------- NAV ---------------- */
+
+  navigateTo(route: string) {
+    this.routes.navigateByUrl(route);
+    this.closeUserDropdown();
+    this.closeMobileMenu();
+  }
+
+  /* ---------------- HELPERS ---------------- */
+
+  private resetUserData() {
+    this.userName = '';
+    this.userEmail = '';
+    this.profilePicture = null;
+    this.isLoggedIn = false;
   }
 }
+

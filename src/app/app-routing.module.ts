@@ -46,6 +46,16 @@ const routes: Routes = [
         path: 'blog-details',
         loadChildren: () =>
           import('./blog-detail/blog-detail-module').then(m => m.BlogDetailModule)
+      },
+      {
+        path: 'my-bookings',
+        loadChildren: () =>
+          import('./my-bookings/my-bookings-module').then(m => m.MyBookingsModule)
+      },
+      {
+        path: 'cancle-bookings',
+        loadChildren: () =>
+          import('./cancle-bookings/cancle-bookings-module').then(m => m.CancleBookingsModule)
       }
     ]
   }

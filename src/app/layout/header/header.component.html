@@ -1,19 +1,179 @@
+<!-- header.component.html -->
+
 <header class="app-header">
-  <div class="header-left">
-    <img class='logo' src="../../../assets/assets/navbarimg.png" alt="Logo" routerLink="" />
-    <img class='title' src="../../../assets/assets/titlename.png" alt="Logo" routerLink="" />
+  <div class="container-fluid">
+    <div class="header-content">
+      
+      <!-- Logo Section -->
+      <div class="header-left">
+        <img 
+          class='logo' 
+          src="../../../assets/assets/navbarimg.png" 
+          alt="Logo" 
+          routerLink="/"
+          style="cursor: pointer;"
+        />
+        <img 
+          class='title' 
+          src="../../../assets/assets/titlename.png" 
+          alt="Logo" 
+          routerLink="/"
+          style="cursor: pointer;"
+        />
+      </div>
+
+
+      <!-- User Section -->
+      <div class="header-right">
+        
+        <!-- Logged Out - Login Button -->
+        <button 
+          class="login-btn" 
+          *ngIf="!isLoggedIn"
+          (click)="openLoginPanel()"
+        >
+          <i class="bi bi-person-fill me-2"></i>
+          Login
+        </button>
+
+        <!-- Logged In - User Menu -->
+        <div class="user-menu" *ngIf="isLoggedIn">
+          
+          <!-- User Avatar Button -->
+          <button 
+            class="user-avatar-btn"
+            (click)="toggleUserDropdown()"
+          >
+            <div class="user-avatar" *ngIf="!profilePicture">
+              {{ getUserInitials() }}
+            </div>
+            <img 
+              *ngIf="profilePicture"
+              [src]="profilePicture" 
+              alt="Profile"
+              class="user-avatar-img"
+            />
+            <span class="user-name">{{ userName }}</span>
+            <i class="bi bi-chevron-down ms-1"></i>
+          </button>
+
+          <!-- User Dropdown -->
+          <div 
+            class="user-dropdown"
+            [class.show]="isUserDropdownOpen"
+            (clickOutside)="closeUserDropdown()"
+          >
+            <div class="dropdown-header">
+              <div class="user-avatar-large" *ngIf="!profilePicture">
+                {{ getUserInitials() }}
+              </div>
+              <img 
+                *ngIf="profilePicture"
+                [src]="profilePicture" 
+                alt="Profile"
+                class="user-avatar-img-large"
+              />
+              <div class="user-info">
+                <div class="user-name-large">{{ userName }}</div>
+                <div class="user-email">{{ userEmail }}</div>
+              </div>
+            </div>
+
+            <div class="dropdown-divider"></div>
+
+            <a 
+              class="dropdown-item"
+              (click)="navigateTo('/my-bookings')"
+            >
+              <i class="bi bi-calendar-check me-2"></i>
+              My Bookings
+            </a>
+
+            <div class="dropdown-divider"></div>
+
+            <a 
+              class="dropdown-item text-danger"
+              (click)="logout()"
+            >
+              <i class="bi bi-box-arrow-right me-2"></i>
+              Logout
+            </a>
+          </div>
+        </div>
+
+        <!-- Mobile Menu Toggle -->
+        <button 
+          class="mobile-menu-btn"
+          (click)="toggleMobileMenu()"
+        >
+          <i class="bi" [ngClass]="isMobileMenuOpen ? 'bi-x-lg' : 'bi-list'"></i>
+        </button>
+      </div>
+
+    </div>
   </div>
 
-  <button class="menu-btn text-dark" *ngIf="showLogin"> <span
-      class="input-group-text border-1 border-dark bg-transparent rounded-circle" (click)="openLoginPanel()">
-      <i class="bi bi-person-fill"></i>
-    </span>
-  </button>
-  <button class="menu-btn text-dark" *ngIf="showLogout" (click)="Logout()"> <span
-      class="input-group-text border-1 border-dark bg-transparent rounded-circle">
-      <i class="bi bi-box-arrow-in-right"></i>
-    </span>
-  </button>
+  <!-- Mobile Navigation Menu -->
+  <div 
+    class="mobile-nav"
+    [class.show]="isMobileMenuOpen"
+  >
+    <div class="mobile-nav-content">
+      
+      <!-- User Info (Mobile) -->
+      <div class="mobile-user-section" *ngIf="isLoggedIn">
+        <div class="mobile-user-avatar" *ngIf="!profilePicture">
+          {{ getUserInitials() }}
+        </div>
+        <img 
+          *ngIf="profilePicture"
+          [src]="profilePicture" 
+          alt="Profile"
+          class="mobile-user-avatar-img"
+        />
+        <div class="mobile-user-info">
+          <div class="mobile-user-name">{{ userName }}</div>
+          <div class="mobile-user-email">{{ userEmail }}</div>
+        </div>
+      </div>
 
-  <!-- Auth is opened as modals from header -->
+
+      <!-- User Actions (Mobile) -->
+      <div class="mobile-user-actions" *ngIf="isLoggedIn">
+        <a 
+          class="mobile-nav-link"
+          (click)="navigateTo('/my-bookings')"
+        >
+          <i class="bi bi-calendar-check"></i>
+          My Bookings
+        </a>
+        <a 
+          class="mobile-nav-link text-danger"
+          (click)="logout()"
+        >
+          <i class="bi bi-box-arrow-right"></i>
+          Logout
+        </a>
+      </div>
+
+      <!-- Login Button (Mobile) -->
+      <div class="mobile-login-section" *ngIf="!isLoggedIn">
+        <button 
+          class="mobile-login-btn"
+          (click)="openLoginPanel()"
+        >
+          <i class="bi bi-person-fill me-2"></i>
+          Login / Sign Up
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Overlay (Mobile) -->
+  <div 
+    class="mobile-overlay"
+    [class.show]="isMobileMenuOpen"
+    (click)="closeMobileMenu()"
+  ></div>
 </header>
