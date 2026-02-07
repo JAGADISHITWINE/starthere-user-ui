@@ -72,7 +72,7 @@ interface MappedTour {
     activities: Activity[];
   }[];
   nextDates: string[];
-  availableSlots: number;
+  availableSlots: any;
   minAge: number;
   maxAge: number;
 }
@@ -103,10 +103,7 @@ export class TourDetailsComponent implements OnInit {
   ngOnInit() {
     this.route.paramMap.subscribe(params => {
       const id = Number(params.get('id'));
-      console.log(id)
-
       if (!id) return;
-
       this.tourId = +id;
       this.isLoading = true;
       this.tour = null;
@@ -128,12 +125,11 @@ export class TourDetailsComponent implements OnInit {
   }
 
   mapTourData(result: any) {
-    const firstBatch = result.batches && result.batches.length > 0 ? result.batches[0] : null;
-
+    const firstBatch = result.batch;
     this.tour = {
-      id: result.id,
+      id: firstBatch?.batchId,
       name: result.name,
-      location: result.location,
+      location: result.location,  
       category: result.category,
       difficulty: result.difficulty,
       fitnessLevel: result.fitness_level,
@@ -171,9 +167,9 @@ export class TourDetailsComponent implements OnInit {
       ) || [],
 
       // Additional info
-      availableSlots: firstBatch?.availableSlots || 0,
-      minAge: firstBatch?.min_age || 0,
-      maxAge: firstBatch?.max_age || 0
+      availableSlots: firstBatch?.availableSlots - firstBatch?.bookedSlots,
+      minAge: firstBatch?.minAge || 0,
+      maxAge: firstBatch?.maxAge || 0
     };
   }
 
@@ -224,9 +220,37 @@ export class TourDetailsComponent implements OnInit {
   async openLoginPanel() {
     try {
       const res = await this.authModal.openLogin();
-      console.log('[Header] login resolved ->', res);
     } catch (err) {
-      console.error('Failed to open login modal', err);
     }
   }
+
+  // Add these methods to your component
+
+getBadgeClass(tour: any): string {
+  const remaining = tour.availableSlots;
+  
+  if (remaining <= 0) {
+    return 'bg-danger';
+  } else if (remaining <= 3) {
+    return 'bg-warning text-dark';
+  } else if (remaining <= 10) {
+    return 'bg-info text-dark';
+  } else {
+    return 'bg-success';
+  }
+}
+
+getBadgeText(tour: any): string {
+  const remaining = tour.availableSlots;
+  
+  if (remaining <= 0) {
+    return 'Sold Out';
+  } else if (remaining <= 3) {
+    return `Only ${remaining} seat${remaining === 1 ? '' : 's'} left!`;
+  } else if (remaining <= 10) {
+    return `Selling Fast - ${remaining} slots left`;
+  } else {
+    return `${remaining} slots available`;
+  }
+}
 }

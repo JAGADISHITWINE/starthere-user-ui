@@ -40,7 +40,6 @@ export class DashboardComponent implements OnInit {
         // Check if data.data is an array or single object
         if (Array.isArray(data.data)) {
           this.treks = data.data.map((trek: any) => this.mapTourData(trek));
-
         } else {
           // If it's a single object, wrap it in an array
           this.treks = [this.mapTourData(data.data)];

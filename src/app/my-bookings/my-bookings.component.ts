@@ -1,7 +1,7 @@
 import { CommonModule } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
 import { IonicModule } from "@ionic/angular";
-import { RouterLink } from "@angular/router";
+import { Router, RouterLink } from "@angular/router";
 import { Auth } from "../core/auth";
 import { MyBookings } from "./my-bookings";
 import { AuthModalService } from "../auth/auth-modal.service";
@@ -53,7 +53,8 @@ export class MyBookingsComponent implements OnInit {
 
   constructor(
     private bookingService: MyBookings,
-    private authModal: AuthModalService
+    private authModal: AuthModalService,
+    private router: Router
   ) { }
 
   ngOnInit() {
@@ -170,12 +171,8 @@ export class MyBookingsComponent implements OnInit {
     this.activeTab = tab;
   }
 
-
   viewBookingDetails(booking: any) {
-    console.log(booking)
-    // this.bookingService.viewBookingDetails(booking).subscribe((res:any)=>{
-
-    // })
+    this.router.navigate(['/tour-details', booking.trek_id]);
   }
 
 
@@ -208,8 +205,6 @@ export class MyBookingsComponent implements OnInit {
 
         // Cleanup
         window.URL.revokeObjectURL(url);
-
-        console.log('Downloaded receipt:', filename);
       },
       error: (error) => {
         console.error('Download failed:', error);
@@ -280,9 +275,6 @@ export class MyBookingsComponent implements OnInit {
    * Check if booking can be cancelled
    */
   canCancel(booking: Booking): boolean {
-    // Can cancel if:
-    // 1. Status is pending or confirmed
-    // 2. Trek is at least 7 days away
     const daysUntil = this.getDaysUntilTrek(booking.start_date);
     return (
       (booking.booking_status === "pending" ||

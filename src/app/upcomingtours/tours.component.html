@@ -162,7 +162,7 @@
     class="card mb-3 shadow-sm trek-card"
     *ngFor="let trek of currentMonthTreks"
     [class.opacity-50]="trek.status === 'sold-out'"
-    (click)="viewDetails(trek.id)"
+    (click)="viewDetails(trek.batch_id)"
     style="cursor:pointer"
   >
     <div class="card-body">
@@ -215,7 +215,7 @@
             [class.btn-success]="trek.status !== 'sold-out'"
             [class.btn-secondary]="trek.status === 'sold-out'"
             [disabled]="trek.status === 'sold-out'"
-            (click)="$event.stopPropagation(); viewDetails(trek.id)"
+            (click)="$event.stopPropagation(); viewDetails(trek.batch_id)"
           >
             {{ trek.status === 'sold-out' ? 'SOLD OUT' : 'VIEW DETAILS' }}
           </button>
