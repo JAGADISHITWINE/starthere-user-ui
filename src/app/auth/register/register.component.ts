@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AlertController, IonicModule } from '@ionic/angular';
 import { Register } from './register';
@@ -13,103 +13,186 @@ import { Auth } from 'src/app/core/auth';
   standalone: true,
   imports: [IonicModule, CommonModule, FormsModule, ReactiveFormsModule]
 })
+
 export class RegisterComponent implements OnInit {
   @Input() embedded: boolean = false;
-  @Output() authSuccess = new EventEmitter<any>();
-  @Output() cancel = new EventEmitter<void>();
-  @Output() switchToLoginRequested = new EventEmitter<void>();
+  @Output() authSuccess             = new EventEmitter<any>();
+  @Output() cancel                  = new EventEmitter<void>();
+  @Output() switchToLoginRequested  = new EventEmitter<void>();
 
-  registerForm: any
-  showPassword = false;
+  registerForm!: FormGroup;
+  showPassword        = false;
   showConfirmPassword = false;
-  errorMessage = '';
-  isLoading = false;
-  successMessage = '';
+  errorMessage        = '';
+  successMessage      = '';
+  isLoading           = false;
 
+  // OTP state
+  step: 'form' | 'otp' = 'form';   // ← controls which view shows
+  otpValue             = '';
+  otpLoading           = false;
+  otpError             = '';
+  resendLoading        = false;
+  resendCooldown       = 0;         // countdown seconds
+  private cooldownRef: any;
+
+  constructor(
+    private fb:              FormBuilder,
+    private registerService: Register,
+    private authService:     Auth,
+  ) {}
 
   ngOnInit() {
-    this.registerForm = new FormGroup({
-      name: new FormControl('', Validators.required),
-      email: new FormControl('', [Validators.required, Validators.email]),
-      phone: new FormControl('', [Validators.required, Validators.pattern('^[0-9]{10}$')]),
-      password: new FormControl('', Validators.required),
-      confirmPassword: new FormControl('', Validators.required)
+    this.registerForm = this.fb.group({
+      name:            ['', Validators.required],
+      email:           ['', [Validators.required, Validators.email]],
+      phone:           ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
+      password:        ['', [Validators.required, Validators.minLength(6)]],
+      confirmPassword: ['', Validators.required]
     });
   }
 
-  constructor(
-    private router: Router,
-    private alertController: AlertController,
-    private registerService: Register,
-    private authService: Auth,
-
-  ) { }
-
+  // ── Step 1: Submit form → send OTP ──────────────────
   async register() {
-    // Fix: Access form values correctly
     if (this.registerForm.value.password !== this.registerForm.value.confirmPassword) {
       this.errorMessage = 'Passwords do not match';
-      this.successMessage = '';
       return;
     }
 
-    this.isLoading = true;
+    this.isLoading    = true;
     this.errorMessage = '';
-    this.successMessage = '';
 
-    this.registerService.register(this.registerForm.value).subscribe(
-      async (res: any) => {
-        console.log('[RegisterComponent] Registration response:', res);
+    this.registerService.sendOtp(this.registerForm.value.email,this.registerForm.value.phone).subscribe({
+      next: (res: any) => {
         this.isLoading = false;
+        if (res.response) {
+          this.step = 'otp';           // ← show OTP screen
+          this.startResendCooldown();
+        } else {
+          this.errorMessage = res.message || 'Failed to send OTP.';
+        }
+      },
+      error: (err) => {
+        this.isLoading    = false;
+        this.errorMessage = err.error?.message || 'Failed to send OTP.';
+      }
+    });
+  }
 
-        if (res.response === true) {
-          // Show success message
+  // ── Step 2: Verify OTP → complete registration ──────
+  verifyOtp() {
+    if (this.otpValue.length !== 6) {
+      this.otpError = 'Please enter the 6-digit OTP';
+      return;
+    }
+
+    this.otpLoading = true;
+    this.otpError   = '';
+
+    this.registerService.verifyOtp(
+      this.registerForm.value.email,
+      this.otpValue
+    ).subscribe({
+      next: (res: any) => {
+        if (res.response) {
+          // OTP verified — now complete registration
+          this.completeRegistration();
+        } else {
+          this.otpLoading = false;
+          this.otpError   = res.message || 'Invalid OTP.';
+        }
+      },
+      error: (err) => {
+        this.otpLoading = false;
+        this.otpError   = err.error?.message || 'Invalid OTP.';
+      }
+    });
+  }
+
+  // ── Step 3: Register after OTP verified ─────────────
+  private completeRegistration() {
+    this.registerService.register(this.registerForm.value).subscribe({
+      next: (res: any) => {
+        this.otpLoading = false;
+        if (res.response) {
           this.successMessage = 'Registration successful! Welcome aboard!';
-          this.errorMessage = '';
-
-          // Auto-dismiss and proceed after 2 seconds
           setTimeout(() => {
-            this.successMessage = '';
-            // mark auth and close modal with token
             this.authService.loginSuccess(res.token);
-            // notify host (embedded modal container or parent) of success
             this.authSuccess.emit({ success: true, token: res.token });
           }, 2000);
         } else {
-          this.errorMessage = res.message || 'Registration failed. Please try again.';
+          this.otpError = res.message || 'Registration failed.';
         }
       },
-      (error) => {
-        // Handle error case
-        this.isLoading = false;
-        this.errorMessage = error.error?.message || 'Registration failed. Please try again.';
-        this.successMessage = '';
+      error: (err) => {
+        this.otpLoading = false;
+        this.otpError   = err.error?.message || 'Registration failed.';
       }
-    );
+    });
   }
 
-  togglePassword() {
-    this.showPassword = !this.showPassword;
+  // ── Resend OTP with 30s cooldown ────────────────────
+  resendOtp() {
+    this.resendLoading = true;
+    this.otpError      = '';
+
+    this.registerService.sendOtp(this.registerForm.value.email,this.registerForm.value.phone).subscribe({
+      next: () => {
+        this.resendLoading = false;
+        this.otpValue      = '';
+        this.startResendCooldown();
+      },
+      error: () => { this.resendLoading = false; }
+    });
   }
 
-  toggleConfirmPassword() {
-    this.showConfirmPassword = !this.showConfirmPassword;
-  }
-
-  async switchToLogin() {
-    console.log('[RegisterComponent] switchToLogin clicked');
-    this.switchToLoginRequested.emit();
-  }
-
-  // Close modal or emit cancel when embedded
-  async closeModal() {
-    this.cancel.emit();
+  private startResendCooldown() {
+    this.resendCooldown = 30;
+    clearInterval(this.cooldownRef);
+    this.cooldownRef = setInterval(() => {
+      this.resendCooldown--;
+      if (this.resendCooldown <= 0) clearInterval(this.cooldownRef);
+    }, 1000);
   }
 
   onlyNumbers(event: Event) {
+    const input = event.target as HTMLInputElement;
+    input.value = input.value.replace(/[^0-9]/g, '');
+  }
+
+  togglePassword()        { this.showPassword        = !this.showPassword; }
+  toggleConfirmPassword() { this.showConfirmPassword  = !this.showConfirmPassword; }
+  switchToLogin()         { this.switchToLoginRequested.emit(); }
+  closeModal()            { this.cancel.emit(); }
+
+  ngOnDestroy() { clearInterval(this.cooldownRef); }
+
+  onOtpInput(event: Event, index: number) {
   const input = event.target as HTMLInputElement;
-  input.value = input.value.replace(/[^0-9]/g, '');
+  const val   = input.value.replace(/[^0-9]/g, '');
+  input.value = val;
+
+  // Build otpValue string
+  const arr      = this.otpValue.split('');
+  arr[index]     = val;
+  this.otpValue  = arr.join('').substring(0, 6);
+
+  // Auto-focus next box
+  if (val && index < 5) {
+    (document.getElementById(`otp-${index + 1}`) as HTMLInputElement)?.focus();
+  }
 }
 
+onOtpKeydown(event: KeyboardEvent, index: number) {
+  if (event.key === 'Backspace' && !this.otpValue[index] && index > 0) {
+    (document.getElementById(`otp-${index - 1}`) as HTMLInputElement)?.focus();
+  }
+}
+
+changeEmail() {
+  this.step = 'form';
+  this.otpValue = '';
+  this.otpError = '';
+}
 
 }
