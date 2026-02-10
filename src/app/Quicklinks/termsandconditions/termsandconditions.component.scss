@@ -4,61 +4,91 @@
     padding-bottom: 2rem;
 }
 
-.policy-page {
-    max-width: 1100px;
-    margin: auto;
-    padding: 40px 20px;
+/* ===== POLICY PAGE THEME (MATCH FAQ STYLE) ===== */
+
+.policy-container {
+  padding: 16px;
+  background: #f8fafc;
 }
 
-.page-title {
-    text-align: center;
-    font-size: 2.2rem;
-    margin-bottom: 10px;
+/* Header */
+.policy-container .header h2 {
+  font-weight: 700;
+  color: var(--ion-color-primary);
 }
 
-.page-subtitle {
-    text-align: center;
-    color: #666;
-    margin-bottom: 40px;
+.policy-container .header p {
+  font-size: 14px;
+  color: #6b7280;
 }
 
-.policy-section {
-    margin-bottom: 50px;
+/* Accordion Wrapper */
+.accordion {
+  margin-top: 20px;
 }
 
-.policy-section h2 {
-    margin-bottom: 20px;
-    font-size: 1.6rem;
-}
-
+/* Accordion Card */
 .accordion-item {
-    border: 1px solid #e0e0e0;
-    margin-bottom: 12px;
-    border-radius: 8px;
-    overflow: hidden;
+  background: #ffffff;
+  border-radius: 14px;
+  margin-bottom: 14px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
 }
 
+/* Accordion Header */
 .accordion-header {
-    width: 100%;
-    background: #373737;
-    padding: 16px 20px;
-    font-size: 1rem;
-    font-weight: 600;
-    border: none;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 16px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #112716;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
 }
 
+/* Chevron */
+.accordion-header span {
+  font-size: 18px;
+  color: var(--ion-color-success);
+  transition: transform 0.3s ease;
+}
+
+.accordion-header span.rotate {
+  transform: rotate(180deg);
+}
+
+/* Accordion Body */
 .accordion-body {
-    padding: 18px 20px;
-    background: #ffffff;
-    color: #444;
-    line-height: 1.6;
+  padding: 0 16px 16px;
+  border-top: 1px solid #e5e7eb;
 }
 
-.rotate {
-    transform: rotate(180deg);
-    transition: transform 0.3s ease;
+.accordion-body p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #374151;
+  margin-top: 10px;
+}
+
+/* Final Notes */
+.policy-container .small {
+  font-size: 12px;
+  color: #6b7280;
+  text-align: center;
+}
+
+/* Mobile Friendly */
+@media (max-width: 768px) {
+  .accordion-header {
+    font-size: 14px;
+  }
+
+  .accordion-body p {
+    font-size: 13px;
+  }
 }

@@ -44,4 +44,12 @@ export class Register {
       );
   }
 
+  sendOtp(email: string, phone : string) {
+    return this.http.post(`${this.API}/send-otp`, { email, phone });
+  }
+
+  verifyOtp(email: string, otp: string) {
+    return this.http.post(`${this.API}/verify-otp`, { email, otp });
+  }
+
 }

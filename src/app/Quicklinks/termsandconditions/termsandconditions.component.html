@@ -1,13 +1,18 @@
 <div class="policy-container">
 
-  <!-- TERMS -->
+  <!-- ================= TERMS & CONDITIONS ================= -->
   <ng-container *ngIf="pageType === 'terms'">
+
     <div class="header mt-5">
       <h2 class="text-center">Terms & Conditions</h2>
+      <p class="text-center text-muted mt-2">
+        These terms govern your participation in all treks, tours, and activities conducted by Karnataka Adventures.
+      </p>
     </div>
 
     <div class="accordion">
 
+      <!-- Booking -->
       <div class="accordion-item">
         <button class="accordion-header" (click)="toggle(1)">
           Booking & Eligibility
@@ -15,110 +20,320 @@
         </button>
         <div class="accordion-body" *ngIf="openIndex === 1">
           <p>
-            All participants must be above 18 years of age or accompanied by a guardian.
-            Bookings are confirmed only after full payment is received.
+            Participation is open only to individuals who meet the minimum age and health requirements.
+            Participants below 18 years must be accompanied by a parent or legal guardian.
+          </p>
+          <p>
+            Bookings are confirmed only after full payment is received. Karnataka Adventures reserves the
+            right to accept or reject any booking without assigning a reason.
           </p>
         </div>
       </div>
 
+      <!-- Payments -->
       <div class="accordion-item">
         <button class="accordion-header" (click)="toggle(2)">
-          Safety & Responsibility
+          Payments & Pricing
           <span [class.rotate]="openIndex === 2">⌄</span>
         </button>
         <div class="accordion-body" *ngIf="openIndex === 2">
           <p>
-            Karnataka Adventures prioritizes safety; however, trekking involves inherent risks.
-            Participants must follow guide instructions at all times.
+            All prices displayed are inclusive of applicable taxes unless mentioned otherwise.
+            Payments must be completed using approved online payment methods only.
+          </p>
+          <p>
+            Karnataka Adventures is not responsible for payment failures caused by banks,
+            gateways, or network-related issues.
           </p>
         </div>
       </div>
 
+      <!-- Safety -->
       <div class="accordion-item">
         <button class="accordion-header" (click)="toggle(3)">
-          Identification & Compliance
+          Safety, Health & Responsibility
           <span [class.rotate]="openIndex === 3">⌄</span>
         </button>
         <div class="accordion-body" *ngIf="openIndex === 3">
           <p>
-            A valid government-issued ID proof is mandatory.
-            Failure to comply with rules may result in removal without refund.
+            Trekking and adventure activities involve inherent risks including injury,
+            weather changes, wildlife encounters, and difficult terrain.
+          </p>
+          <p>
+            Participants join entirely at their own risk and must strictly follow all
+            instructions given by trek leaders and support staff.
           </p>
         </div>
       </div>
 
+      <!-- ID & Conduct -->
       <div class="accordion-item">
         <button class="accordion-header" (click)="toggle(4)">
-          Organizer Rights
+          Identification & Participant Conduct
           <span [class.rotate]="openIndex === 4">⌄</span>
         </button>
         <div class="accordion-body" *ngIf="openIndex === 4">
           <p>
-            The organizer reserves the right to modify or cancel the trek due to weather,
-            safety concerns, or unforeseen circumstances.
+            Carrying a valid government-issued photo ID is mandatory for all participants.
+          </p>
+          <p>
+            Misconduct, abusive behavior, or violation of rules will result in immediate
+            removal from the trek without any refund.
           </p>
         </div>
       </div>
 
-    </div>
-  </ng-container>
-
-  <!-- CANCELLATION -->
-  <ng-container *ngIf="pageType === 'cancellation'">
-    <h2>Cancellation Policy</h2>
-
-    <div class="accordion">
-
+      <!-- Alcohol -->
       <div class="accordion-item">
         <button class="accordion-header" (click)="toggle(5)">
-          Standard Cancellation
+          Alcohol, Smoking & Substance Abuse
           <span [class.rotate]="openIndex === 5">⌄</span>
         </button>
         <div class="accordion-body" *ngIf="openIndex === 5">
           <p>
-            If cancellation is made 7 or more days before the trek date,
-            80% of the booking amount will be refunded.
+            Consumption or possession of alcohol, drugs, or intoxicating substances is
+            strictly prohibited during travel, trekking, camping, or inside buses,
+            TT vehicles, or vans.
+          </p>
+          <p>
+            Smoking is prohibited in forest areas, trekking zones, campsites, and vehicles.
+            Violators will be removed immediately without refund.
           </p>
         </div>
       </div>
 
+      <!-- Illegal -->
       <div class="accordion-item">
         <button class="accordion-header" (click)="toggle(6)">
-          Late Cancellation
+          Illegal Activities & Zero Tolerance Policy
           <span [class.rotate]="openIndex === 6">⌄</span>
         </button>
         <div class="accordion-body" *ngIf="openIndex === 6">
           <p>
-            Cancellations made between 3 to 6 days before the trek
-            are eligible for a 50% refund.
+            Any illegal activity including drug possession, theft, vandalism,
+            harassment, or violation of local laws is strictly prohibited.
+          </p>
+          <p>
+            Karnataka Adventures reserves the right to hand over offenders to
+            local authorities without refund or compensation.
           </p>
         </div>
       </div>
 
+      <!-- Travel -->
       <div class="accordion-item">
         <button class="accordion-header" (click)="toggle(7)">
-          Last-Minute & No Show
+          Travel, Transport & Vehicle Rules
           <span [class.rotate]="openIndex === 7">⌄</span>
         </button>
         <div class="accordion-body" *ngIf="openIndex === 7">
           <p>
-            No refunds will be provided for cancellations within 3 days
-            or for participants who fail to show up.
+            Participants must follow all travel instructions given by trip coordinators
+            and vehicle staff during transportation.
+          </p>
+          <p>
+            Standing, leaning out of windows, loud music, or unsafe behavior inside
+            buses, TT vehicles, or vans is strictly prohibited.
           </p>
         </div>
       </div>
 
+      <!-- Belongings -->
       <div class="accordion-item">
         <button class="accordion-header" (click)="toggle(8)">
-          Refund Processing
+          Personal Belongings & Valuables
           <span [class.rotate]="openIndex === 8">⌄</span>
         </button>
         <div class="accordion-body" *ngIf="openIndex === 8">
           <p>
-            Approved refunds will be processed within 7–10 working days
-            to the original payment method.
+            Participants are solely responsible for their personal belongings including
+            mobile phones, wallets, cash, gold, cameras, electronics, and documents.
+          </p>
+          <p>
+            Karnataka Adventures is not liable for any loss, theft, or damage
+            during travel, trekking, or stay.
           </p>
         </div>
       </div>
 
+      <!-- Privacy -->
+      <div class="accordion-item">
+        <button class="accordion-header" (click)="toggle(9)">
+          Privacy & Data Protection
+          <span [class.rotate]="openIndex === 9">⌄</span>
+        </button>
+        <div class="accordion-body" *ngIf="openIndex === 9">
+          <p>
+            Personal data collected during booking is used only for operational,
+            safety, and legal purposes.
+          </p>
+          <p>
+            Karnataka Adventures does not sell or misuse customer data and
+            shares it only when legally required.
+          </p>
+        </div>
+      </div>
+
+      <!-- Media -->
+      <div class="accordion-item">
+        <button class="accordion-header" (click)="toggle(10)">
+          Photography & Media Usage
+          <span [class.rotate]="openIndex === 10">⌄</span>
+        </button>
+        <div class="accordion-body" *ngIf="openIndex === 10">
+          <p>
+            Photos and videos captured during treks may be used for marketing,
+            promotional, and social media purposes.
+          </p>
+          <p>
+            Participation implies consent for such usage without additional
+            approval or compensation.
+          </p>
+        </div>
+      </div>
+
+      <!-- Final -->
+      <p class="mt-4 text-muted small">
+        By booking and participating in any activity with Karnataka Adventures,
+        you confirm that you have read, understood, and agreed to all the above
+        terms, conditions, and policies.
+      </p>
+
     </div>
+  </ng-container>
+
+  <!-- ================= CANCELLATION POLICY ================= -->
+  <ng-container *ngIf="pageType === 'cancellation'">
+
+    <div class="header mt-5">
+      <h2 class="text-center">Cancellation Policy</h2>
+      <p class="text-center text-muted mt-2">
+        Designed to be fair while covering operational commitments.
+      </p>
+    </div>
+
+    <div class="accordion">
+
+      <div class="accordion-item">
+        <button class="accordion-header" (click)="toggle(11)">
+          7 Days or More
+          <span [class.rotate]="openIndex === 11">⌄</span>
+        </button>
+        <div class="accordion-body" *ngIf="openIndex === 11">
+          <p>80% refund of total booking amount.</p>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <button class="accordion-header" (click)="toggle(12)">
+          3 to 6 Days
+          <span [class.rotate]="openIndex === 12">⌄</span>
+        </button>
+        <div class="accordion-body" *ngIf="openIndex === 12">
+          <p>50% refund due to prior logistical arrangements.</p>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <button class="accordion-header" (click)="toggle(13)">
+          Less than 3 Days / No Show
+          <span [class.rotate]="openIndex === 13">⌄</span>
+        </button>
+        <div class="accordion-body" *ngIf="openIndex === 13">
+          <p>No refund will be provided.</p>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <button class="accordion-header" (click)="toggle(14)">
+          Refund Processing Time
+          <span [class.rotate]="openIndex === 14">⌄</span>
+        </button>
+        <div class="accordion-body" *ngIf="openIndex === 14">
+          <p>
+            Approved refunds will be processed within 7–10 working days to the
+            original payment method.
+          </p>
+        </div>
+      </div>
+      <!-- Force Majeure -->
+      <div class="accordion-item">
+        <button class="accordion-header" (click)="toggle(15)">
+          Weather, Government Orders & Force Majeure
+          <span [class.rotate]="openIndex === 15">⌄</span>
+        </button>
+        <div class="accordion-body" *ngIf="openIndex === 15">
+          <p>
+            In case of trek cancellation due to heavy rainfall, landslides,
+            forest department restrictions, government orders, pandemics,
+            natural disasters, or any force majeure situations, refunds will
+            be processed based on recoverable costs.
+          </p>
+          <p>
+            Karnataka Adventures may offer rescheduling or partial refunds
+            depending on third-party commitments such as permits, transport,
+            and accommodation.
+          </p>
+        </div>
+      </div>
+
+      <!-- Organizer Cancellation -->
+      <div class="accordion-item">
+        <button class="accordion-header" (click)="toggle(16)">
+          Cancellation by Organizer
+          <span [class.rotate]="openIndex === 16">⌄</span>
+        </button>
+        <div class="accordion-body" *ngIf="openIndex === 16">
+          <p>
+            If Karnataka Adventures cancels a trek due to safety concerns,
+            insufficient participants, or operational challenges, customers
+            will be offered either a full refund or an option to reschedule.
+          </p>
+          <p>
+            No additional compensation beyond the booking amount shall be
+            provided under any circumstances.
+          </p>
+        </div>
+      </div>
+
+      <!-- Partial Participation -->
+      <div class="accordion-item">
+        <button class="accordion-header" (click)="toggle(17)">
+          Early Exit or Partial Participation
+          <span [class.rotate]="openIndex === 17">⌄</span>
+        </button>
+        <div class="accordion-body" *ngIf="openIndex === 17">
+          <p>
+            No refunds will be issued for participants who choose to leave
+            the trek early, arrive late, or skip any portion of the itinerary
+            for personal, medical, or other reasons.
+          </p>
+        </div>
+      </div>
+
+      <!-- Transfer Policy -->
+      <div class="accordion-item">
+        <button class="accordion-header" (click)="toggle(18)">
+          Booking Transfer Policy
+          <span [class.rotate]="openIndex === 18">⌄</span>
+        </button>
+        <div class="accordion-body" *ngIf="openIndex === 18">
+          <p>
+            Bookings are strictly non-transferable. Participant name changes
+            are not allowed once booking is confirmed unless explicitly
+            approved by Karnataka Adventures.
+          </p>
+        </div>
+      </div>
+
+      <!-- Final Note -->
+      <p class="mt-4 text-muted small">
+        By confirming a booking, you acknowledge that you have read and
+        understood the cancellation terms and agree to abide by the refund
+        timelines and conditions stated above.
+      </p>
+
+    </div>
+  </ng-container>
+
+</div>

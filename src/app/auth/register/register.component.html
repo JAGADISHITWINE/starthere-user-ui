@@ -1,113 +1,109 @@
 <ng-template #registerCard>
   <div class="auth-card">
-    <!-- Close button (inside card) -->
-    <div class="d-flex justify-content-end align-items-center">
-      <button
-        type="button"
-        class="btn-close close-modal"
-        aria-label="Close"
-        (click)="closeModal()"
-      ></button>
+    <div class="d-flex justify-content-end">
+      <button type="button" class="btn-close close-modal" (click)="closeModal()"></button>
     </div>
 
-    <!-- Logo -->
     <div class="logo-section">
       <img src="../../../assets/assets/navbarimg.png" alt="Logo" />
-      <p>Register your account</p>
+      <p>{{ step === 'form' ? 'Register your account' : 'Verify your email' }}</p>
     </div>
 
-    <div class="auth-body">
-      <!-- Form -->
+    <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+    <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
+
+    <!-- ── STEP 1: Registration Form ── -->
+    <div class="auth-body" *ngIf="step === 'form'">
       <form [formGroup]="registerForm" (ngSubmit)="register()">
+
         <div class="form-group">
-          <label>Name<span class="text-danger">*</span></label>
-          <input
-            type="text"
-            formControlName="name"
-            placeholder="Enter your name"
-          />
+          <label>Name <span class="text-danger">*</span></label>
+          <input type="text" formControlName="name" placeholder="Enter your name" />
         </div>
 
         <div class="form-group">
-          <label>Email<span class="text-danger">*</span></label>
-          <input
-            type="email"
-            formControlName="email"
-            placeholder="you@example.com"
-          />
+          <label>Email <span class="text-danger">*</span></label>
+          <input type="email" formControlName="email" placeholder="you@example.com" />
         </div>
 
         <div class="form-group">
-          <label>Phone<span class="text-danger">*</span></label>
-          <input
-            type="tel"
-            formControlName="phone"
-            placeholder="Enter phone number"
-            maxlength="10"
-            pattern="[0-9]*"
-            inputmode="numeric"
-            (input)="onlyNumbers($event)"
-          />
+          <label>Phone <span class="text-danger">*</span></label>
+          <input type="tel" formControlName="phone" placeholder="Enter phone number"
+            maxlength="10" inputmode="numeric" (input)="onlyNumbers($event)" />
         </div>
 
         <div class="form-group password-group">
-          <label>Password<span class="text-danger">*</span></label>
-          <input
-            [type]="showPassword ? 'text' : 'password'"
-            formControlName="password"
-            placeholder="••••••••"
-          />
-          <button
-            type="button"
-            class="toggle-password"
-            (click)="togglePassword()"
-          >
-            {{ showPassword ? "🙈" : "👁️" }}
+          <label>Password <span class="text-danger">*</span></label>
+          <input [type]="showPassword ? 'text' : 'password'" formControlName="password" placeholder="••••••••" />
+          <button type="button" class="toggle-password" (click)="togglePassword()">
+            {{ showPassword ? '🙈' : '👁️' }}
           </button>
         </div>
 
         <div class="form-group password-group">
-          <label>Confirm Password<span class="text-danger">*</span></label>
-          <input
-            [type]="showConfirmPassword ? 'text' : 'password'"
-            formControlName="confirmPassword"
-            placeholder="••••••••"
-          />
-          <button
-            type="button"
-            class="toggle-password"
-            (click)="toggleConfirmPassword()"
-          >
-            {{ showConfirmPassword ? "🙈" : "👁️" }}
+          <label>Confirm Password <span class="text-danger">*</span></label>
+          <input [type]="showConfirmPassword ? 'text' : 'password'" formControlName="confirmPassword" placeholder="••••••••" />
+          <button type="button" class="toggle-password" (click)="toggleConfirmPassword()">
+            {{ showConfirmPassword ? '🙈' : '👁️' }}
           </button>
         </div>
 
-        <button
-          class="btn primary"
-          type="submit"
-          [disabled]="registerForm.invalid || isLoading"
-        >
-          {{ isLoading ? "Registering…" : "Register" }}
+        <button class="btn primary" type="submit" [disabled]="registerForm.invalid || isLoading">
+          {{ isLoading ? 'Sending OTP…' : 'Continue' }}
         </button>
+
       </form>
+    </div>
+
+    <!-- ── STEP 2: OTP Verification ── -->
+    <div class="auth-body otp-body" *ngIf="step === 'otp'">
+      <div class="otp-header">
+        <div class="otp-icon">📩</div>
+        <p class="otp-hint">
+          We sent a 6-digit code to <strong>{{ registerForm.value.email }}</strong>
+        </p>
+      </div>
+
+      <div *ngIf="otpError" class="alert alert-danger">{{ otpError }}</div>
+
+      <!-- OTP input boxes -->
+      <div class="otp-inputs">
+        <input
+          *ngFor="let i of [0,1,2,3,4,5]"
+          type="text"
+          maxlength="1"
+          inputmode="numeric"
+          class="otp-box"
+          [value]="otpValue[i] || ''"
+          (input)="onOtpInput($event, i)"
+          (keydown)="onOtpKeydown($event, i)"
+          [id]="'otp-' + i"
+        />
+      </div>
+
+      <button class="btn primary" (click)="verifyOtp()" [disabled]="otpValue.length !== 6 || otpLoading">
+        {{ otpLoading ? 'Verifying…' : 'Verify & Register' }}
+      </button>
+
+      <div class="resend-row">
+        <span *ngIf="resendCooldown > 0" class="resend-timer">
+          Resend OTP in {{ resendCooldown }}s
+        </span>
+        <button *ngIf="resendCooldown === 0" class="btn-link" (click)="resendOtp()" [disabled]="resendLoading">
+          {{ resendLoading ? 'Sending...' : '🔁 Resend OTP' }}
+        </button>
+      </div>
+
+      <p class="switch-auth">
+        <span (click)="changeEmail()" >← Change email</span>
+      </p>
     </div>
 
     <div class="divider">or</div>
 
     <p class="switch-auth">
-      Already have an account?
-      <span (click)="switchToLogin()">Login</span>
+      Already have an account? <span (click)="switchToLogin()">Login</span>
     </p>
-
-    <!-- Error Message -->
-    <div *ngIf="errorMessage" class="alert alert-danger">
-      {{ errorMessage }}
-    </div>
-
-    <!-- Success Message -->
-    <div *ngIf="successMessage" class="alert alert-success">
-      {{ successMessage }}
-    </div>
   </div>
 </ng-template>
 
