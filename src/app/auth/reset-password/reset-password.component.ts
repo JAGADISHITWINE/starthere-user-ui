@@ -83,7 +83,7 @@ export class ResetPasswordComponent implements OnInit {
           setTimeout(() => {
             // ✅ Navigate to home first, then open login modal
             this.router.navigate(['/']).then(() => {
-              this.authService.openLogin();
+              window.location.reload();
             });
           }, 2000);
         } else {

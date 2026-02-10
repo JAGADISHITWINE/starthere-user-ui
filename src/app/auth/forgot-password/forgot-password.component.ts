@@ -35,11 +35,13 @@ export class ForgotPasswordComponent implements OnInit {
   }
 
 sendResetLink() {
+  this.isLoading =  true;
   this.forgotpassService.forgotPassword(this.forgotPasswordForm.value.email).subscribe({
     next: (res) => {
       if (res.response) {
         this.successMessage = 'Reset link sent! Please check your email.';
         this.emailSent = true;
+        this.isLoading = false;
       }
     },
     error: (err) => {
