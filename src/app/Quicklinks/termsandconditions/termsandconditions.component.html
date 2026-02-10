@@ -1,0 +1,124 @@
+<div class="policy-container">
+
+  <!-- TERMS -->
+  <ng-container *ngIf="pageType === 'terms'">
+    <div class="header mt-5">
+      <h2 class="text-center">Terms & Conditions</h2>
+    </div>
+
+    <div class="accordion">
+
+      <div class="accordion-item">
+        <button class="accordion-header" (click)="toggle(1)">
+          Booking & Eligibility
+          <span [class.rotate]="openIndex === 1">⌄</span>
+        </button>
+        <div class="accordion-body" *ngIf="openIndex === 1">
+          <p>
+            All participants must be above 18 years of age or accompanied by a guardian.
+            Bookings are confirmed only after full payment is received.
+          </p>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <button class="accordion-header" (click)="toggle(2)">
+          Safety & Responsibility
+          <span [class.rotate]="openIndex === 2">⌄</span>
+        </button>
+        <div class="accordion-body" *ngIf="openIndex === 2">
+          <p>
+            Karnataka Adventures prioritizes safety; however, trekking involves inherent risks.
+            Participants must follow guide instructions at all times.
+          </p>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <button class="accordion-header" (click)="toggle(3)">
+          Identification & Compliance
+          <span [class.rotate]="openIndex === 3">⌄</span>
+        </button>
+        <div class="accordion-body" *ngIf="openIndex === 3">
+          <p>
+            A valid government-issued ID proof is mandatory.
+            Failure to comply with rules may result in removal without refund.
+          </p>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <button class="accordion-header" (click)="toggle(4)">
+          Organizer Rights
+          <span [class.rotate]="openIndex === 4">⌄</span>
+        </button>
+        <div class="accordion-body" *ngIf="openIndex === 4">
+          <p>
+            The organizer reserves the right to modify or cancel the trek due to weather,
+            safety concerns, or unforeseen circumstances.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </ng-container>
+
+  <!-- CANCELLATION -->
+  <ng-container *ngIf="pageType === 'cancellation'">
+    <h2>Cancellation Policy</h2>
+
+    <div class="accordion">
+
+      <div class="accordion-item">
+        <button class="accordion-header" (click)="toggle(5)">
+          Standard Cancellation
+          <span [class.rotate]="openIndex === 5">⌄</span>
+        </button>
+        <div class="accordion-body" *ngIf="openIndex === 5">
+          <p>
+            If cancellation is made 7 or more days before the trek date,
+            80% of the booking amount will be refunded.
+          </p>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <button class="accordion-header" (click)="toggle(6)">
+          Late Cancellation
+          <span [class.rotate]="openIndex === 6">⌄</span>
+        </button>
+        <div class="accordion-body" *ngIf="openIndex === 6">
+          <p>
+            Cancellations made between 3 to 6 days before the trek
+            are eligible for a 50% refund.
+          </p>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <button class="accordion-header" (click)="toggle(7)">
+          Last-Minute & No Show
+          <span [class.rotate]="openIndex === 7">⌄</span>
+        </button>
+        <div class="accordion-body" *ngIf="openIndex === 7">
+          <p>
+            No refunds will be provided for cancellations within 3 days
+            or for participants who fail to show up.
+          </p>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <button class="accordion-header" (click)="toggle(8)">
+          Refund Processing
+          <span [class.rotate]="openIndex === 8">⌄</span>
+        </button>
+        <div class="accordion-body" *ngIf="openIndex === 8">
+          <p>
+            Approved refunds will be processed within 7–10 working days
+            to the original payment method.
+          </p>
+        </div>
+      </div>
+
+    </div>
