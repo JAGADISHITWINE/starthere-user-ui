@@ -30,11 +30,10 @@ export class RegisterComponent implements OnInit {
   ngOnInit() {
     this.registerForm = new FormGroup({
       name: new FormControl('', Validators.required),
-      email: new FormControl('', Validators.required),
-      phone: new FormControl('', Validators.required),
+      email: new FormControl('', [Validators.required, Validators.email]),
+      phone: new FormControl('', [Validators.required, Validators.pattern('^[0-9]{10}$')]),
       password: new FormControl('', Validators.required),
-      confirmPassword: new FormControl('', Validators.required),
-      agreeToTerms: new FormControl('', Validators.required)
+      confirmPassword: new FormControl('', Validators.required)
     });
   }
 
@@ -60,9 +59,10 @@ export class RegisterComponent implements OnInit {
 
     this.registerService.register(this.registerForm.value).subscribe(
       async (res: any) => {
+        console.log('[RegisterComponent] Registration response:', res);
         this.isLoading = false;
 
-        if (res.response == true && res.token) {
+        if (res.response === true) {
           // Show success message
           this.successMessage = 'Registration successful! Welcome aboard!';
           this.errorMessage = '';
@@ -105,5 +105,11 @@ export class RegisterComponent implements OnInit {
   async closeModal() {
     this.cancel.emit();
   }
+
+  onlyNumbers(event: Event) {
+  const input = event.target as HTMLInputElement;
+  input.value = input.value.replace(/[^0-9]/g, '');
+}
+
 
 }

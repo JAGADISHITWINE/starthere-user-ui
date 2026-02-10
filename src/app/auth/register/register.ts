@@ -25,7 +25,7 @@ export class Register {
         map((res: any) => {
           try {
             // Decrypt the response
-            const decrypted = this.crypto.decrypt(res.data);
+            const decrypted = res;
 
             if (decrypted && decrypted.token) {
               // Store the JWT token (not the decrypted object)
