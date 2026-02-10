@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
-type AuthView = 'login' | 'register' | 'cancle' | null;
+type AuthView = 'login' | 'register' | 'forgotPassword' | 'cancle' | null;
 
 interface ModalState {
   open: boolean;
@@ -19,7 +19,7 @@ export class AuthModalService {
   private resolver: ((value: any) => void) | null = null;
   private rejecter: ((reason?: any) => void) | null = null;
 
-  constructor() {}
+  constructor() { }
 
   openLogin(): Promise<any> {
     return this.open('login');
@@ -64,4 +64,11 @@ export class AuthModalService {
     this.rejecter = null;
     this.state.next({ open: false, view: null, payload: null });
   }
+
+  // Add this method
+  openForgotPassword() {
+    this.state.next({ open: true, view: 'forgotPassword' });
+  }
+
+
 }

@@ -1,8 +1,15 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { MainpageComponent } from './layout/mainpage/mainpage.component';
+import { ResetPasswordComponent } from './auth/reset-password/reset-password.component';
 
 const routes: Routes = [
+  // ✅ Standalone route — outside MainpageComponent so no navbar/header shows
+  {
+    path: 'reset-password',
+    component: ResetPasswordComponent
+  },
+
   {
     path: '',
     component: MainpageComponent,
@@ -58,8 +65,10 @@ const routes: Routes = [
           import('./cancle-bookings/cancle-bookings-module').then(m => m.CancleBookingsModule)
       }
     ]
-  }
+  },
 
+  // ✅ Wildcard must always be last
+  { path: '**', redirectTo: '' }
 ];
 @NgModule({
   imports: [

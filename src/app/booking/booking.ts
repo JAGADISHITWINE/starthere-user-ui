@@ -4,24 +4,35 @@ import { BehaviorSubject, map, Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { EncryptionService } from '../core/encryption.service';
 
+export interface Participant {
+  name: string;
+  age: number | null;
+  gender: string;
+  idType: string;
+  idNumber: string;
+  phone: string;
+  medicalInfo: string;
+}
+
 export interface BookingData {
   userId: any;
   trekId: any;
-  trekName: any;
+  trekName: string;
   batchId: any;
-  startDate: any;
-  endDate: any;
+  startDate: string;
+  endDate: string;
   price: any;
   availableSlots: any;
   participants: any;
   selectedAddOns: any[];
   personalInfo: {
-    name: any;
-    email: any;
-    phone: any;
-    emergencyContact: any;
-    specialRequests: any;
+    name: string;
+    email: string;
+    phone: string;
+    emergencyContact: string;
+    specialRequests: string;
   };
+  participantDetails?: Participant[]; // NEW: Add this field
 }
 
 @Injectable({

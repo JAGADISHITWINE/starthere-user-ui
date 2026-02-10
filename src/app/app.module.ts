@@ -14,7 +14,7 @@ import { BackBlockService } from './core/back-block.service';
 
 @NgModule({
   declarations: [AppComponent],
-  imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule,MainpageComponent, HttpClientModule, AuthModalComponent, AuthClickDirective],
+  imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule,MainpageComponent, HttpClientModule, AuthModalComponent, AuthClickDirective,IonicModule.forRoot()],
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     BackBlockService

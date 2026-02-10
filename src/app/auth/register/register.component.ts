@@ -24,6 +24,7 @@ export class RegisterComponent implements OnInit {
   showConfirmPassword = false;
   errorMessage = '';
   isLoading = false;
+  successMessage = '';
 
 
   ngOnInit() {
@@ -41,31 +42,50 @@ export class RegisterComponent implements OnInit {
     private router: Router,
     private alertController: AlertController,
     private registerService: Register,
-    private authService : Auth,
+    private authService: Auth,
 
   ) { }
 
   async register() {
-
-    if (this.registerForm.password !== this.registerForm.confirmPassword) {
-      const alert = await this.alertController.create({
-        header: 'Error',
-        message: 'Passwords do not match',
-        buttons: ['OK']
-      });
-      await alert.present();
+    // Fix: Access form values correctly
+    if (this.registerForm.value.password !== this.registerForm.value.confirmPassword) {
+      this.errorMessage = 'Passwords do not match';
+      this.successMessage = '';
       return;
     }
 
-    this.registerService.register(this.registerForm.value).subscribe(async (res: any) => {
-      if (res.response == true && res.token) {
-        // mark auth and close modal with result
-        this.authService.loginSuccess(res.token);
-        this.authSuccess.emit({ success: true, token: res.token });
+    this.isLoading = true;
+    this.errorMessage = '';
+    this.successMessage = '';
+
+    this.registerService.register(this.registerForm.value).subscribe(
+      async (res: any) => {
+        this.isLoading = false;
+
+        if (res.response == true && res.token) {
+          // Show success message
+          this.successMessage = 'Registration successful! Welcome aboard!';
+          this.errorMessage = '';
+
+          // Auto-dismiss and proceed after 2 seconds
+          setTimeout(() => {
+            this.successMessage = '';
+            // mark auth and close modal with token
+            this.authService.loginSuccess(res.token);
+            // notify host (embedded modal container or parent) of success
+            this.authSuccess.emit({ success: true, token: res.token });
+          }, 2000);
+        } else {
+          this.errorMessage = res.message || 'Registration failed. Please try again.';
+        }
+      },
+      (error) => {
+        // Handle error case
+        this.isLoading = false;
+        this.errorMessage = error.error?.message || 'Registration failed. Please try again.';
+        this.successMessage = '';
       }
-    })
-
-
+    );
   }
 
   togglePassword() {

@@ -75,7 +75,9 @@ export class HeaderComponent implements OnInit {
     this.closeUserDropdown();
     this.closeMobileMenu();
 
-    this.routes.navigateByUrl('/');
+    setTimeout(()=>{
+          this.routes.navigateByUrl('/');
+    },500)
   }
 
   /* ---------------- USER UI ---------------- */

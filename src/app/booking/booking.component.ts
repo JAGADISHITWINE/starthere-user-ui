@@ -8,6 +8,17 @@ import { Booking, BookingData } from "./booking";
 import { Auth } from "../core/auth";
 import { AuthModalService } from "../auth/auth-modal.service";
 
+// Participant interface
+interface Participant {
+  name: string;
+  age: number | null;
+  gender: string;
+  idType: string;
+  idNumber: string;
+  phone: string;
+  medicalInfo: string;
+}
+
 @Component({
   selector: "app-booking",
   templateUrl: "./booking.component.html",
@@ -25,7 +36,7 @@ export class BookingComponent implements OnInit {
   trekId: number = 0;
   currentStep: number = 1;
   isLoading: boolean = true;
-  termsAccepted: boolean = false;
+  termsAccepted: boolean = true;
 
   // Trek data from API
   trek: any = null;
@@ -44,12 +55,16 @@ export class BookingComponent implements OnInit {
     specialRequests: "",
   };
 
+  // Participants array
+  participants: Participant[] = [];
+
   // Add-ons
   addOns = [
     { id: 1, name: "Trekking Poles", price: 200, selected: false },
     { id: 2, name: "Sleeping Bag", price: 300, selected: false },
     { id: 3, name: "Travel Insurance", price: 500, selected: false },
   ];
+  
   userId: any;
   successMessage: any;
   errorMessage: any;
@@ -91,20 +106,19 @@ export class BookingComponent implements OnInit {
             this.batches = [];
           }
 
-          // Now you can safely use find
+          // Find available batch
           const availableBatch = this.batches.find(
             (b: any) => b.status === "active" && b.availableSlots > 0,
           );
 
           if (availableBatch) {
-            // Use the correct property name from your API response
             const batchIdValue = availableBatch.batchId || availableBatch.id;
             this.booking.batchId = batchIdValue;
             this.onBatchSelect(batchIdValue);
           }
 
+          // Pre-fill user data from token
           const token = sessionStorage.getItem("token");
-
           let user: any = {};
 
           if (token) {
@@ -118,31 +132,135 @@ export class BookingComponent implements OnInit {
           this.booking.name = user.name || "";
           this.booking.email = user.email || "";
           this.booking.phone = user.phone || "";
+
+          // Initialize participants array
+          this.initializeParticipants();
         }
         this.isLoading = false;
       },
       error: (error) => {
-       
+        console.error('Load trek error:', error);
         this.isLoading = false;
       },
     });
   }
 
   onBatchSelect(batchId: number | string) {
-    // Convert to number if it's a string
     const numericBatchId =
       typeof batchId === "string" ? parseInt(batchId) : batchId;
 
-    // Try to find by batchId first, then by id
     this.selectedBatch = this.batches.find(
       (b) => b.batchId === numericBatchId || b.id === numericBatchId,
     );
 
     if (this.selectedBatch) {
       this.booking.date = this.selectedBatch.startDate;
-      // Update the batchId in booking to match
       this.booking.batchId =
         this.selectedBatch.batchId || this.selectedBatch.id;
+    }
+  }
+
+  /**
+   * Initialize participants array based on number of participants
+   */
+  initializeParticipants() {
+    this.participants = [];
+    
+    for (let i = 0; i < this.booking.participants; i++) {
+      if (i === 0) {
+        // First participant is the primary contact
+        this.participants.push({
+          name: this.booking.name,
+          age: null,
+          gender: "",
+          idType: "",
+          idNumber: "",
+          phone: this.booking.phone,
+          medicalInfo: "",
+        });
+      } else {
+        // Additional participants
+        this.participants.push({
+          name: "",
+          age: null,
+          gender: "",
+          idType: "",
+          idNumber: "",
+          phone: "",
+          medicalInfo: "",
+        });
+      }
+    }
+  }
+
+  /**
+   * Update participants array when number changes
+   */
+  onParticipantsInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+    let value = Number(input.value);
+
+    if (!this.selectedBatch) return;
+
+    const max = this.selectedBatch.availableSlots;
+
+    // Clamp to max available
+    if (value > max) value = max;
+    if (value < 1) value = 1;
+
+    // Update model
+    this.booking.participants = value;
+    input.value = value.toString();
+
+    // Reinitialize participants array
+    this.initializeParticipants();
+  }
+
+  /**
+   * Sync primary contact data to first participant
+   */
+  syncPrimaryContactToParticipant() {
+    if (this.participants.length > 0) {
+      this.participants[0].name = this.booking.name;
+      this.participants[0].phone = this.booking.phone;
+    }
+  }
+
+  /**
+   * Check if all participants have required fields filled
+   */
+  areAllParticipantsValid(): boolean {
+    return this.participants.every(participant => 
+      participant.name.trim() !== '' &&
+      participant.age !== null &&
+      participant.age > 0 &&
+      participant.gender !== '' &&
+      participant.idType !== '' &&
+      participant.idNumber.trim() !== ''
+    );
+  }
+
+  /**
+   * Check if can proceed to next step
+   */
+  canProceedToNextStep(): boolean {
+    switch (this.currentStep) {
+      case 1:
+        return this.booking.batchId > 0 && 
+               this.booking.participants >= 1 &&
+               this.selectedBatch !== null;
+      
+      case 2:
+        return this.booking.name.trim() !== '' &&
+               this.booking.email.trim() !== '' &&
+               this.booking.phone.length === 10 &&
+               this.booking.emergencyContact.length === 10;
+      
+      case 3:
+        return this.areAllParticipantsValid();
+      
+      default:
+        return true;
     }
   }
 
@@ -166,35 +284,23 @@ export class BookingComponent implements OnInit {
 
   nextStep() {
     // Validate current step
-    if (this.currentStep === 1) {
-      if (!this.booking.batchId || this.booking.participants < 1) {
-        alert("Please select a date and number of participants");
-        return;
+    if (!this.canProceedToNextStep()) {
+      if (this.currentStep === 1) {
+        alert("Please select a batch and number of participants");
+      } else if (this.currentStep === 2) {
+        alert("Please fill all required contact information");
+      } else if (this.currentStep === 3) {
+        alert("Please fill all required participant details");
       }
-
-      if (
-        this.selectedBatch &&
-        this.booking.participants > this.selectedBatch.availableSlots
-      ) {
-        alert(`Only ${this.selectedBatch.availableSlots} slots available`);
-        return;
-      }
+      return;
     }
 
+    // Check authentication before step 3
     if (this.currentStep === 2) {
-      if (
-        !this.booking.name ||
-        !this.booking.email ||
-        !this.booking.phone ||
-        !this.booking.emergencyContact
-      ) {
-        alert("Please fill all required fields");
-        return;
-      }
+      // Sync primary contact to first participant before moving forward
+      this.syncPrimaryContactToParticipant();
 
-      // Require authentication before moving to review/payment
       if (!this.auth.isLoggedIn()) {
-        // open login modal (Bootstrap-backed) and proceed on success
         this.authModal
           .openLogin()
           .then((result: any) => {
@@ -203,13 +309,13 @@ export class BookingComponent implements OnInit {
             }
           })
           .catch(() => {
-            // cancelled or failed - do nothing
+            // User cancelled login
           });
         return;
       }
     }
 
-    if (this.currentStep < 3) {
+    if (this.currentStep < 4) {
       this.currentStep++;
     }
   }
@@ -220,29 +326,12 @@ export class BookingComponent implements OnInit {
     }
   }
 
-  onParticipantsInput(event: Event) {
-    const input = event.target as HTMLInputElement;
-    let value = Number(input.value);
-
-    if (!this.selectedBatch) return;
-
-    const max = this.selectedBatch.availableSlots;
-
-    // clamp logic
-    if (value > max) value = max;
-
-    // update model + input
-    this.booking.participants = value;
-    input.value = value.toString();
-  }
-
   proceedToPayment() {
     this.successMessage = "";
     this.errorMessage = "";
     this.isSubmitting = true;
 
     const token = sessionStorage.getItem("token");
-
     let user: any = {};
 
     if (token) {
@@ -272,6 +361,7 @@ export class BookingComponent implements OnInit {
         emergencyContact: this.booking.emergencyContact,
         specialRequests: this.booking.specialRequests,
       },
+      participantDetails: this.participants, // NEW: Include participant details
     };
 
     // Save to service
@@ -288,7 +378,6 @@ export class BookingComponent implements OnInit {
       } else {
         this.errorMessage = res.message || "Booking failed";
         setTimeout(() => {
-          this.resetBooking();
           this.errorMessage = "";
           this.isSubmitting = false;
         }, 1500);
@@ -298,24 +387,17 @@ export class BookingComponent implements OnInit {
 
   resetBooking() {
     this.currentStep = 1;
-    const bookingData: BookingData = {
-      userId: "",
-      trekId: "",
-      trekName: "",
-      batchId: "",
-      startDate: "",
-      endDate: "",
-      price: "",
-      availableSlots: "",
-      participants: "",
-      selectedAddOns: [],
-      personalInfo: {
-        name: "",
-        email: "",
-        phone: "",
-        emergencyContact: "",
-        specialRequests: "",
-      },
+    this.booking = {
+      batchId: 0,
+      date: "",
+      participants: 1,
+      name: "",
+      email: "",
+      phone: "",
+      emergencyContact: "",
+      specialRequests: "",
     };
+    this.participants = [];
+    this.initializeParticipants();
   }
 }

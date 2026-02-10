@@ -208,7 +208,6 @@ export class MyBookingsComponent implements OnInit {
       },
       error: (error) => {
         console.error('Download failed:', error);
-        alert('Failed to download receipt. Please try again.');
       }
     });
   }

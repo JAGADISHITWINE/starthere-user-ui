@@ -133,3 +133,70 @@
     }
   }
 }
+.participant-form {
+  background-color: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+
+  h6 {
+    color: #495057;
+    font-weight: 600;
+    margin-bottom: 15px;
+  }
+
+  &:last-child {
+    margin-bottom: 0;
+    border-bottom: none !important;
+  }
+}
+
+.badge-primary {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.table {
+  font-size: 0.9rem;
+
+  th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+  }
+
+  td {
+    vertical-align: middle;
+  }
+}
+
+// Progress steps
+.progress-steps {
+  background-color: #fff;
+
+  .rounded-circle {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+
+    &.bg-primary {
+      border-color: var(--bs-primary) !important;
+    }
+  }
+
+  small {
+    display: block;
+    margin-top: 5px;
+    font-size: 0.75rem;
+    color: #6c757d;
+  }
+}
+
+// Responsive table
+@media (max-width: 768px) {
+  .table-responsive {
+    font-size: 0.8rem;
+  }
+}
