@@ -14,11 +14,7 @@
 
   <div class="article-meta">
     <div class="author-section">
-      <img
-        [src]="post.author.avatar"
-        [alt]="post.author.name"
-        class="author-avatar"
-      />
+      <img [src]="post.author.avatar" [alt]="post.author.name" class="author-avatar" />
       <div class="author-details">
         <div class="author-name">{{ post.author.name }}</div>
         <div class="author-bio">{{ post.author.bio }}</div>
@@ -79,11 +75,7 @@
   <ion-card>
     <ion-card-content>
       <div class="author-card-content">
-        <img
-          [src]="post.author.avatar"
-          [alt]="post.author.name"
-          class="author-avatar-large"
-        />
+        <img [src]="post.author.avatar" [alt]="post.author.name" class="author-avatar-large" />
         <div class="author-info">
           <h3>{{ post.author.name }}</h3>
           <p>{{ post.author.bio }}</p>
@@ -103,10 +95,7 @@
 
   <ion-card class="add-comment-card">
     <ion-card-content>
-      <ion-textarea
-        placeholder="Share your thoughts..."
-        rows="3"
-      ></ion-textarea>
+      <ion-textarea placeholder="Share your thoughts..." rows="3"></ion-textarea>
       <button class="btn btn-outline-secondary">
         Post Comment
       </button>
@@ -148,11 +137,7 @@
 <div class="related-posts">
   <h2>Related Articles</h2>
   <div class="related-grid">
-    <ion-card
-      *ngFor="let relatedPost of relatedPosts"
-      button
-      (click)="viewRelatedPost(relatedPost.id)"
-    >
+    <ion-card *ngFor="let relatedPost of relatedPosts" button (click)="viewRelatedPost(relatedPost.id)">
       <img [src]="relatedPost.image" [alt]="relatedPost.title" />
       <ion-card-content>
         <ion-chip size="small" color="success" outline="true">

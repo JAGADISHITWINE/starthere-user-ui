@@ -4,7 +4,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { BlogDetailComponent } from './blog-detail.component';
 
-const routes: Routes = [{ path: '', component: BlogDetailComponent }];
+const routes: Routes = [{ path: ':id', component: BlogDetailComponent }];
 
 @NgModule({
   declarations: [],
