@@ -63,7 +63,20 @@ const routes: Routes = [
         path: 'cancle-bookings',
         loadChildren: () =>
           import('./cancle-bookings/cancle-bookings-module').then(m => m.CancleBookingsModule)
+      },
+      {
+        path: 'terms',
+        loadChildren: () =>
+          import('./Quicklinks/termsandconditions/termsandconditons-module')
+            .then(m => m.TermsandconditionsModule)
+      },
+      {
+        path: 'cancellation',
+        loadChildren: () =>
+          import('./Quicklinks/termsandconditions/termsandconditons-module')
+            .then(m => m.TermsandconditionsModule)
       }
+
     ]
   },
 

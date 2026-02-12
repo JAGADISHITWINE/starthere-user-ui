@@ -11,10 +11,11 @@ import { MainpageComponent } from './layout/mainpage/mainpage.component';
 import { AuthModalComponent } from './shared/auth-modal/auth-modal.component';
 import { AuthClickDirective } from './core/auth-click.directive';
 import { BackBlockService } from './core/back-block.service';
+import { TermsandconditionsModule } from './Quicklinks/termsandconditions/termsandconditons-module';
 
 @NgModule({
   declarations: [AppComponent],
-  imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule,MainpageComponent, HttpClientModule, AuthModalComponent, AuthClickDirective,IonicModule.forRoot()],
+  imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule,MainpageComponent, TermsandconditionsModule, HttpClientModule, AuthModalComponent, AuthClickDirective,IonicModule.forRoot()],
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     BackBlockService

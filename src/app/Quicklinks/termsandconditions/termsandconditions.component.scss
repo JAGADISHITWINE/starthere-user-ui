@@ -1,0 +1,94 @@
+.policy-container {
+    background: #f6f8fb;
+    min-height: 100%;
+    padding-bottom: 2rem;
+}
+
+/* ===== POLICY PAGE THEME (MATCH FAQ STYLE) ===== */
+
+.policy-container {
+  padding: 16px;
+  background: #f8fafc;
+}
+
+/* Header */
+.policy-container .header h2 {
+  font-weight: 700;
+  color: var(--ion-color-primary);
+}
+
+.policy-container .header p {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+/* Accordion Wrapper */
+.accordion {
+  margin-top: 20px;
+}
+
+/* Accordion Card */
+.accordion-item {
+  background: #ffffff;
+  border-radius: 14px;
+  margin-bottom: 14px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+/* Accordion Header */
+.accordion-header {
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 16px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #112716;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+/* Chevron */
+.accordion-header span {
+  font-size: 18px;
+  color: var(--ion-color-success);
+  transition: transform 0.3s ease;
+}
+
+.accordion-header span.rotate {
+  transform: rotate(180deg);
+}
+
+/* Accordion Body */
+.accordion-body {
+  padding: 0 16px 16px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.accordion-body p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #374151;
+  margin-top: 10px;
+}
+
+/* Final Notes */
+.policy-container .small {
+  font-size: 12px;
+  color: #6b7280;
+  text-align: center;
+}
+
+/* Mobile Friendly */
+@media (max-width: 768px) {
+  .accordion-header {
+    font-size: 14px;
+  }
+
+  .accordion-body p {
+    font-size: 13px;
+  }
+}
