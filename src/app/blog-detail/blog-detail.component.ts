@@ -1,11 +1,14 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { IonicModule } from '@ionic/angular';
-import { ActivatedRoute, Router } from '@angular/router';
-import { BlogDetail } from './blog-detail';
+import { Component, OnInit } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { IonicModule } from "@ionic/angular";
+import { ActivatedRoute, Router } from "@angular/router";
+import { BlogDetail } from "./blog-detail";
+import { FormsModule } from "@angular/forms";
+import { AuthModalService } from "../auth/auth-modal.service";
 
 interface Comment {
   id: number;
+  userId: number;
   author: {
     name: string;
     avatar: string;
@@ -15,16 +18,29 @@ interface Comment {
   likes: number;
 }
 
+interface RelatedPost {
+  id: number;
+  title: string;
+  image: string;
+  category: string;
+  readTime: string;
+}
+
 @Component({
-  selector: 'app-blog-detail',
-  templateUrl: './blog-detail.component.html',
-  styleUrls: ['./blog-detail.component.scss'],
+  selector: "app-blog-detail",
+  templateUrl: "./blog-detail.component.html",
+  styleUrls: ["./blog-detail.component.scss"],
   standalone: true,
-  imports: [IonicModule, CommonModule],
+  imports: [IonicModule, CommonModule, FormsModule],
 })
 export class BlogDetailComponent implements OnInit {
-
   postId: any;
+  newComment: string = "";
+  isSubmittingComment: boolean = false;
+  currentUserId: any | null = null;
+  editingCommentId: any | null = null;
+  editedContent: string = "";
+  Loading = false
 
   post!: {
     id: number;
@@ -36,6 +52,7 @@ export class BlogDetailComponent implements OnInit {
       bio: string;
     };
     category: string;
+    categoryId?: number;
     tags: string[];
     date: string;
     readTime: string;
@@ -44,118 +61,283 @@ export class BlogDetailComponent implements OnInit {
     content: string;
   };
 
-
-  relatedPosts = [
-    {
-      id: 2,
-      title: '10 Essential Items Every Trekker Must Carry',
-      image: 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=400',
-      category: 'tips-tricks',
-      readTime: '6 min'
-    },
-    {
-      id: 5,
-      title: 'Monsoon Trekking Safety: 15 Critical Tips',
-      image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400',
-      category: 'safety',
-      readTime: '9 min'
-    },
-    {
-      id: 6,
-      title: 'Exploring Coorg: Top 5 Treks for Beginners',
-      image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400',
-      category: 'destinations',
-      readTime: '8 min'
-    }
-  ];
-
-  comments: Comment[] = [
-    {
-      id: 1,
-      author: {
-        name: 'Arun Sharma',
-        avatar: 'https://ui-avatars.com/api/?name=Arun+Sharma&size=100'
-      },
-      content: 'Great guide! Did this trek last month and your tips were spot on. The sunrise from the peak was absolutely breathtaking.',
-      date: '2 days ago',
-      likes: 12
-    },
-    {
-      id: 2,
-      author: {
-        name: 'Neha Patel',
-        avatar: 'https://ui-avatars.com/api/?name=Neha+Patel&size=100'
-      },
-      content: 'Very comprehensive guide. One addition - trekking poles are highly recommended, especially for the descent. Saved my knees!',
-      date: '5 days ago',
-      likes: 8
-    }
-  ];
+  relatedPosts: RelatedPost[] = [];
+  comments: Comment[] = [];
+  user: any;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private blogDetailService: BlogDetail
-  ) { }
+    private blogDetailService: BlogDetail,
+    private authModal: AuthModalService,
+  ) {}
 
   ngOnInit() {
-    this.route.params.subscribe(params => {
-      this.postId = +params['id'];
+    this.route.params.subscribe((params) => {
+      this.postId = +params["id"];
+      this.loadPost();
+      this.loadComments();
+      this.setCurrentUser();
     });
-    this.loadPost();
+    const token = sessionStorage.getItem("token");
+  }
+
+  setCurrentUser() {
+    const token = sessionStorage.getItem("token");
+
+    if (!token) {
+      this.currentUserId = null;
+      return;
+    }
+
+    try {
+      const decoded: any = JSON.parse(atob(token.split(".")[1]));
+      this.currentUserId = Number(decoded?.id); // 🔥 FORCE NUMBER
+    } catch {
+      this.currentUserId = null;
+    }
   }
 
   loadPost() {
-    this.blogDetailService.getPostById(this.postId).subscribe((res: any) => {
-
+    this.blogDetailService.getPostById(this.postId).subscribe((result: any) => {
+      const res = result.data;
       this.post = {
         id: res.id,
         title: res.title,
-        image: `http://localhost:4001/${res.featured_image}`, // full image path
+        image: `http://localhost:4001/${res.featured_image}`,
         author: {
-          name: res.author_name || 'Admin',
-          avatar: res.author_avatar || 'https://ui-avatars.com/api/?name=Admin',
-          bio: res.author_bio || ''
+          name: res.author_name || "Admin",
+          avatar: res.author_avatar || "https://ui-avatars.com/api/?name=Admin",
+          bio: res.author_bio || "",
         },
-        category: res.category, // ✅ FIXED (was category_slug)
+        category: res.category,
+        categoryId: res.category_id, // Store category ID for related posts
         tags: res.tags || [],
-        date: res.published_at
-          ? new Date(res.published_at).toDateString()
-          : '',
-        readTime: res.read_time || '5 min read',
+        date: res.published_at ? new Date(res.published_at).toDateString() : "",
+        readTime: res.read_time || "5 min read",
         views: res.views || 0,
         likes: res.likes || 0,
-        content: res.content
+        content: res.content,
       };
 
+      // Load related posts after getting the post data
+      if (this.post.categoryId) {
+        this.loadRelated(this.post.categoryId);
+      }
     });
   }
 
+  loadComments() {
+    this.blogDetailService.getComments(this.postId).subscribe(
+      (res: any) => {
+        const commentsData = res.data || [];
+
+        this.comments = commentsData.map((comment: any) => ({
+          id: comment.id,
+          userId: comment.user_id,
+          author: {
+            name: comment.author_name || "User",
+            avatar:
+              comment.author_avatar ||
+              `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.author_name || "User")}&size=100`,
+          },
+          content: comment.content,
+          date: this.formatCommentDate(comment.created_at),
+          likes: comment.likes || 0,
+          replies: comment.replies || [],
+        }));
+      },
+      (error) => {
+        console.error("Error loading comments:", error);
+        this.comments = [];
+      },
+    );
+  }
 
   loadRelated(categoryId: number) {
     this.blogDetailService
       .getRelatedPosts(categoryId, this.postId)
       .subscribe((res: any) => {
-        this.relatedPosts = res;
+        if (res.success == true) {
+          this.Loading = false;
+          const relatedData = res.data || [];
+          this.relatedPosts = relatedData.map((post: any) => ({
+            id: post.id,
+            title: post.title,
+            image: `http://localhost:4001/${post.featured_image}`,
+            category: post.category,
+            readTime: post.read_time || "5 min",
+          }));
+        } else {
+          this.relatedPosts = res.data || [];
+          this.Loading = true;
+        }
       });
   }
 
-  // async sharPost() {
-  //   if (navigator.share) {
-  //     await navigator.share({
-  //       title: this.post.title,
-  //       text: 'Check out this article',
-  //       url: window.location.href
-  //     });
-  //   }
-  // }
+  async openLoginPanel() {
+    try {
+      const res = await this.authModal.openLogin();
+    } catch (err) {}
+  }
+
+  postComment() {
+    if (!this.newComment?.trim()) return;
+
+    const token = sessionStorage.getItem("token");
+
+    if (!token) {
+      this.openLoginPanel();
+      return; // 🚀 hard stop
+    }
+
+    let decodedUser: any;
+
+    try {
+      decodedUser = JSON.parse(atob(token.split(".")[1]));
+    } catch (e) {
+      this.openLoginPanel();
+      return; // 🚀 stop if invalid token
+    }
+
+    if (!decodedUser?.id) {
+      this.openLoginPanel();
+      return;
+    }
+
+    this.isSubmittingComment = true;
+
+    const commentData = {
+      post_id: this.postId,
+      content: this.newComment.trim(),
+    };
+
+    this.blogDetailService.addComment(commentData).subscribe(
+      (res: any) => {
+        const comment = res.data;
+
+        this.comments.unshift({
+          id: comment.id,
+          userId: comment.user_id,
+          author: {
+            name: comment.author_name,
+            avatar:
+              comment.author_avatar ||
+              `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.author_name || "User")}&size=100`,
+          },
+          content: comment.content,
+          date: "Just now",
+          likes: 0,
+        });
+
+        this.newComment = "";
+        this.isSubmittingComment = false;
+      },
+      (error) => {
+        console.error("Error posting comment:", error);
+        this.isSubmittingComment = false;
+      },
+    );
+  }
+
+  likePost() {
+    this.blogDetailService.likePost(this.postId).subscribe(
+      (res: any) => {
+        this.post.likes = res.data.likes;
+      },
+      (error) => {
+        console.error("Error liking post:", error);
+      },
+    );
+  }
+
+  likeComment(commentId: number) {
+    this.blogDetailService.likeComment(commentId).subscribe(
+      (res: any) => {
+        const comment = this.comments.find((c) => c.id === commentId);
+        if (comment) {
+          comment.likes = res.data.likes;
+        }
+      },
+      (error) => {
+        console.error("Error liking comment:", error);
+      },
+    );
+  }
 
   viewRelatedPost(postId: number) {
-    this.router.navigate(['/blog', postId]);
+    this.router.navigate(["/blog", postId]).then(() => {
+      // Reload the page to fetch new data
+      window.location.reload();
+    });
   }
 
   getCategoryLabel(category: string): string {
-    return category.replace(/-/g, ' ');
+    return category.replace(/-/g, " ");
   }
 
+  formatCommentDate(dateString: string): string {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return "Just now";
+    if (diffMins < 60)
+      return `${diffMins} minute${diffMins > 1 ? "s" : ""} ago`;
+    if (diffHours < 24)
+      return `${diffHours} hour${diffHours > 1 ? "s" : ""} ago`;
+    if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? "s" : ""} ago`;
+
+    return date.toLocaleDateString();
+  }
+
+  startEdit(comment: any) {
+    this.editingCommentId = comment.id;
+    this.editedContent = comment.content;
+  }
+
+  cancelEdit() {
+    this.editingCommentId = null;
+    this.editedContent = "";
+  }
+
+  updateComment(commentId: number) {
+    if (!this.editedContent.trim()) return;
+
+    const content = this.editedContent.trim();
+
+    this.blogDetailService
+      .updateComment(commentId, this.currentUserId, content)
+      .subscribe(
+        (res: any) => {
+          if (res.success == true) {
+            this.cancelEdit();
+            this.loadComments();
+          }
+        },
+        (err) => {
+          console.error("Update failed", err);
+        },
+      );
+  }
+
+  deleteComment(commentId: number) {
+    this.blogDetailService
+      .deleteComment(commentId, this.currentUserId)
+      .subscribe(
+        (res: any) => {
+          if (res.success == true) {
+            this.comments = this.comments.filter((c) => c.id !== commentId);
+            this.loadComments();
+            this.cancelEdit();
+          }
+        },
+        (err) => {
+          console.error("Delete failed", err);
+        },
+      );
+  }
 }

@@ -15,7 +15,7 @@ import { TermsandconditionsModule } from './Quicklinks/termsandconditions/termsa
 
 @NgModule({
   declarations: [AppComponent],
-  imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule,MainpageComponent, TermsandconditionsModule, HttpClientModule, AuthModalComponent, AuthClickDirective,IonicModule.forRoot()],
+  imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule,MainpageComponent, TermsandconditionsModule, HttpClientModule, AuthModalComponent, AuthClickDirective],
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     BackBlockService

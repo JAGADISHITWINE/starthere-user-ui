@@ -35,12 +35,12 @@ export class Blog {
 
   // Get single post by ID
   getPost(id: number): Observable<Post> {
-    return this.http.get<Post>(`${this.API}/postEditor/${id}`);
+    return this.http.get<Post>(`${this.API}/blog/posts/${id}`);
   }
 
   // Get all posts (for admin)
   getAllPosts(): Observable<Post[]> {
-    return this.http.get<Post[]>(`${this.API}/postEditor`);
+    return this.http.get<Post[]>(`${this.API}/blog/posts`);
   }
 
   // Get published posts (for public blog)
@@ -63,33 +63,14 @@ export class Blog {
     return this.http.get<Post[]>(`${this.API}/blog/posts/category/${category}`);
   }
 
-  // Create new post with FormData
-  createPost(formData: FormData): Observable<any> {
-    return this.http.post(`${this.API}/postEditor`, formData);
-  }
-
-  // Update existing post with FormData
-  updatePost(id: number, formData: FormData): Observable<any> {
-    return this.http.put(`${this.API}/postEditor/${id}`, formData);
-  }
-
-  // Save post (create or update)
-  savePost(id: number | null, formData: FormData): Observable<any> {
-    if (id) {
-      return this.updatePost(id, formData);
-    } else {
-      return this.createPost(formData);
-    }
-  }
-
   // Delete post
   deletePost(id: number): Observable<any> {
-    return this.http.delete(`${this.API}/postEditor/${id}`);
+    return this.http.delete(`${this.API}/blog/posts/${id}`);
   }
 
   // Publish post
   publishPost(id: number): Observable<any> {
-    return this.http.patch(`${this.API}/postEditor/${id}/publish`, {});
+    return this.http.patch(`${this.API}/blog/posts/${id}/publish`, {});
   }
 
   // Get categories

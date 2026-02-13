@@ -67,8 +67,8 @@ export class BlogComponent implements OnInit {
     await loading.present();
 
     this.blogService.getPublishedPosts().subscribe({
-      next: (posts) => {
-        this.allPosts = posts.map(post => this.mapPostToBlogPost(post));
+      next: (posts:any) => {
+        this.allPosts = posts.data.map((post:any)=> this.mapPostToBlogPost(post));
         this.extractPopularTags();
         loading.dismiss();
         this.isLoading = false;
