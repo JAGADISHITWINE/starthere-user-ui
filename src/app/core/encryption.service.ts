@@ -1,33 +1,33 @@
-// src/app/encryption.service.ts
 import { Injectable } from '@angular/core';
-import * as CryptoJS from 'crypto-js'
+import * as CryptoJS from 'crypto-js';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class EncryptionService {
-  private secretKey = environment.encryptionKey;
+  private readonly secretKey = environment.encryptionKey;
 
-
- encrypt(data: any) {
+  encrypt(data: unknown): string {
     try {
       return CryptoJS.AES.encrypt(JSON.stringify(data), this.secretKey).toString();
-    } catch (e) {
-      console.error('Encrypt error:', e);
+    } catch {
       return '';
     }
   }
 
-  decrypt(encryptedText: any){
+  decrypt<T = unknown>(encryptedText: string): T | null {
     try {
       const bytes = CryptoJS.AES.decrypt(encryptedText, this.secretKey);
       const decrypted = bytes.toString(CryptoJS.enc.Utf8);
-      return JSON.parse(decrypted);
-    } catch (e) {
-      console.error('Decrypt error:', e);
+
+      if (!decrypted) {
+        return null;
+      }
+
+      return JSON.parse(decrypted) as T;
+    } catch {
       return null;
     }
   }
-
 }

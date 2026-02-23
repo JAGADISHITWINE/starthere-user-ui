@@ -4,13 +4,14 @@ import { IonicModule, LoadingController } from "@ionic/angular";
 import { FormsModule } from "@angular/forms";
 import { Router } from "@angular/router";
 import { Blog } from "./blog";
+import { environment } from "src/environments/environment";
 
 interface BlogPost {
   id: number;
   title: string;
   excerpt: string;
   content: string;
-  image: any;
+  image: string | null;
   author: {
     name: string;
     avatar: string;
@@ -47,6 +48,7 @@ export class BlogComponent implements OnInit {
 
   allPosts: BlogPost[] = [];
   popularTags: string[] = [];
+  readonly assetBaseUrl = environment.assetBaseUrl;
 
   constructor(
     private router: Router,
@@ -87,7 +89,7 @@ export class BlogComponent implements OnInit {
     this.blogService.getCategories().subscribe({
       next: (categories) => {
         // Map backend categories to frontend format
-        const mappedCategories = categories.map((cat:any) => ({
+        const mappedCategories = categories.map((cat: { slug?: string; name: string }) => ({
           value: cat.slug || cat.name.toLowerCase().replace(/\s+/g, "-"),
           label: cat.name,
           icon: this.getCategoryIconByName(cat.name),
@@ -111,9 +113,7 @@ export class BlogComponent implements OnInit {
       title: post.title,
       excerpt: post.excerpt,
       content: post.content,
-      image: post.featured_image
-        ? `http://localhost:4001/${post.featured_image}`
-        : null,
+      image: this.buildAssetUrl(post.featured_image),
       author: {
         name: post.author_name || "Admin",
         avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(post.author_name || "Admin")}&size=100`,
@@ -125,6 +125,13 @@ export class BlogComponent implements OnInit {
       views: post.views || 0,
       featured: post.views > 2000,
     };
+  }
+
+  private buildAssetUrl(path?: string | null): string | null {
+    if (!path) return null;
+
+    const cleanPath = String(path).replace(/^\/+/, "");
+    return `${this.assetBaseUrl}/${cleanPath}`;
   }
 
   slugify(text: string): string {

@@ -3,34 +3,69 @@ import { Router } from '@angular/router';
 import { jwtDecode } from 'jwt-decode';
 import { BehaviorSubject } from 'rxjs';
 
+interface JwtPayload {
+  exp?: number;
+  name?: string;
+  email?: string;
+  [key: string]: unknown;
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class Auth {
-  private loggedIn$ = new BehaviorSubject<boolean>(this.hasValidToken());
-  authStatus$ = this.loggedIn$.asObservable();
+  private readonly tokenStorageKey = 'token';
+  private readonly loggedIn$ = new BehaviorSubject<boolean>(this.hasValidToken());
+  readonly authStatus$ = this.loggedIn$.asObservable();
 
   constructor(private router: Router) {}
 
-  private hasValidToken(): boolean {
-    const token = sessionStorage.getItem('token');
-    if (!token) return false;
-
+  private decodeToken(token: string): JwtPayload | null {
     try {
-      const decoded: any = jwtDecode(token);
-      return decoded.exp * 1000 > Date.now();
+      return jwtDecode<JwtPayload>(token);
     } catch {
-      return false;
+      return null;
     }
   }
 
-  loginSuccess(token: string) {
-    sessionStorage.setItem('token', token);
+  private isPayloadValid(decoded: JwtPayload | null): decoded is JwtPayload & { exp: number } {
+    return Boolean(decoded?.exp && decoded.exp * 1000 > Date.now());
+  }
+
+  private hasValidToken(): boolean {
+    const token = this.getToken();
+    if (!token) {
+      return false;
+    }
+
+    return this.isPayloadValid(this.decodeToken(token));
+  }
+
+  getToken(): string | null {
+    return sessionStorage.getItem(this.tokenStorageKey);
+  }
+
+  getDecodedTokenPayload(): JwtPayload | null {
+    const token = this.getToken();
+    if (!token) {
+      return null;
+    }
+
+    return this.decodeTokenPayload(token);
+  }
+
+  decodeTokenPayload(token: string): JwtPayload | null {
+    const decoded = this.decodeToken(token);
+    return this.isPayloadValid(decoded) ? decoded : null;
+  }
+
+  loginSuccess(token: string): void {
+    sessionStorage.setItem(this.tokenStorageKey, token);
     this.loggedIn$.next(true);
   }
 
-  logout() {
-    sessionStorage.clear();
+  logout(): void {
+    sessionStorage.removeItem(this.tokenStorageKey);
     this.loggedIn$.next(false);
     this.router.navigate(['']);
   }

@@ -27,7 +27,7 @@
   <div class="featured-grid">
     <ion-card *ngFor="let post of featuredPosts" class="featured-card" button (click)="viewPost(post.id)">
       <div class="featured-image">
-        <img [src]="'http://localhost:4001/' + post.image" [alt]="post.title" />
+        <img [src]="post.image" [alt]="post.title" />
         <div class="featured-badge">
           <ion-icon name="star"></ion-icon>
           Featured

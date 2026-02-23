@@ -1,45 +1,52 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, map, tap, throwError } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { EncryptionService } from 'src/app/core/encryption.service';
 import { environment } from 'src/environments/environment';
+
+interface LoginPayload {
+  email: string;
+  password: string;
+}
+
+interface LoginResponse {
+  response: boolean;
+  token?: string;
+  [key: string]: unknown;
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class Login {
-  constructor(private http: HttpClient, private crypto: EncryptionService) { }
-  private API = environment.baseUrl
+  private readonly api = environment.baseUrl;
 
-  login(data: any) {
-    const payload = {
+  constructor(private http: HttpClient, private crypto: EncryptionService) {}
+
+  login(data: LoginPayload): Observable<LoginResponse> {
+    const payload: LoginPayload = {
       email: data.email,
-      password: data.password
+      password: data.password,
     };
 
     const encryptedPayload = this.crypto.encrypt(payload);
 
-    return this.http.post<any>(`${this.API}/login`, { encryptedPayload })
+    return this.http
+      .post<{ data?: string }>(`${this.api}/login`, { encryptedPayload })
       .pipe(
-        map((res: any) => {
-          try {
-            const decrypted = this.crypto.decrypt(res.data);
-            if (decrypted && decrypted.token) {
-              sessionStorage.setItem('token', decrypted.token);
+        map((res) => {
+          const decrypted = this.crypto.decrypt<LoginResponse>(res?.data ?? '');
 
-              return decrypted;
-            } else {
-              throw new Error('Invalid response format');
-            }
-          } catch (error) {
-            console.error('Decryption error:', error);
-            throw error;
+          if (decrypted?.token) {
+            return decrypted;
           }
-        })
+
+          throw new Error('Invalid response format');
+        }),
       );
   }
 
-  logout() {
+  logout(): void {
     sessionStorage.removeItem('token');
     sessionStorage.removeItem('user');
   }
@@ -49,7 +56,6 @@ export class Login {
   }
 
   isLoggedIn(): boolean {
-    return !!this.getToken();
+    return Boolean(this.getToken());
   }
-
 }

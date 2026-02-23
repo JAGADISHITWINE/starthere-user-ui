@@ -5,9 +5,9 @@
 export const environment = {
   production: false,
   baseUrl: 'http://localhost:4002/api/auth',
-
-  encryptionKey: "JagguBoss_Secret_2025!",
-  encryptionSalt: 'start-here-salt'
+  assetBaseUrl: 'http://localhost:4001',
+  encryptionKey: 'JagguBoss_Secret_2025!',
+  encryptionSalt: 'start-here-salt',
 };
 
 /*
