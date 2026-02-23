@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Auth } from 'src/app/core/auth';
 import { AuthModalService } from 'src/app/auth/auth-modal.service';
 
@@ -11,9 +12,10 @@ import { AuthModalService } from 'src/app/auth/auth-modal.service';
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
   standalone: true,
-  imports: [IonicModule, RouterLink, CommonModule, FormsModule]
+  imports: [IonicModule, RouterLink, CommonModule, FormsModule],
 })
 export class HeaderComponent implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
 
   // Auth state
   isLoggedIn = false;
@@ -30,30 +32,23 @@ export class HeaderComponent implements OnInit {
   constructor(
     private routes: Router,
     private authService: Auth,
-    private authModal: AuthModalService
+    private authModal: AuthModalService,
   ) {}
 
   ngOnInit() {
-    this.authService.authStatus$.subscribe(isLoggedIn => {
-      this.isLoggedIn = isLoggedIn;
+    this.authService.authStatus$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((isLoggedIn) => {
+        this.isLoggedIn = isLoggedIn;
 
-      if (isLoggedIn) {
-        const token = sessionStorage.getItem('token');
-          let user: any = {};
-          if (token) {
-            try {
-              user = JSON.parse(atob(token.split('.')[1]));
-            } catch (e) {
-              user = {};
-            }
-          }
-          this.userName = user.name || 'User';
-          this.userEmail = user.email || '';
-
-      } else {
-        this.resetUserData();
-      }
-    });
+        if (isLoggedIn) {
+          const user = this.authService.getDecodedTokenPayload();
+          this.userName = typeof user?.name === 'string' ? user.name : 'User';
+          this.userEmail = typeof user?.email === 'string' ? user.email : '';
+        } else {
+          this.resetUserData();
+        }
+      });
   }
 
   /* ---------------- AUTH ---------------- */
@@ -67,17 +62,10 @@ export class HeaderComponent implements OnInit {
   }
 
   logout() {
-    sessionStorage.removeItem('token');
-    sessionStorage.removeItem('userData');
-
+    this.authService.logout();
     this.resetUserData();
-
     this.closeUserDropdown();
     this.closeMobileMenu();
-
-    setTimeout(()=>{
-          this.routes.navigateByUrl('/');
-    },500)
   }
 
   /* ---------------- USER UI ---------------- */
@@ -94,7 +82,7 @@ export class HeaderComponent implements OnInit {
     if (!this.userName) return 'U';
     return this.userName
       .split(' ')
-      .map(n => n[0])
+      .map((n) => n[0])
       .join('')
       .toUpperCase();
   }
@@ -126,4 +114,3 @@ export class HeaderComponent implements OnInit {
     this.isLoggedIn = false;
   }
 }
-
