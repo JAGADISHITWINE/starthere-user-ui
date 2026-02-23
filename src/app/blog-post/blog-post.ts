@@ -1,8 +1,9 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
+import { map } from "rxjs/operators";
 import { environment } from "src/environments/environment";
-import { Post } from "../blog/blog";
+import { EncryptionService } from "../core/encryption.service";
 
 @Injectable({
   providedIn: "root",
@@ -10,14 +11,60 @@ import { Post } from "../blog/blog";
 export class BlogPost {
   private API = environment.baseUrl;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private crypto: EncryptionService) {}
 
-  // Update existing post with FormData
-  updatePost(id: number, formData: FormData): Observable<any> {
-    return this.http.put(`${this.API}/blog/posts/${id}`, formData);
+  // ==================== GET METHODS ====================
+
+  getPost(id: number): Observable<any> {
+    return this.http.get(`${this.API}/blog/posts/${id}`).pipe(
+      map((res: any) => {
+        const decrypted = this.crypto.decrypt(res.data);
+        return { ...res, data: decrypted };
+      })
+    );
   }
 
-  // Save post (create or update)
+  getCategories(): Observable<any> {
+    return this.http.get(`${this.API}/categories`).pipe(
+      map((res: any) => {
+        const decrypted = this.crypto.decrypt(res.data);
+        return { ...res, data: decrypted };
+      })
+    );
+  }
+
+  // ==================== POST/PUT METHODS ====================
+
+  createPost(formData: FormData): Observable<any> {
+    const encryptedFormData = this.encryptFormData(formData);
+    return this.http.post(`${this.API}/blog/posts`, encryptedFormData).pipe(
+      map((res: any) => {
+        try {
+          const decrypted = this.crypto.decrypt(res.data);
+          return { ...res, data: decrypted };
+        } catch (error) {
+          console.error('Decryption error:', error);
+          throw error;
+        }
+      })
+    );
+  }
+
+  updatePost(id: number, formData: FormData): Observable<any> {
+    const encryptedFormData = this.encryptFormData(formData);
+    return this.http.put(`${this.API}/blog/posts/${id}`, encryptedFormData).pipe(
+      map((res: any) => {
+        try {
+          const decrypted = this.crypto.decrypt(res.data);
+          return { ...res, data: decrypted };
+        } catch (error) {
+          console.error('Decryption error:', error);
+          throw error;
+        }
+      })
+    );
+  }
+
   savePost(id: number | null, formData: FormData): Observable<any> {
     if (id) {
       return this.updatePost(id, formData);
@@ -26,18 +73,30 @@ export class BlogPost {
     }
   }
 
-  // Create new post with FormData
-  createPost(formData: FormData): Observable<any> {
-    return this.http.post(`${this.API}/blog/posts`, formData);
-  }
+  // ==================== HELPER ====================
 
-  // Get categories
-  getCategories(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.API}/categories`);
-  }
+  private encryptFormData(formData: FormData): FormData {
+    // Extract all non-file fields
+    const plainData: any = {};
+    formData.forEach((value, key) => {
+      if (!(value instanceof File)) {
+        plainData[key] = value;
+      }
+    });
 
-  // Get single post by ID
-  getPost(id: number): Observable<Post> {
-    return this.http.get<Post>(`${this.API}/blog/posts/${id}`);
+    // Encrypt fields
+    const encryptedPayload = this.crypto.encrypt(plainData);
+
+    // Build new FormData with encrypted payload + raw image
+    const encryptedFormData = new FormData();
+    encryptedFormData.append('encryptedPayload', encryptedPayload);
+
+    // Re-attach image file as-is (can't encrypt binary)
+    const imageFile = formData.get('image');
+    if (imageFile instanceof File) {
+      encryptedFormData.append('image', imageFile, imageFile.name);
+    }
+
+    return encryptedFormData;
   }
 }

@@ -1,32 +1,159 @@
-<!-- FOOTER -->
-<footer class="app-footer">
-  <div class="footer-grid">
-    <div class="footer-section">
-      <img class='logo' src="../../../assets/assets/navbarimg.png" alt="Logo" />
-      <img class='title' src="../../../assets/assets/titlename.png" alt="Logo" />
-      <p>Exploring the magnificent Western Ghats, one trek at a time.</p>
-    </div>
+<!-- footer.component.html -->
+<footer class="footer-section">
 
-    <div class="footer-section">
-      <h4>Quick Links</h4>
-      <ul>
-        <li routerLink="about">About Us</li>
-        <li routerLink="faqs">FAQ's</li>
-        <li routerLink="blog">Blog</li>
-        <li routerLink="terms">Terms & Conditions</li>
-        <li routerLink="cancellation">Cancellation Policy</li>
-      </ul>
-    </div>
+  <!-- ========== MAIN FOOTER ========== -->
+  <div class="footer-main">
+    <div class="container">
+      <div class="row gy-5">
 
-    <div class="footer-section">
-      <h4>Contact Info</h4>
-      <p>📧 info@karnataka-adventures.com</p>
-      <p>📞 +91 98765 43210</p>
-      <p>📍 Bengaluru, Karnataka</p>
+        <!-- Col 1: Logo + About -->
+        <div class="col-12 col-lg-4">
+          <div class="footer-logo mb-4">
+            <img src="../../../assets/assets/logo.png" alt="Karnataka Adventures"
+              onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='flex'">
+            <div class="logo-text-fallback" id="logo-fallback">
+              <span class="logo-mountain"></span>
+              <div class="logo-words">
+                <span class="logo-name">Karnataka</span>
+                <span class="logo-sub">Adventures</span>
+              </div>
+            </div>
+          </div>
+
+          <p class="footer-about-text">
+            Karnataka's leading trekking and adventure travel company. Since 2015, we've been guiding passionate
+            explorers through the breathtaking peaks, lush forests, and hidden trails of the Western Ghats.
+          </p>
+          <p class="footer-about-text">
+            Our certified guides, safety-first approach, and deep love for Karnataka's wilderness make every
+            trek an unforgettable story worth telling.
+          </p>
+
+          <div class="footer-social mt-4">
+            <span class="social-label">Follow our adventures</span>
+            <div class="social-icons mt-2">
+              <a href="#" class="social-icon si-facebook" title="Facebook" aria-label="Facebook">
+                <i class="fab fa-facebook-f"></i>
+              </a>
+              <a href="#" class="social-icon si-instagram" title="Instagram" aria-label="Instagram">
+                <i class="fab fa-instagram"></i>
+              </a>
+              <a href="#" class="social-icon si-youtube" title="YouTube" aria-label="YouTube">
+                <i class="fab fa-youtube"></i>
+              </a>
+              <a href="#" class="social-icon si-whatsapp" title="WhatsApp" aria-label="WhatsApp">
+                <i class="fab fa-whatsapp"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Col 2: Quick Links -->
+        <div class="col-6 col-md-3 col-lg-2 offset-lg-1">
+          <div class="footer-widget">
+            <h5 class="footer-widget-title">Quick Links</h5>
+            <ul class="footer-links">
+              <li><a routerLink="/">Home</a></li>
+              <li><a routerLink="about">About Us</a></li>
+              <li><a routerLink="blog">Blog</a></li>
+              <li><a routerLink="faqs">FAQ's</a></li>
+              <li><a routerLink="cancellation">Cancellation</a></li>
+              <li><a routerLink="termsandcondition">Terms & Conditions</a></li>
+            </ul>
+          </div>
+        </div>
+
+
+        <!-- Col 3: Newsletter + Trust -->
+        <div class="col-12 col-md-6 col-lg-3">
+          <div class="footer-widget">
+            <h5 class="footer-widget-title">Stay Updated</h5>
+            <p class="footer-newsletter-text">
+              Get trek alerts, seasonal guides, and exclusive offers straight to your inbox.
+            </p>
+            <div class="newsletter-form">
+              <input type="email" placeholder="Your email address" class="newsletter-input">
+              <button class="newsletter-btn" type="button" aria-label="Subscribe">
+                <i class="fas fa-paper-plane"></i>
+              </button>
+            </div>
+
+            <div class="trust-badges mt-4">
+              <div class="trust-item">
+                <i class="fas fa-shield-alt"></i>
+                <span>100% Safe Treks</span>
+              </div>
+              <div class="trust-item">
+                <i class="fas fa-certificate"></i>
+                <span>Certified Guides</span>
+              </div>
+              <div class="trust-item">
+                <i class="fas fa-star"></i>
+                <span>4.9★ Rated on Google</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div>
   </div>
 
-  <p class="copyright">
-    © 2026 Karnataka Adventures. All rights reserved.
-  </p>
+  <!-- ========== CTA STRIP ========== -->
+  <div class="footer-cta">
+    <div class="container">
+      <div class="row py-4 gy-4">
+        <div class="col-12 col-md-4">
+          <div class="single-cta">
+            <i class="fas fa-map-marker-alt"></i>
+            <div class="cta-text">
+              <h4>Find us</h4>
+              <span>Bengaluru, Karnataka</span>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-md-4">
+          <div class="single-cta">
+            <i class="fas fa-phone"></i>
+            <div class="cta-text">
+              <h4>Call us</h4>
+              <span>+91 98765 43210</span>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-md-4">
+          <div class="single-cta">
+            <i class="far fa-envelope-open"></i>
+            <div class="cta-text">
+              <h4>Mail us</h4>
+              <span>info&#64;karnataka-adventures.com</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== COPYRIGHT BAR ========== -->
+  <div class="copyright-area">
+    <div class="container">
+      <div class="row align-items-center gy-2">
+        <div class="col-12 col-lg-6 text-center text-lg-start">
+          <p class="copyright-text mb-0">
+            Copyright &copy; 2026 <a href="#">Karnataka Adventures</a>. All rights reserved.
+          </p>
+        </div>
+        <div class="col-12 col-lg-6 text-center text-lg-end">
+          <ul class="footer-menu">
+            <li><a routerLink="about">About</a></li>
+            <li><a routerLink="faqs">FAQ's</a></li>
+            <li><a routerLink="blog">Blog</a></li>
+            <li><a routerLink="termsandcondition">Terms & Conditions</a></li>
+            <li><a routerLink="cancellation">Cancellation</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </footer>

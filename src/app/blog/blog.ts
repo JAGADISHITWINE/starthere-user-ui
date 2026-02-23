@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { EncryptionService } from '../core/encryption.service';
 
 export interface Post {
   id?: number;
@@ -31,55 +32,134 @@ export interface Post {
 export class Blog {
   private API = environment.baseUrl;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private crypto: EncryptionService
+  ) {}
 
-  // Get single post by ID
-  getPost(id: number): Observable<Post> {
-    return this.http.get<Post>(`${this.API}/blog/posts/${id}`);
+  // ==================== GET METHODS ====================
+
+  getPost(id: number): Observable<any> {
+    return this.http.get(`${this.API}/blog/posts/${id}`).pipe(
+      map((res: any) => {
+        const decrypted = this.crypto.decrypt(res.data);
+        return { ...res, data: decrypted };
+      })
+    );
   }
 
-  // Get all posts (for admin)
-  getAllPosts(): Observable<Post[]> {
-    return this.http.get<Post[]>(`${this.API}/blog/posts`);
+  getAllPosts(): Observable<any> {
+    return this.http.get(`${this.API}/blog/posts`).pipe(
+      map((res: any) => {
+        const decrypted = this.crypto.decrypt(res.data);
+        return { ...res, data: decrypted };
+      })
+    );
   }
 
-  // Get published posts (for public blog)
-  getPublishedPosts(): Observable<Post[]> {
-    return this.http.get<Post[]>(`${this.API}/blog/posts`);
+  getPublishedPosts(): Observable<any> {
+    return this.http.get(`${this.API}/blog/posts`).pipe(
+      map((res: any) => {
+        const decrypted = this.crypto.decrypt(res.data);
+        return { ...res, data: decrypted };
+      })
+    );
   }
 
-  // Get single published post by ID or slug (for public blog)
-  getPublishedPost(idOrSlug: string | number): Observable<Post> {
-    return this.http.get<Post>(`${this.API}/blog/posts/${idOrSlug}`);
+  getPublishedPost(idOrSlug: string | number): Observable<any> {
+    return this.http.get(`${this.API}/blog/posts/${idOrSlug}`).pipe(
+      map((res: any) => {
+        const decrypted = this.crypto.decrypt(res.data);
+        return { ...res, data: decrypted };
+      })
+    );
   }
 
-  // Get featured posts
-  getFeaturedPosts(): Observable<Post[]> {
-    return this.http.get<Post[]>(`${this.API}/blog/posts/featured`);
+  getPostsByCategory(category: string): Observable<any> {
+    return this.http.get(`${this.API}/blog/posts/category/${category}`).pipe(
+      map((res: any) => {
+        const decrypted = this.crypto.decrypt(res.data);
+        return { ...res, data: decrypted };
+      })
+    );
   }
 
-  // Get posts by category
-  getPostsByCategory(category: string): Observable<Post[]> {
-    return this.http.get<Post[]>(`${this.API}/blog/posts/category/${category}`);
+  getCategories(): Observable<any> {
+    return this.http.get(`${this.API}/blog/categories`).pipe(
+      map((res: any) => {
+        const decrypted = this.crypto.decrypt(res.data);
+        return { ...res, data: decrypted };
+      })
+    );
   }
 
-  // Delete post
-  deletePost(id: number): Observable<any> {
-    return this.http.delete(`${this.API}/blog/posts/${id}`);
-  }
-
-  // Publish post
-  publishPost(id: number): Observable<any> {
-    return this.http.patch(`${this.API}/blog/posts/${id}/publish`, {});
-  }
-
-  // Get categories
-  getCategories(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.API}/categories`);
-  }
-
-  // Increment view count
   incrementViews(postId: number): Observable<any> {
-    return this.http.post(`${this.API}/blog/posts/${postId}/view`, {});
+    return this.http.post(`${this.API}/blog/posts/${postId}/view`, {}).pipe(
+      map((res: any) => {
+        const decrypted = this.crypto.decrypt(res.data);
+        return { ...res, data: decrypted };
+      })
+    );
+  }
+
+  // ==================== POST/PUT METHODS ====================
+
+  savePost(id: number | null, formData: FormData): Observable<any> {
+    // NOTE: FormData cannot be encrypted directly.
+    // Extract fields, encrypt non-file data, then reattach image.
+    const plainData: any = {};
+    formData.forEach((value, key) => {
+      if (!(value instanceof File)) {
+        plainData[key] = value;
+      }
+    });
+
+    const encryptedPayload = this.crypto.encrypt(plainData);
+    const encryptedFormData = new FormData();
+    encryptedFormData.append('encryptedPayload', encryptedPayload);
+
+    // Re-attach image file if present
+    const imageFile = formData.get('image');
+    if (imageFile instanceof File) {
+      encryptedFormData.append('image', imageFile, imageFile.name);
+    }
+
+    const request$ = id
+      ? this.http.put(`${this.API}/blog/posts/${id}`, encryptedFormData)
+      : this.http.post(`${this.API}/blog/posts`, encryptedFormData);
+
+    return request$.pipe(
+      map((res: any) => {
+        try {
+          const decrypted = this.crypto.decrypt(res.data);
+          return { ...res, data: decrypted };
+        } catch (error) {
+          console.error('Decryption error:', error);
+          throw error;
+        }
+      })
+    );
+  }
+
+  deletePost(id: number): Observable<any> {
+    const encryptedPayload = this.crypto.encrypt({ id });
+    return this.http.delete(`${this.API}/blog/posts/${id}`, {
+      body: { encryptedPayload }
+    }).pipe(
+      map((res: any) => {
+        const decrypted = this.crypto.decrypt(res.data);
+        return { ...res, data: decrypted };
+      })
+    );
+  }
+
+  publishPost(id: number): Observable<any> {
+    const encryptedPayload = this.crypto.encrypt({ id });
+    return this.http.patch(`${this.API}/blog/posts/${id}/publish`, { encryptedPayload }).pipe(
+      map((res: any) => {
+        const decrypted = this.crypto.decrypt(res.data);
+        return { ...res, data: decrypted };
+      })
+    );
   }
 }

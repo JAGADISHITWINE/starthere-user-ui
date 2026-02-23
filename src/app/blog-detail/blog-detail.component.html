@@ -203,7 +203,7 @@
 </div>
 
 <!-- Related Posts -->
-<div class="related-grid" *ngIf="!Loading && relatedPosts.length > 0">
+<div class="related-grid mb-2" *ngIf="!Loading && relatedPosts.length > 0">
   <ion-card
     *ngFor="let relatedPost of relatedPosts"
     button
@@ -232,3 +232,8 @@
   <p class="text-muted">No related articles found.</p>
 </div>
 
+<!-- FLOATING ADD BUTTON -->
+<button class="btn btn-success position-fixed bottom-0 end-0 m-4 rounded-circle shadow-lg"
+  style="width: 56px; height: 56px; z-index: 1000;" (click)="createPost()">
+  <ion-icon name="add" style="font-size: 24px;"></ion-icon>
+</button>

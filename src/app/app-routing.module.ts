@@ -65,7 +65,7 @@ const routes: Routes = [
           import('./cancle-bookings/cancle-bookings-module').then(m => m.CancleBookingsModule)
       },
       {
-        path: 'terms',
+        path: 'termsandcondition',
         loadChildren: () =>
           import('./Quicklinks/termsandconditions/termsandconditons-module')
             .then(m => m.TermsandconditionsModule)
@@ -75,6 +75,12 @@ const routes: Routes = [
         loadChildren: () =>
           import('./Quicklinks/termsandconditions/termsandconditons-module')
             .then(m => m.TermsandconditionsModule)
+      },
+      {
+        path:'blog-post',
+        loadChildren:()=>
+          import('./blog-post/blog-post-module')
+         .then(m => m.BlogPostModule)
       }
 
     ]

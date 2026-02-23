@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { IonicModule, LoadingController } from '@ionic/angular';
-import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
-import { Blog } from './blog';
+import { Component, OnInit } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { IonicModule, LoadingController } from "@ionic/angular";
+import { FormsModule } from "@angular/forms";
+import { Router } from "@angular/router";
+import { Blog } from "./blog";
 
 interface BlogPost {
   id: number;
@@ -24,25 +24,25 @@ interface BlogPost {
 }
 
 @Component({
-  selector: 'app-blog',
-  templateUrl: './blog.component.html',
-  styleUrls: ['./blog.component.scss'],
+  selector: "app-blog",
+  templateUrl: "./blog.component.html",
+  styleUrls: ["./blog.component.scss"],
   standalone: true,
   imports: [IonicModule, CommonModule, FormsModule],
 })
 export class BlogComponent implements OnInit {
-  selectedCategory: string = 'all';
-  searchQuery: string = '';
+  selectedCategory: string = "all";
+  searchQuery: string = "";
   isLoading: boolean = false;
 
   categories = [
-    { value: 'all', label: 'All Posts', icon: 'apps' },
-    { value: 'trek-guides', label: 'Trek Guides', icon: 'map' },
-    { value: 'tips-tricks', label: 'Tips & Tricks', icon: 'bulb' },
-    { value: 'gear-reviews', label: 'Gear Reviews', icon: 'bag-handle' },
-    { value: 'travel-stories', label: 'Travel Stories', icon: 'book' },
-    { value: 'safety', label: 'Safety', icon: 'shield-checkmark' },
-    { value: 'destinations', label: 'Destinations', icon: 'location' }
+    { value: "all", label: "All Posts", icon: "apps" },
+    { value: "trek-guides", label: "Trek Guides", icon: "map" },
+    { value: "tips-tricks", label: "Tips & Tricks", icon: "bulb" },
+    { value: "gear-reviews", label: "Gear Reviews", icon: "bag-handle" },
+    { value: "travel-stories", label: "Travel Stories", icon: "book" },
+    { value: "safety", label: "Safety", icon: "shield-checkmark" },
+    { value: "destinations", label: "Destinations", icon: "location" },
   ];
 
   allPosts: BlogPost[] = [];
@@ -51,8 +51,8 @@ export class BlogComponent implements OnInit {
   constructor(
     private router: Router,
     private blogService: Blog,
-    private loadingController: LoadingController
-  ) { }
+    private loadingController: LoadingController,
+  ) {}
 
   ngOnInit() {
     this.loadPosts();
@@ -62,22 +62,24 @@ export class BlogComponent implements OnInit {
   async loadPosts() {
     this.isLoading = true;
     const loading = await this.loadingController.create({
-      message: 'Loading posts...',
+      message: "Loading posts...",
     });
     await loading.present();
 
     this.blogService.getPublishedPosts().subscribe({
-      next: (posts:any) => {
-        this.allPosts = posts.data.map((post:any)=> this.mapPostToBlogPost(post));
+      next: (posts: any) => {
+        this.allPosts = posts.data.map((post: any) =>
+          this.mapPostToBlogPost(post),
+        );
         this.extractPopularTags();
         loading.dismiss();
         this.isLoading = false;
       },
       error: (error) => {
-        console.error('Error loading posts:', error);
+        console.error("Error loading posts:", error);
         loading.dismiss();
         this.isLoading = false;
-      }
+      },
     });
   }
 
@@ -85,21 +87,21 @@ export class BlogComponent implements OnInit {
     this.blogService.getCategories().subscribe({
       next: (categories) => {
         // Map backend categories to frontend format
-        const mappedCategories = categories.map(cat => ({
-          value: cat.slug || cat.name.toLowerCase().replace(/\s+/g, '-'),
+        const mappedCategories = categories.map((cat:any) => ({
+          value: cat.slug || cat.name.toLowerCase().replace(/\s+/g, "-"),
           label: cat.name,
-          icon: this.getCategoryIconByName(cat.name)
+          icon: this.getCategoryIconByName(cat.name),
         }));
 
         // Keep "All Posts" at the beginning
         this.categories = [
-          { value: 'all', label: 'All Posts', icon: 'apps' },
-          ...mappedCategories
+          { value: "all", label: "All Posts", icon: "apps" },
+          ...mappedCategories,
         ];
       },
       error: (error) => {
-        console.error('Error loading categories:', error);
-      }
+        console.error("Error loading categories:", error);
+      },
     });
   }
 
@@ -109,38 +111,40 @@ export class BlogComponent implements OnInit {
       title: post.title,
       excerpt: post.excerpt,
       content: post.content,
-      image: post.featured_image? `http://localhost:4001/${post.featured_image}`: null,
+      image: post.featured_image
+        ? `http://localhost:4001/${post.featured_image}`
+        : null,
       author: {
-        name: post.author || 'Admin',
-        avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(post.author || 'Admin')}&size=100`
+        name: post.author_name || "Admin",
+        avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(post.author_name || "Admin")}&size=100`,
       },
       category: this.slugify(post.category_name || post.category),
       tags: post.tags || [],
       date: this.formatDate(post.published_at || post.created_at),
       readTime: this.calculateReadTime(post.content),
       views: post.views || 0,
-      featured: post.views > 2000
+      featured: post.views > 2000,
     };
   }
 
   slugify(text: string): string {
     return text
       .toLowerCase()
-      .replace(/\s+/g, '-')
-      .replace(/[^\w\-]+/g, '')
-      .replace(/\-\-+/g, '-');
+      .replace(/\s+/g, "-")
+      .replace(/[^\w\-]+/g, "")
+      .replace(/\-\-+/g, "-");
   }
 
   formatDate(dateString?: string): string {
-    if (!dateString) return 'Recently';
+    if (!dateString) return "Recently";
 
     const date = new Date(dateString);
     const options: Intl.DateTimeFormatOptions = {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric'
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
     };
-    return date.toLocaleDateString('en-GB', options);
+    return date.toLocaleDateString("en-GB", options);
   }
 
   calculateReadTime(content: string): string {
@@ -153,8 +157,8 @@ export class BlogComponent implements OnInit {
   extractPopularTags() {
     const tagFrequency: { [key: string]: number } = {};
 
-    this.allPosts.forEach(post => {
-      post.tags.forEach(tag => {
+    this.allPosts.forEach((post) => {
+      post.tags.forEach((tag) => {
         tagFrequency[tag] = (tagFrequency[tag] || 0) + 1;
       });
     });
@@ -168,41 +172,42 @@ export class BlogComponent implements OnInit {
 
   getCategoryIconByName(name: string): string {
     const iconMap: { [key: string]: string } = {
-      'Trek Guides': 'map',
-      'Tips & Tricks': 'bulb',
-      'Gear Reviews': 'bag-handle',
-      'Travel Stories': 'book',
-      'Safety': 'shield-checkmark',
-      'Destinations': 'location'
+      "Trek Guides": "map",
+      "Tips & Tricks": "bulb",
+      "Gear Reviews": "bag-handle",
+      "Travel Stories": "book",
+      Safety: "shield-checkmark",
+      Destinations: "location",
     };
-    return iconMap[name] || 'document-text';
+    return iconMap[name] || "document-text";
   }
 
   get featuredPosts(): BlogPost[] {
-    return this.allPosts.filter(post => post.featured).slice(0, 3);
+    return this.allPosts.filter((post) => post.featured).slice(0, 3);
   }
 
   get filteredPosts(): BlogPost[] {
     let posts = this.allPosts;
 
     // Filter by category
-    if (this.selectedCategory !== 'all') {
-      posts = posts.filter(post => post.category === this.selectedCategory);
+    if (this.selectedCategory !== "all") {
+      posts = posts.filter((post) => post.category === this.selectedCategory);
     }
 
     // Filter by search
     if (this.searchQuery.trim()) {
       const query = this.searchQuery.toLowerCase();
-      posts = posts.filter(post =>
-        post.title.toLowerCase().includes(query) ||
-        post.excerpt.toLowerCase().includes(query) ||
-        post.tags.some(tag => tag.toLowerCase().includes(query))
+      posts = posts.filter(
+        (post) =>
+          post.title.toLowerCase().includes(query) ||
+          post.excerpt.toLowerCase().includes(query) ||
+          post.tags.some((tag) => tag.toLowerCase().includes(query)),
       );
     }
 
     // Exclude featured posts from regular list if showing all
-    if (this.selectedCategory === 'all' && !this.searchQuery) {
-      posts = posts.filter(post => !post.featured);
+    if (this.selectedCategory === "all" && !this.searchQuery) {
+      posts = posts.filter((post) => !post.featured);
     }
 
     return posts;
@@ -212,8 +217,8 @@ export class BlogComponent implements OnInit {
     // Increment view count
     this.blogService.incrementViews(postId).subscribe({
       next: () => {
-        this.router.navigate(['/blog-details', postId]);
-      }
+        this.router.navigate(["/blog-details", postId]);
+      },
     });
   }
 
@@ -222,32 +227,32 @@ export class BlogComponent implements OnInit {
   }
 
   getCategoryIcon(category: string): string {
-    const cat = this.categories.find(c => c.value === category);
-    return cat ? cat.icon : 'document-text';
+    const cat = this.categories.find((c) => c.value === category);
+    return cat ? cat.icon : "document-text";
   }
 
   getCategoryColor(category: string): string {
     const colors: { [key: string]: string } = {
-      'trek-guides': 'primary',
-      'tips-tricks': 'success',
-      'gear-reviews': 'warning',
-      'travel-stories': 'tertiary',
-      'safety': 'danger',
-      'destinations': 'secondary'
+      "trek-guides": "primary",
+      "tips-tricks": "success",
+      "gear-reviews": "warning",
+      "travel-stories": "tertiary",
+      safety: "danger",
+      destinations: "secondary",
     };
-    return colors[category] || 'medium';
+    return colors[category] || "medium";
   }
 
   get categoryTitle(): string {
-    if (this.selectedCategory === 'all') {
-      return 'Latest Articles';
+    if (this.selectedCategory === "all") {
+      return "Latest Articles";
     }
 
     const category = this.categories.find(
-      c => c.value === this.selectedCategory
+      (c) => c.value === this.selectedCategory,
     );
 
-    return category?.label ?? 'Latest Articles';
+    return category?.label ?? "Latest Articles";
   }
 
   refreshPosts(event?: any) {
@@ -257,5 +262,9 @@ export class BlogComponent implements OnInit {
         event.target.complete();
       }, 1000);
     }
+  }
+
+  createPost() {
+    this.router.navigate(["/blog-post"]);
   }
 }

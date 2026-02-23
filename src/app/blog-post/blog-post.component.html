@@ -1,181 +1,948 @@
 <ion-header>
   <ion-toolbar color="primary">
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="/dashboard"></ion-back-button>
+    <ion-buttons slot="end">
+      <ion-button (click)="openExamplesModal()">
+        <ion-icon name="bulb-outline" slot="start"></ion-icon>
+        Examples
+      </ion-button>
     </ion-buttons>
-    <ion-title>{{ isEditMode ? 'Edit Post' : 'Create New Post' }}</ion-title>
   </ion-toolbar>
 </ion-header>
+<div class="editor-container">
+  <form [formGroup]="postForm">
+    <!-- Title -->
+    <ion-card>
+      <ion-card-content>
+        <ion-item lines="none">
+          <ion-input
+            formControlName="title"
+            placeholder="Post Title"
+            class="title-input"
+          >
+          </ion-input>
+        </ion-item>
+        <ion-text
+          color="danger"
+          *ngIf="
+            postForm.get('title')?.invalid && postForm.get('title')?.touched
+          "
+        >
+          <small>Title is required</small>
+        </ion-text>
+      </ion-card-content>
+    </ion-card>
 
-<ion-content>
-  <div class="editor-container">
-    <form [formGroup]="postForm">
-      <!-- Title -->
-      <ion-card>
-        <ion-card-content>
-          <ion-item lines="none">
-            <ion-input 
-              formControlName="title" 
-              placeholder="Post Title" 
-              class="title-input">
-            </ion-input>
-          </ion-item>
-          <ion-text color="danger" *ngIf="postForm.get('title')?.invalid && postForm.get('title')?.touched">
-            <small>Title is required</small>
-          </ion-text>
-        </ion-card-content>
-      </ion-card>
+    <!-- Excerpt -->
+    <ion-card>
+      <ion-card-content>
+        <ion-item>
+          <ion-label position="stacked">Brief Description (Excerpt)</ion-label>
+          <ion-textarea
+            formControlName="excerpt"
+            rows="3"
+            placeholder="Write a brief overview of your post..."
+          >
+          </ion-textarea>
+        </ion-item>
+        <ion-text
+          color="danger"
+          *ngIf="
+            postForm.get('excerpt')?.invalid && postForm.get('excerpt')?.touched
+          "
+        >
+          <small>Excerpt is required</small>
+        </ion-text>
+      </ion-card-content>
+    </ion-card>
 
-      <!-- Content -->
-      <ion-card>
-        <ion-card-header>
-          <ion-card-title>Content</ion-card-title>
-        </ion-card-header>
-        <ion-card-content>
-          <ion-item>
-            <ion-label position="stacked">Excerpt</ion-label>
-            <ion-textarea 
-              formControlName="excerpt" 
-              rows="3"
-              placeholder="Brief description of the post...">
-            </ion-textarea>
-          </ion-item>
-          <ion-text color="danger" *ngIf="postForm.get('excerpt')?.invalid && postForm.get('excerpt')?.touched">
-            <small>Excerpt is required</small>
-          </ion-text>
-
-          <!-- Rich Text Editor for Full Content -->
-          <div class="editor-wrapper">
-            <ion-label position="stacked" class="editor-label">Full Content</ion-label>
-            <quill-editor 
-              formControlName="content"
-              [modules]="quillModules"
-              placeholder="Write your blog post content here..."
-              class="content-editor">
-            </quill-editor>
+    <!-- Content Sections -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Content Sections</ion-card-title>
+        <ion-card-subtitle
+          >Build your post with flexible sections - perfect for any content
+          type</ion-card-subtitle
+        >
+      </ion-card-header>
+      <ion-card-content>
+        <!-- Sections List -->
+        <div formArrayName="sections" class="sections-container">
+          <!-- Empty State -->
+          <div *ngIf="sections.length === 0" class="empty-state">
+            <ion-icon
+              name="document-text-outline"
+              class="empty-icon"
+            ></ion-icon>
+            <p class="empty-text">
+              No sections yet. Click a button below to add your first section!
+            </p>
           </div>
-          <ion-text color="danger" *ngIf="postForm.get('content')?.invalid && postForm.get('content')?.touched">
-            <small>Content is required</small>
-          </ion-text>
-        </ion-card-content>
-      </ion-card>
 
-      <!-- Settings -->
-      <ion-card>
-        <ion-card-header>
-          <ion-card-title>Post Settings</ion-card-title>
-        </ion-card-header>
-        <ion-card-content>
-          <ion-item>
-            <ion-label position="stacked">Category</ion-label>
-            <ion-select placeholder="Select" formControlName="category">
-              <ion-select-option *ngFor="let cat of categories" [value]="cat">
-                {{ cat }}
-              </ion-select-option>
-            </ion-select>
-          </ion-item>
-          <ion-text color="danger" *ngIf="postForm.get('category')?.invalid && postForm.get('category')?.touched">
-            <small>Category is required</small>
-          </ion-text>
+          <!-- Section Items -->
+          <div
+            *ngFor="let section of sections.controls; let i = index"
+            [formGroupName]="i"
+            class="section-item"
+          >
+            <!-- Section Header -->
+            <div class="section-header">
+              <div class="section-type-badge">
+                <ion-icon
+                  [name]="getSectionIcon(section.get('type')?.value)"
+                ></ion-icon>
+                <span>{{ getSectionLabel(section.get("type")?.value) }}</span>
+              </div>
+              <div class="section-actions">
+                <ion-button
+                  fill="clear"
+                  size="small"
+                  (click)="moveSection(i, 'up')"
+                  [disabled]="i === 0"
+                >
+                  <ion-icon name="arrow-up" slot="icon-only"></ion-icon>
+                </ion-button>
+                <ion-button
+                  fill="clear"
+                  size="small"
+                  (click)="moveSection(i, 'down')"
+                  [disabled]="i === sections.length - 1"
+                >
+                  <ion-icon name="arrow-down" slot="icon-only"></ion-icon>
+                </ion-button>
+                <ion-button
+                  fill="clear"
+                  size="small"
+                  color="danger"
+                  (click)="removeSection(i)"
+                >
+                  <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+                </ion-button>
+              </div>
+            </div>
 
-          <ion-item>
-            <ion-label position="stacked">Publish Date</ion-label>
-            <ion-datetime 
-              formControlName="publishDate" 
-              presentation="date-time">
-            </ion-datetime>
-          </ion-item>
-
-          <div class="tags-section">
-            <ion-label>Tags</ion-label>
-            <div formArrayName="tags">
-              <div *ngFor="let tag of tags.controls; let i = index" class="tag-item">
+            <!-- Section Content -->
+            <div class="section-content">
+              <!-- TEXT SECTION -->
+              <div *ngIf="section.get('type')?.value === 'text'">
                 <ion-item>
-                  <ion-input 
-                    [formControlName]="i" 
-                    placeholder="Enter tag">
-                  </ion-input>
-                  <ion-button 
-                    slot="end" 
-                    fill="clear" 
-                    color="danger" 
-                    (click)="removeTag(i)" 
-                    *ngIf="tags.length > 1">
-                    <ion-icon name="close-circle"></ion-icon>
+                  <ion-label position="stacked">Heading (optional)</ion-label>
+                  <ion-input
+                    formControlName="heading"
+                    placeholder="e.g., Introduction, My Experience, Key Features..."
+                  ></ion-input>
+                </ion-item>
+                <ion-item>
+                  <ion-label position="stacked">Content *</ion-label>
+                  <ion-textarea
+                    formControlName="content"
+                    rows="6"
+                    placeholder="Write your content here..."
+                  ></ion-textarea>
+                </ion-item>
+              </div>
+
+              <!-- LIST SECTION -->
+              <div *ngIf="section.get('type')?.value === 'list'">
+                <ion-item>
+                  <ion-label position="stacked">List Heading *</ion-label>
+                  <ion-input
+                    formControlName="heading"
+                    placeholder="e.g., What to Carry, Pros and Cons, Key Features..."
+                  ></ion-input>
+                </ion-item>
+
+                <ion-item>
+                  <ion-label>List Type</ion-label>
+                  <ion-segment formControlName="listType">
+                    <ion-segment-button value="bullet">
+                      <ion-label>• Bullet</ion-label>
+                    </ion-segment-button>
+                    <ion-segment-button value="numbered">
+                      <ion-label>1. Numbered</ion-label>
+                    </ion-segment-button>
+                  </ion-segment>
+                </ion-item>
+
+                <div class="list-items-container" [formArrayName]="'listItems'">
+                  <ion-label class="list-label">List Items *</ion-label>
+                  <div
+                    *ngFor="let item of getListItems(i).controls; let j = index"
+                    class="list-item"
+                  >
+                    <ion-item>
+                      <ion-input
+                        [formControlName]="j"
+                        placeholder="List item {{ j + 1 }}"
+                      ></ion-input>
+                      <ion-button
+                        slot="end"
+                        fill="clear"
+                        color="danger"
+                        (click)="removeListItem(i, j)"
+                        *ngIf="getListItems(i).length > 1"
+                      >
+                        <ion-icon
+                          name="close-circle"
+                          slot="icon-only"
+                        ></ion-icon>
+                      </ion-button>
+                    </ion-item>
+                  </div>
+                  <ion-button
+                    fill="outline"
+                    size="small"
+                    (click)="addListItem(i)"
+                    class="add-item-btn"
+                  >
+                    <ion-icon name="add" slot="start"></ion-icon>
+                    Add Item
                   </ion-button>
+                </div>
+              </div>
+
+              <!-- QUOTE SECTION -->
+              <div *ngIf="section.get('type')?.value === 'quote'">
+                <ion-item>
+                  <ion-label position="stacked">Quote Text *</ion-label>
+                  <ion-textarea
+                    formControlName="content"
+                    rows="4"
+                    placeholder="Enter quote or testimonial..."
+                  ></ion-textarea>
+                </ion-item>
+                <ion-item>
+                  <ion-label position="stacked"
+                    >Attribution (optional)</ion-label
+                  >
+                  <ion-input
+                    formControlName="heading"
+                    placeholder="e.g., - John Doe, Experienced Trekker"
+                  ></ion-input>
+                </ion-item>
+              </div>
+
+              <!-- TIP BOX -->
+              <div *ngIf="section.get('type')?.value === 'tip'">
+                <ion-item>
+                  <ion-label position="stacked">Tip Title (optional)</ion-label>
+                  <ion-input
+                    formControlName="heading"
+                    placeholder="e.g., Pro Tip, Expert Advice..."
+                  ></ion-input>
+                </ion-item>
+                <ion-item>
+                  <ion-label position="stacked">Tip Content *</ion-label>
+                  <ion-textarea
+                    formControlName="content"
+                    rows="4"
+                    placeholder="Share your helpful tip or advice..."
+                  ></ion-textarea>
+                </ion-item>
+              </div>
+
+              <!-- WARNING BOX -->
+              <div *ngIf="section.get('type')?.value === 'warning'">
+                <ion-item>
+                  <ion-label position="stacked"
+                    >Warning Title (optional)</ion-label
+                  >
+                  <ion-input
+                    formControlName="heading"
+                    placeholder="e.g., Safety Warning, Important Note..."
+                  ></ion-input>
+                </ion-item>
+                <ion-item>
+                  <ion-label position="stacked">Warning Content *</ion-label>
+                  <ion-textarea
+                    formControlName="content"
+                    rows="4"
+                    placeholder="Important information readers should be aware of..."
+                  ></ion-textarea>
                 </ion-item>
               </div>
             </div>
-            <ion-button fill="outline" size="small" (click)="addTag()">
-              <ion-icon name="add" slot="start"></ion-icon>
-              Add Tag
+          </div>
+        </div>
+
+        <!-- Add Section Buttons -->
+        <div class="add-section-buttons">
+          <div class="section-label">Add Section:</div>
+          <div class="button-grid">
+            <ion-button
+              *ngFor="let type of sectionTypes"
+              fill="outline"
+              size="small"
+              (click)="addSection(type.value)"
+            >
+              <ion-icon [name]="type.icon" slot="start"></ion-icon>
+              {{ type.label }}
             </ion-button>
           </div>
-        </ion-card-content>
-      </ion-card>
+        </div>
+      </ion-card-content>
+    </ion-card>
 
-      <!-- Featured Image -->
-      <ion-card>
-        <ion-card-header>
-          <ion-card-title>Featured Image</ion-card-title>
-        </ion-card-header>
-        <ion-card-content>
-          
-          <!-- Image Preview -->
-          <div *ngIf="imagePreview" class="image-preview-container">
-            <img [src]="'http://localhost:4001/' + imagePreview" alt="Preview" class="image-preview" />
-            <ion-button 
-              expand="block" 
-              fill="clear" 
-              color="danger" 
-              (click)="removeImage()"
-              class="remove-image-btn">
-              <ion-icon name="trash-outline" slot="start"></ion-icon>
-              Remove Image
-            </ion-button>
+    <!-- Settings -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Post Settings</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-item>
+          <ion-label position="stacked">Category *</ion-label>
+          <ion-select placeholder="Select Category" formControlName="category">
+            <ion-select-option *ngFor="let cat of categories" [value]="cat">
+              {{ cat }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-text
+          color="danger"
+          *ngIf="
+            postForm.get('category')?.invalid &&
+            postForm.get('category')?.touched
+          "
+        >
+          <small>Category is required</small>
+        </ion-text>
+
+        <!-- Publish Date & Time -->
+        <div class="date-time-row">
+          <!-- Date -->
+          <mat-form-field appearance="outline" class="date-field">
+            <mat-label>Publish Date</mat-label>
+            <input
+              matInput
+              [matDatepicker]="picker"
+              formControlName="publishDate"
+              placeholder="Select date"
+              readonly
+            />
+            <mat-datepicker-toggle
+              matIconSuffix
+              [for]="picker"
+            ></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+
+          <!-- Time -->
+          <mat-form-field appearance="outline" class="time-field">
+            <mat-label>Publish Time</mat-label>
+            <input
+              matInput
+              [ngxMatTimepicker]="timePicker"
+              formControlName="publishTime"
+              placeholder="Select time"
+              readonly
+            />
+            <mat-icon
+              matSuffix
+              (click)="timePicker.open()"
+              style="cursor: pointer"
+              >⏰</mat-icon
+            >
+            <ngx-mat-timepicker #timePicker></ngx-mat-timepicker>
+          </mat-form-field>
+        </div>
+
+        <div class="tags-section">
+          <ion-label>Tags</ion-label>
+          <div formArrayName="tags">
+            <div
+              *ngFor="let tag of tags.controls; let i = index"
+              class="tag-item"
+            >
+              <ion-item>
+                <ion-input [formControlName]="i" placeholder="Enter tag">
+                </ion-input>
+                <ion-button
+                  slot="end"
+                  fill="clear"
+                  color="danger"
+                  (click)="removeTag(i)"
+                  *ngIf="tags.length > 1"
+                >
+                  <ion-icon name="close-circle"></ion-icon>
+                </ion-button>
+              </ion-item>
+            </div>
           </div>
-
-          <!-- Upload Button (show when no preview) -->
-          <ion-button 
-            *ngIf="!imagePreview"
-            expand="block" 
-            fill="outline" 
-            (click)="fileInput.click()">
-            <ion-icon name="image-outline" slot="start"></ion-icon>
-            Upload Image
+          <ion-button fill="outline" size="small" (click)="addTag()">
+            <ion-icon name="add" slot="start"></ion-icon>
+            Add Tag
           </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
 
-          <!-- Change Image Button (show when preview exists) -->
-          <ion-button 
-            *ngIf="imagePreview"
-            expand="block" 
-            fill="outline" 
-            (click)="fileInput.click()">
-            <ion-icon name="image-outline" slot="start"></ion-icon>
-            Change Image
+    <!-- Featured Image -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Featured Image</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <!-- Image Preview -->
+        <div *ngIf="imagePreview" class="image-preview-container">
+          <img [src]="imagePreview" alt="Preview" class="image-preview" />
+          <ion-button
+            expand="block"
+            fill="clear"
+            color="danger"
+            (click)="removeImage()"
+            class="remove-image-btn"
+          >
+            <ion-icon name="trash-outline" slot="start"></ion-icon>
+            Remove Image
           </ion-button>
+        </div>
 
-          <input 
-            #fileInput 
-            type="file" 
-            accept="image/*" 
-            style="display: none" 
-            (change)="onImageSelect($event)" 
-          />
-          
-          <ion-note class="ion-padding-top">
-            <small>Recommended size: 1200x630px. Max file size: 5MB</small>
-          </ion-note>
-        </ion-card-content>
-      </ion-card>
-
-      <!-- Action Buttons -->
-      <div class="action-buttons">
-        <ion-button expand="block" color="success" (click)="publish()">
-          <ion-icon name="paper-plane-outline" slot="start"></ion-icon>
-          Publish Now
+        <!-- Upload Button -->
+        <ion-button
+          *ngIf="!imagePreview"
+          expand="block"
+          fill="outline"
+          (click)="fileInput.click()"
+        >
+          <ion-icon name="image-outline" slot="start"></ion-icon>
+          Upload Image
         </ion-button>
+
+        <ion-button
+          *ngIf="imagePreview"
+          expand="block"
+          fill="outline"
+          (click)="fileInput.click()"
+        >
+          <ion-icon name="image-outline" slot="start"></ion-icon>
+          Change Image
+        </ion-button>
+
+        <input
+          #fileInput
+          type="file"
+          accept="image/*"
+          style="display: none"
+          (change)="onImageSelect($event)"
+          formControlName="image"
+        />
+
+        <ion-note class="ion-padding-top">
+          <small>Recommended size: 1200x630px. Max file size: 5MB</small>
+        </ion-note>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <button
+        class="btn btn-success w-100"
+        (click)="publish()"
+        [disabled]="this.postForm.invalid"
+      >
+        <i class="bi bi-telegram"></i>
+        Publish Now
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- Modal Backdrop -->
+<div
+  class="modal-backdrop fade"
+  [class.show]="showExamplesModal"
+  *ngIf="showExamplesModal"
+  (click)="closeExamplesModal()"
+></div>
+
+<!-- Modal -->
+<div
+  class="modal fade"
+  [class.show]="showExamplesModal"
+  [class.d-block]="showExamplesModal"
+  tabindex="-1"
+  role="dialog"
+>
+  <div class="modal-dialog modal-xl modal-dialog-scrollable" role="document">
+    <div class="modal-content">
+      <!-- Modal Header -->
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title fw-bold">
+          <i class="bi bi-book me-2"></i> Example Blog Posts
+        </h5>
+        <button
+          type="button"
+          class="btn-close btn-close-white"
+          (click)="closeExamplesModal()"
+        ></button>
       </div>
-    </form>
+
+      <!-- Modal Body -->
+      <div class="modal-body p-0">
+        <!-- Intro Banner -->
+        <div
+          class="alert alert-info rounded-0 mb-0 border-0 border-bottom border-info"
+        >
+          <i class="bi bi-info-circle me-2"></i>
+          Not sure how to start? Browse these examples and click
+          <strong>"Load This Example"</strong> to pre-fill the form. You can
+          then edit and customize the content.
+        </div>
+
+        <div class="p-4">
+          <!-- Example Tabs -->
+          <ul class="nav nav-tabs mb-4" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link fw-semibold"
+                [class.active]="selectedExample === 'trek'"
+                (click)="selectExample('trek')"
+                type="button"
+              >
+                🏔️ Trek Guide
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link fw-semibold"
+                [class.active]="selectedExample === 'review'"
+                (click)="selectExample('review')"
+                type="button"
+              >
+                ⭐ Gear Review
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link fw-semibold"
+                [class.active]="selectedExample === 'story'"
+                (click)="selectExample('story')"
+                type="button"
+              >
+                ✈️ Travel Story
+              </button>
+            </li>
+          </ul>
+
+          <!-- ===================== TREK GUIDE ===================== -->
+          <div *ngIf="selectedExample === 'trek'">
+            <div class="row g-4">
+              <!-- Left: Meta Info -->
+              <div class="col-lg-4">
+                <div class="card h-100 border-0 shadow-sm">
+                  <div class="card-header bg-success text-white fw-bold">
+                    🏔️ Trek Guide Example
+                  </div>
+                  <div class="card-body">
+                    <p class="text-muted small mb-3">
+                      Perfect for: trekking guides, hiking routes, mountain
+                      trails
+                    </p>
+
+                    <div class="mb-3">
+                      <span class="text-muted small text-uppercase fw-bold"
+                        >Title</span
+                      >
+                      <p class="mb-0 fw-semibold">
+                        {{ examples.trek.data.title }}
+                      </p>
+                    </div>
+
+                    <div class="mb-3">
+                      <span class="text-muted small text-uppercase fw-bold"
+                        >Excerpt</span
+                      >
+                      <p class="mb-0 small">{{ examples.trek.data.excerpt }}</p>
+                    </div>
+
+                    <div class="mb-3">
+                      <span class="text-muted small text-uppercase fw-bold"
+                        >Category</span
+                      >
+                      <p class="mb-0">
+                        <span class="badge bg-success">{{
+                          examples.trek.data.category
+                        }}</span>
+                      </p>
+                    </div>
+
+                    <div class="mb-3">
+                      <span class="text-muted small text-uppercase fw-bold"
+                        >Tags</span
+                      >
+                      <div class="d-flex flex-wrap gap-1 mt-1">
+                        <span
+                          *ngFor="let tag of examples.trek.data.tags"
+                          class="badge bg-light text-dark border"
+                          >{{ tag }}</span
+                        >
+                      </div>
+                    </div>
+
+                    <div class="mb-3">
+                      <span class="text-muted small text-uppercase fw-bold"
+                        >Sections Included</span
+                      >
+                      <ul class="list-group list-group-flush mt-1">
+                        <li
+                          *ngFor="let section of examples.trek.data.sections"
+                          class="list-group-item px-0 py-1 border-0 small"
+                        >
+                          <i
+                            class="bi bi-check-circle-fill text-success me-1"
+                          ></i>
+                          {{ getSectionLabel(section.type) }}
+                          <span *ngIf="section.heading" class="text-muted"
+                            >– {{ section.heading }}</span
+                          >
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div class="card-footer bg-white border-0">
+                    <button
+                      class="btn btn-success w-100 fw-bold"
+                      (click)="loadExample('trek')"
+                    >
+                      <i class="bi bi-download me-2"></i> Load This Example
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right: Full Content Preview -->
+              <div class="col-lg-8">
+                <h6 class="text-muted text-uppercase fw-bold mb-3">
+                  <i class="bi bi-eye me-1"></i> Full Content Preview
+                </h6>
+                <div class="sections-preview">
+                  <div
+                    *ngFor="let section of examples.trek.data.sections"
+                    class="section-preview-card mb-3"
+                  >
+                    <!-- Section Type Badge -->
+                    <div class="d-flex align-items-center mb-2">
+                      <span
+                        class="section-type-pill me-2"
+                        [ngClass]="getSectionClass(section.type)"
+                      >
+                        {{ getSectionLabel(section.type) }}
+                      </span>
+                      <span
+                        *ngIf="section.heading"
+                        class="fw-semibold text-dark"
+                        >{{ section.heading }}</span
+                      >
+                    </div>
+
+                    <!-- Content -->
+                    <p
+                      *ngIf="section.content"
+                      class="text-secondary small mb-1"
+                    >
+                      {{ section.content }}
+                    </p>
+                    <ul
+                      *ngIf="section.listItems && section.listItems.length > 0"
+                      class="small mb-0 ps-3"
+                      [class.list-styled-numbered]="
+                        section.listType === 'numbered'
+                      "
+                    >
+                      <li
+                        *ngFor="let item of section.listItems"
+                        class="text-secondary"
+                      >
+                        {{ item }}
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ===================== GEAR REVIEW ===================== -->
+          <div *ngIf="selectedExample === 'review'">
+            <div class="row g-4">
+              <div class="col-lg-4">
+                <div class="card h-100 border-0 shadow-sm">
+                  <div class="card-header bg-warning text-dark fw-bold">
+                    ⭐ Gear Review Example
+                  </div>
+                  <div class="card-body">
+                    <p class="text-muted small mb-3">
+                      Perfect for: product reviews, equipment testing, gear
+                      comparisons
+                    </p>
+
+                    <div class="mb-3">
+                      <span class="text-muted small text-uppercase fw-bold"
+                        >Title</span
+                      >
+                      <p class="mb-0 fw-semibold">
+                        {{ examples.review.data.title }}
+                      </p>
+                    </div>
+
+                    <div class="mb-3">
+                      <span class="text-muted small text-uppercase fw-bold"
+                        >Excerpt</span
+                      >
+                      <p class="mb-0 small">
+                        {{ examples.review.data.excerpt }}
+                      </p>
+                    </div>
+
+                    <div class="mb-3">
+                      <span class="text-muted small text-uppercase fw-bold"
+                        >Category</span
+                      >
+                      <p class="mb-0">
+                        <span class="badge bg-warning text-dark">{{
+                          examples.review.data.category
+                        }}</span>
+                      </p>
+                    </div>
+
+                    <div class="mb-3">
+                      <span class="text-muted small text-uppercase fw-bold"
+                        >Tags</span
+                      >
+                      <div class="d-flex flex-wrap gap-1 mt-1">
+                        <span
+                          *ngFor="let tag of examples.review.data.tags"
+                          class="badge bg-light text-dark border"
+                          >{{ tag }}</span
+                        >
+                      </div>
+                    </div>
+
+                    <div class="mb-3">
+                      <span class="text-muted small text-uppercase fw-bold"
+                        >Sections Included</span
+                      >
+                      <ul class="list-group list-group-flush mt-1">
+                        <li
+                          *ngFor="let section of examples.review.data.sections"
+                          class="list-group-item px-0 py-1 border-0 small"
+                        >
+                          <i
+                            class="bi bi-check-circle-fill text-warning me-1"
+                          ></i>
+                          {{ getSectionLabel(section.type) }}
+                          <span *ngIf="section.heading" class="text-muted"
+                            >– {{ section.heading }}</span
+                          >
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div class="card-footer bg-white border-0">
+                    <button
+                      class="btn btn-warning w-100 fw-bold text-dark"
+                      (click)="loadExample('review')"
+                    >
+                      <i class="bi bi-download me-2"></i> Load This Example
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-lg-8">
+                <h6 class="text-muted text-uppercase fw-bold mb-3">
+                  <i class="bi bi-eye me-1"></i> Full Content Preview
+                </h6>
+                <div class="sections-preview">
+                  <div
+                    *ngFor="let section of examples.review.data.sections"
+                    class="section-preview-card mb-3"
+                  >
+                    <div class="d-flex align-items-center mb-2">
+                      <span
+                        class="section-type-pill me-2"
+                        [ngClass]="getSectionClass(section.type)"
+                      >
+                        {{ getSectionLabel(section.type) }}
+                      </span>
+                      <span
+                        *ngIf="section.heading"
+                        class="fw-semibold text-dark"
+                        >{{ section.heading }}</span
+                      >
+                    </div>
+                    <p
+                      *ngIf="section.content"
+                      class="text-secondary small mb-1"
+                    >
+                      {{ section.content }}
+                    </p>
+                    <ul
+                      *ngIf="section.listItems && section.listItems.length > 0"
+                      class="small mb-0 ps-3"
+                    >
+                      <li
+                        *ngFor="let item of section.listItems"
+                        class="text-secondary"
+                      >
+                        {{ item }}
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ===================== TRAVEL STORY ===================== -->
+          <div *ngIf="selectedExample === 'story'">
+            <div class="row g-4">
+              <div class="col-lg-4">
+                <div class="card h-100 border-0 shadow-sm">
+                  <div class="card-header bg-info text-white fw-bold">
+                    ✈️ Travel Story Example
+                  </div>
+                  <div class="card-body">
+                    <p class="text-muted small mb-3">
+                      Perfect for: travel blogs, journey narratives, personal
+                      experiences
+                    </p>
+
+                    <div class="mb-3">
+                      <span class="text-muted small text-uppercase fw-bold"
+                        >Title</span
+                      >
+                      <p class="mb-0 fw-semibold">
+                        {{ examples.story.data.title }}
+                      </p>
+                    </div>
+
+                    <div class="mb-3">
+                      <span class="text-muted small text-uppercase fw-bold"
+                        >Excerpt</span
+                      >
+                      <p class="mb-0 small">
+                        {{ examples.story.data.excerpt }}
+                      </p>
+                    </div>
+
+                    <div class="mb-3">
+                      <span class="text-muted small text-uppercase fw-bold"
+                        >Category</span
+                      >
+                      <p class="mb-0">
+                        <span class="badge bg-info">{{
+                          examples.story.data.category
+                        }}</span>
+                      </p>
+                    </div>
+
+                    <div class="mb-3">
+                      <span class="text-muted small text-uppercase fw-bold"
+                        >Tags</span
+                      >
+                      <div class="d-flex flex-wrap gap-1 mt-1">
+                        <span
+                          *ngFor="let tag of examples.story.data.tags"
+                          class="badge bg-light text-dark border"
+                          >{{ tag }}</span
+                        >
+                      </div>
+                    </div>
+
+                    <div class="mb-3">
+                      <span class="text-muted small text-uppercase fw-bold"
+                        >Sections Included</span
+                      >
+                      <ul class="list-group list-group-flush mt-1">
+                        <li
+                          *ngFor="let section of examples.story.data.sections"
+                          class="list-group-item px-0 py-1 border-0 small"
+                        >
+                          <i class="bi bi-check-circle-fill text-info me-1"></i>
+                          {{ getSectionLabel(section.type) }}
+                          <span *ngIf="section.heading" class="text-muted"
+                            >– {{ section.heading }}</span
+                          >
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div class="card-footer bg-white border-0">
+                    <button
+                      class="btn btn-info w-100 fw-bold text-white"
+                      (click)="loadExample('story')"
+                    >
+                      <i class="bi bi-download me-2"></i> Load This Example
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-lg-8">
+                <h6 class="text-muted text-uppercase fw-bold mb-3">
+                  <i class="bi bi-eye me-1"></i> Full Content Preview
+                </h6>
+                <div class="sections-preview">
+                  <div
+                    *ngFor="let section of examples.story.data.sections"
+                    class="section-preview-card mb-3"
+                  >
+                    <div class="d-flex align-items-center mb-2">
+                      <span
+                        class="section-type-pill me-2"
+                        [ngClass]="getSectionClass(section.type)"
+                      >
+                        {{ getSectionLabel(section.type) }}
+                      </span>
+                      <span
+                        *ngIf="section.heading"
+                        class="fw-semibold text-dark"
+                        >{{ section.heading }}</span
+                      >
+                    </div>
+                    <p
+                      *ngIf="section.content"
+                      class="text-secondary small mb-1"
+                    >
+                      {{ section.content }}
+                    </p>
+                    <ul
+                      *ngIf="section.listItems && section.listItems.length > 0"
+                      class="small mb-0 ps-3"
+                      [class.list-styled-numbered]="
+                        section.listType === 'numbered'
+                      "
+                    >
+                      <li
+                        *ngFor="let item of section.listItems"
+                        class="text-secondary"
+                      >
+                        {{ item }}
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer bg-light">
+        <div class="d-flex align-items-center text-muted small me-auto">
+          <i class="bi bi-info-circle me-2"></i>
+          After loading, all content is fully editable — it's just a starting
+          point!
+        </div>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="closeExamplesModal()"
+        >
+          Close
+        </button>
+      </div>
+    </div>
   </div>
-</ion-content>
+</div>

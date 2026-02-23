@@ -40,7 +40,7 @@ export class BlogDetailComponent implements OnInit {
   currentUserId: any | null = null;
   editingCommentId: any | null = null;
   editedContent: string = "";
-  Loading = false
+  Loading = false;
 
   post!: {
     id: number;
@@ -339,5 +339,9 @@ export class BlogDetailComponent implements OnInit {
           console.error("Delete failed", err);
         },
       );
+  }
+
+  createPost() {
+    this.router.navigate(["/blog-post"]);
   }
 }
