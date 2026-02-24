@@ -1,417 +1,736 @@
-// Hero Banner
-.hero-banner {
-  position: relative;
-  height: 250px;
-  overflow: hidden;
+*, *::before, *::after { box-sizing: border-box; }
 
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .hero-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(
-      to bottom,
-      rgba(0, 0, 0, 0.3),
-      rgba(0, 0, 0, 0.6)
-    );
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    h1 {
-      color: white;
-      font-size: 2rem;
-      font-weight: 700;
-      text-align: center;
-      padding: 0 20px;
-      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-
-      @media (max-width: 768px) {
-        font-size: 1.5rem;
-      }
-    }
-  }
+body {
+  background: #f7f3ec;;
+  color: #1c2533;
+  font-family: 'Outfit', sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
-// Breadcrumb
-.breadcrumb {
+// PAGE ENTER
+.page-enter {
+  animation: pageIn 0.6s cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+// ─── HERO ─────────────────────────────────────────────────────
+.hero {
+  position: relative;
+  height: 340px;
+  overflow: hidden;
+}
+
+.hero-img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Ccircle cx='200' cy='200' r='60' fill='none' stroke='%23ffffff' stroke-width='0.4' opacity='0.08'/%3E%3Ccircle cx='200' cy='200' r='105' fill='none' stroke='%23ffffff' stroke-width='0.4' opacity='0.06'/%3E%3Ccircle cx='200' cy='200' r='155' fill='none' stroke='%23ffffff' stroke-width='0.4' opacity='0.05'/%3E%3Ccircle cx='200' cy='200' r='210' fill='none' stroke='%23ffffff' stroke-width='0.4' opacity='0.04'/%3E%3C/svg%3E"),
+    linear-gradient(to bottom, rgba(28,37,51,0.3) 0%, rgba(28,37,51,0.85) 100%);
+  z-index: 1;
+}
+
+.hero-body {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0 6vw 40px;
+}
+
+.hero-breadcrumb {
   display: flex;
   align-items: center;
-  padding: 12px 16px;
-  background: white;
   gap: 8px;
-  overflow-x: auto;
+  margin-bottom: 18px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: rgba(240,232,216,0.5);
 
-  ion-chip {
-    margin: 0;
+  a {
+    color: rgba(240,232,216,0.5);
+    text-decoration: none;
+    transition: color 0.2s;
+    &:hover { color: #f0e8d8; }
   }
 
-  ion-icon {
-    color: #6b7280;
-  }
+  .sep { opacity: 0.35; }
+  .current { color: #f0e8d8; }
 }
 
-// Controls Section
-.controls-section {
-  background: white;
-  padding: 16px;
-  border-bottom: 1px solid #e5e7eb;
-
-  .showing-count {
-    font-size: 0.95rem;
-    color: #4b5563;
-    padding: 8px 0;
-  }
-
-  ion-item {
-    --padding-start: 0;
-    --inner-padding-end: 0;
-  }
+.hero-title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(1.8rem, 4.5vw, 3rem);
+  font-weight: 800;
+  color: #f0e8d8;
+  letter-spacing: -0.01em;
+  line-height: 1;
 }
 
-// Year Navigation
-.year-navigation {
+.hero-sub {
+  margin-top: 10px;
+  color: rgba(240,232,216,0.5);
+  font-size: 0.82rem;
+  font-weight: 300;
+  letter-spacing: 0.05em;
+}
+
+// ─── CONTROL BAR ──────────────────────────────────────────────
+.control-bar {
+  background: #0f2417;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 6vw;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.control-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 0;
+}
+
+.trek-count-label {
+  font-size: 0.78rem;
+  color: #a4b8c8;
+
+  strong { color: #f0e8d8; font-weight: 600; }
+}
+
+.control-month {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: #e07a52;
+}
+
+.divider-v {
+  width: 1px;
+  height: 16px;
+  background: rgba(255,255,255,0.1);
+}
+
+.control-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sort-label {
+  font-size: 0.7rem;
+  color: #6e8398;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.sort-select {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #f0e8d8;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.78rem;
+  padding: 6px 28px 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  outline: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23a4b8c8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+}
+
+// ─── ERROR ALERT ──────────────────────────────────────────────
+.error-alert {
+  max-width: 1100px;
+  margin: 16px auto;
+  padding: 0 6vw;
+}
+
+.alert-inner {
+  background: rgba(168,50,50,0.08);
+  border: 1px solid rgba(168,50,50,0.2);
+  border-radius: 6px;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.85rem;
+  color: #a83232;
+}
+
+.retry-btn {
+  margin-left: auto;
+  background: transparent;
+  border: 1px solid #a83232;
+  color: #a83232;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+
+  &:hover { background: #a83232; color: #fff; }
+}
+
+// ─── YEAR NAV ─────────────────────────────────────────────────
+.year-nav {
+  background: #14281d;
+  padding: 20px 6vw;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px 16px;
-  background: #f9fafb;
-  gap: 16px;
-
-  .current-year {
-    font-size: 1.125rem;
-    padding: 8px 24px;
-  }
-
-  ion-button {
-    --color: #059669;
-  }
+  gap: 28px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
-// Month Tabs
+.year-btn {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.12);
+  color: #a4b8c8;
+  font-family: 'Syne', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  padding: 8px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover:not([disabled]) {
+    border-color: rgba(255,255,255,0.3);
+    color: #f0e8d8;
+    background: rgba(255,255,255,0.05);
+  }
+
+  &[disabled] { opacity: 0.35; cursor: default; }
+}
+
+.year-current {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #f0e8d8;
+  letter-spacing: 0.06em;
+  position: relative;
+  padding: 0 16px;
+
+  &::before, &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 20px; height: 1px;
+    background: rgba(240,232,216,0.18);
+  }
+
+  &::before { right: 100%; }
+  &::after  { left:  100%; }
+}
+
+.year-dropdown-wrap {
+  background: #2c3d33;
+  display: flex;
+  justify-content: center;
+  padding: 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+
+// ─── MONTH TABS ───────────────────────────────────────────────
 .month-tabs {
-  background: white;
-  padding: 12px 0;
-  border-bottom: 2px solid #e5e7eb;
-  position: sticky;
-  top: 0;
-  z-index: 10;
+  background: #2c3d33;
+  padding: 0 6vw;
+  display: flex;
+  gap: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  border-bottom: 2px solid rgba(255,255,255,0.04);
 
-  ion-segment {
-    --background: transparent;
+  &::-webkit-scrollbar { display: none; }
+}
+
+.month-tab {
+  flex-shrink: 0;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  padding: 14px 16px;
+  color: rgba(164,184,200,0.45);
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+
+  &:hover:not([disabled]) { color: #a4b8c8; }
+
+  &.active {
+    color: #f0e8d8;
+    border-bottom-color: #c2603a;
   }
 
-  ion-segment-button {
-    min-width: 60px;
-    text-transform: none;
-    font-weight: 500;
+  &[disabled] { cursor: default; opacity: 0.4; }
+}
 
-    ion-label {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
+.month-count {
+  background: rgba(194,96,58,0.2);
+  color: #e07a52;
+  font-size: 0.62rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 10px;
 
-    ion-badge {
-      margin-top: 4px;
-    }
+  .active & {
+    background: #c2603a;
+    color: #fff;
   }
 }
 
-// Treks Container
-.treks-container {
-  padding: 24px 16px;
+// ─── CONTENT ──────────────────────────────────────────────────
+.content {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 6vw 80px;
 }
 
-// Month Header
 .month-header {
-  margin-bottom: 24px;
-
-  h2 {
-    font-size: 1.75rem;
-    font-weight: 700;
-    color: #1f2937;
-    margin-bottom: 4px;
-  }
-
-  p {
-    color: #6b7280;
-    font-size: 0.95rem;
-  }
+  padding: 40px 0 20px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(28, 37, 51, 0.08);
+  margin-bottom: 4px;
 }
 
-// Table Header
+.month-heading {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #1c2533;
+  letter-spacing: -0.01em;
+
+  span { color: #c2603a; }
+}
+
+.month-sub {
+  color: #6e8398;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+}
+
+// TABLE HEADER
 .table-header {
-  background: #f3f4f6;
-  padding: 12px 0;
-  border-radius: 8px;
-  margin-bottom: 16px;
+  display: grid;
+  grid-template-columns: 160px 1fr 130px 160px;
+  gap: 16px;
+  padding: 10px 0;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #6e8398;
+  border-bottom: 1px solid rgba(28, 37, 51, 0.08);
+  margin-bottom: 0;
 
-  ion-col {
-    font-weight: 600;
-    font-size: 0.875rem;
-    text-transform: lowercase;
-    color: #4b5563;
-  }
+  @media (max-width: 768px) { display: none; }
 }
 
-// Trek Card
-.trek-card {
-  margin-bottom: 16px;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
+// ─── TREK ROW ─────────────────────────────────────────────────
+.trek-row {
+  display: grid;
+  grid-template-columns: 160px 1fr 130px 160px;
+  gap: 16px;
+  align-items: center;
+  padding: 20px 0;
+  border-bottom: 1px solid rgba(28, 37, 51, 0.08);
+  cursor: pointer;
+  transition: padding-left 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: -6vw; right: -6vw;
+    top: 0; bottom: 0;
+    background: rgba(240,232,216,0.52);
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+    z-index: -1;
+  }
 
   &:hover {
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-    transform: translateY(-2px);
+    padding-left: 8px;
+
+    &::before { opacity: 1; }
+
+    .trek-thumb img { transform: scale(1.08); }
+    .btn-arrow { transform: translateX(3px); }
   }
 
   &.sold-out {
-    opacity: 0.7;
-
-    .trek-image img {
-      filter: grayscale(50%);
-    }
+    opacity: 0.48;
+    cursor: default;
+    &:hover { padding-left: 0; &::before { opacity: 0; } }
   }
 
-  ion-grid {
-    padding: 16px;
-  }
-}
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 18px 0;
 
-// Date Column
-.date-column {
-  display: flex;
-  align-items: center;
-
-  .date-info {
-    .date {
-      font-weight: 600;
-      font-size: 0.95rem;
-      color: #1f2937;
-      margin-bottom: 4px;
-    }
-
-    .duration {
+    .col-date {
       display: flex;
+      gap: 12px;
       align-items: center;
-      gap: 4px;
-      font-size: 0.875rem;
-      color: #6b7280;
+      flex-wrap: wrap;
+      .duration-tag { margin-top: 0; }
+    }
 
-      ion-icon {
-        font-size: 16px;
-      }
+    .col-price {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 12px;
+      border-top: 1px solid rgba(28, 37, 51, 0.08);
     }
   }
 }
 
-// Trek Info Column
-.trek-info-column {
-  .trek-info {
-    display: flex;
-    gap: 16px;
-
-    .trek-image {
-      flex-shrink: 0;
-      width: 100px;
-      height: 100px;
-      border-radius: 8px;
-      overflow: hidden;
-
-      @media (max-width: 768px) {
-        width: 80px;
-        height: 80px;
-      }
-
-      img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
-    }
-
-    .trek-details {
-      flex: 1;
-
-      h3 {
-        font-size: 1.125rem;
-        font-weight: 700;
-        color: #1f2937;
-        margin-bottom: 6px;
-        line-height: 1.4;
-      }
-
-      .location {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        color: #6b7280;
-        font-size: 0.875rem;
-        margin-bottom: 8px;
-
-        ion-icon {
-          font-size: 16px;
-        }
-      }
-
-      .category-chip {
-        font-size: 0.75rem;
-        height: 24px;
-      }
-    }
+// DATE COL
+.col-date {
+  .date-main {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1c2533;
+    line-height: 1.3;
   }
-}
 
-// Status Column
-.status-column {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  .date-time {
+    font-size: 0.72rem;
+    color: #6e8398;
+    margin-top: 2px;
+  }
 
-  .status-badge {
-    padding: 8px 16px;
+  .duration-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #1c2533;
+    color: #a4b8c8;
+    font-size: 0.65rem;
     font-weight: 600;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.06em;
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-top: 8px;
   }
 }
 
-// Price Column
-.price-column {
+// TREK INFO COL
+.col-trek {
   display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.trek-thumb {
+  flex-shrink: 0;
+  width: 82px;
+  height: 66px;
+  border-radius: 6px;
+  overflow: hidden;
+
+  img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform 0.45s cubic-bezier(0.23, 1, 0.32, 1);
+    display: block;
+  }
+}
+
+.trek-info-text {
+  h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1c2533;
+    line-height: 1.3;
+    margin-bottom: 5px;
+  }
+}
+
+.trek-location {
+  font-size: 0.74rem;
+  color: #6e8398;
+  margin-bottom: 6px;
+}
+
+.category-tag {
+  display: inline-block;
+  background: rgba(28,37,51,0.07);
+  color: #3d4f63;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+// STATUS COL
+.col-status { display: flex; align-items: center; }
+
+.status-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 6px 12px;
+  border-radius: 4px;
+}
+
+.status-available { background: rgba(45,106,79,0.1);  color: #2d6a4f; border: 1px solid rgba(45,106,79,0.22);  }
+.status-fast      { background: rgba(212,145,58,0.1); color: #b8732a; border: 1px solid rgba(212,145,58,0.22); }
+.status-last      { background: rgba(168,50,50,0.1);  color: #a83232; border: 1px solid rgba(168,50,50,0.22);  }
+.status-soldout   { background: rgba(110,131,152,0.08); color: #6e8398; border: 1px solid rgba(110,131,152,0.18); }
+
+// PRICE COL
+.col-price {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.price-amount {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1c2533;
+  line-height: 1;
+}
+
+.price-per {
+  font-size: 0.66rem;
+  color: #6e8398;
+  margin-top: -4px;
+}
+
+.view-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.2s;
+
+  &.available {
+    background: #c2603a;
+    color: #fff;
+
+    &:hover {
+      background: #e07a52;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(194,96,58,0.3);
+    }
+  }
+
+  &.soldout {
+    background: rgba(110,131,152,0.1);
+    color: #6e8398;
+    cursor: default;
+  }
+
+  .btn-arrow { transition: transform 0.2s cubic-bezier(0.23, 1, 0.32, 1); }
+}
+
+// ─── LOADER ───────────────────────────────────────────────────
+.loader-wrapper {
+  min-height: 55vh;
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-
-  .price-section {
-    text-align: center;
-    width: 100%;
-
-    .price {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: #059669;
-      margin-bottom: 2px;
-    }
-
-    .per-person {
-      font-size: 0.75rem;
-      color: #6b7280;
-      margin-bottom: 12px;
-    }
-
-    .view-btn {
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-    }
-  }
+  gap: 20px;
 }
 
-// Mobile Responsive Adjustments
-@media (max-width: 768px) {
-  .trek-card {
-    ion-col {
-      padding: 8px;
-    }
-  }
-
-  .date-column,
-  .trek-info-column {
-    border-bottom: 1px solid #e5e7eb;
-    padding-bottom: 12px !important;
-    margin-bottom: 12px;
-  }
-
-  .status-column,
-  .price-column {
-    padding-top: 12px !important;
-  }
-
-  .status-column {
-    justify-content: flex-start;
-  }
-
-  .price-column {
-    justify-content: flex-end;
-  }
+.loader-bars {
+  display: flex;
+  gap: 5px;
+  align-items: flex-end;
+  height: 38px;
 }
 
-// No Treks
-.no-treks {
+.loader-bar {
+  width: 4px;
+  border-radius: 2px;
+  background: #c2603a;
+  animation: barBounce 1s ease-in-out infinite;
+
+  &:nth-child(1) { animation-delay: 0s;    height: 16px; }
+  &:nth-child(2) { animation-delay: 0.12s; height: 28px; }
+  &:nth-child(3) { animation-delay: 0.24s; height: 20px; }
+  &:nth-child(4) { animation-delay: 0.36s; height: 34px; }
+  &:nth-child(5) { animation-delay: 0.48s; height: 22px; }
+}
+
+@keyframes barBounce {
+  0%, 100% { opacity: 0.2; transform: scaleY(0.6); }
+  50%       { opacity: 1;  transform: scaleY(1); }
+}
+
+.loader-text {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #6e8398;
+}
+
+// ─── EMPTY STATE ──────────────────────────────────────────────
+.empty-state {
+  padding: 80px 0;
   text-align: center;
-  padding: 60px 20px;
 
-  ion-icon {
-    font-size: 80px;
-    color: #d1d5db;
-    margin-bottom: 16px;
+  .empty-icon {
+    font-size: 4rem;
+    opacity: 0.15;
+    line-height: 1;
+    margin-bottom: 20px;
   }
 
   h3 {
+    font-family: 'Syne', sans-serif;
     font-size: 1.5rem;
-    color: #4b5563;
+    font-weight: 700;
+    color: #1c2533;
     margin-bottom: 8px;
   }
 
-  p {
-    color: #6b7280;
-  }
+  p { color: #6e8398; font-size: 0.85rem; }
 }
 
-// Bottom CTA
+// ─── BOTTOM CTA ───────────────────────────────────────────────
 .bottom-cta {
-  padding: 24px 16px;
+  max-width: 1100px;
+  margin: 0 auto 80px;
+  padding: 0 6vw;
+}
 
-  ion-card-content {
-    text-align: center;
-    padding: 32px 20px;
+.cta-card {
+  background: #14281d;
+  border-radius: 6px;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 32px;
+  padding: 40px 48px;
+  position: relative;
 
-    h2 {
-      font-size: 1.5rem;
-      margin-bottom: 12px;
-      color: #1f2937;
-    }
+  &::after {
+    content: '';
+    position: absolute;
+    right: -40px; top: -40px;
+    width: 240px; height: 240px;
+    border-radius: 50%;
+    border: 40px solid rgba(255,255,255,0.025);
+    pointer-events: none;
+  }
 
-    p {
-      color: #6b7280;
-      margin-bottom: 24px;
-      line-height: 1.6;
-    }
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+    padding: 32px 24px;
+    gap: 24px;
   }
 }
 
-.gap-2 {
-  gap: 1.6rem !important;
+.cta-eyebrow {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #e07a52;
+  margin-bottom: 10px;
 }
 
-.trek-card {
-  transition: all 0.3s ease;
+.cta-heading {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #f0e8d8;
+  margin-bottom: 8px;
+  line-height: 1.2;
 }
 
-.trek-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+.cta-body {
+  color: #a4b8c8;
+  font-size: 0.85rem;
+  font-weight: 300;
+  line-height: 1.7;
 }
 
-.badge {
-  letter-spacing: 0.5px;
-}
+.cta-btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: #c2603a;
+  color: #fff;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 14px 28px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.2s, transform 0.2s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.2s;
 
-.empty-state-icon {
-  opacity: 0.5;
-}
+  &:hover {
+    background: #e07a52;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(194,96,58,0.4);
+  }
 
-.hide {
-  display: none; /* Removes the element from the document flow */
+  @media (max-width: 640px) { width: 100%; justify-content: center; }
 }

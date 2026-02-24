@@ -1,0 +1,325 @@
+<div class="search-page">
+
+  <!-- ═══════════════════════════════════════
+       HERO + SEARCH BAR
+  ════════════════════════════════════════ -->
+  <section class="hero" aria-label="Search hero">
+
+    <!-- Animated mountain panorama -->
+    <div class="hero-bg" aria-hidden="true">
+      <svg class="mountains" viewBox="0 0 1440 320" preserveAspectRatio="xMidYMid slice">
+        <path class="m-far"   d="M0 320 L120 180 L260 260 L380 140 L500 220 L640 80  L760 200 L880 100 L1000 200 L1140 60  L1280 180 L1440 120 L1440 320Z"/>
+        <path class="m-mid"   d="M0 320 L80  220 L200 280 L340 160 L460 240 L580 120 L700 230 L840 130 L960 210 L1100 90  L1240 200 L1360 150 L1440 190 L1440 320Z"/>
+        <path class="m-near"  d="M0 320 L60  250 L160 300 L280 200 L420 270 L540 170 L660 260 L780 180 L920 250 L1060 160 L1180 240 L1320 170 L1440 220 L1440 320Z"/>
+        <path class="m-front" d="M0 320 L0  300 L100 280 L220 310 L380 260 L520 300 L660 270 L800 305 L960 265 L1100 295 L1260 270 L1440 290 L1440 320Z"/>
+      </svg>
+      <div class="hero-stars"></div>
+      <div class="hero-mist"></div>
+    </div>
+
+    <div class="hero-content">
+      <p class="hero-eyebrow">Discover the world's finest trails</p>
+      <h1 class="hero-title">
+        Find Your<br/>
+        <span class="hero-title-accent">Next Summit</span>
+      </h1>
+      <p class="hero-sub">{{ treksTours.length > 0 ? treksTours.length + ' expeditions found' : '2,400+ curated treks & tours worldwide' }}</p>
+    </div>
+
+    <!-- ── FLOATING SEARCH FORM ── -->
+    <form
+      class="search-form"
+      (ngSubmit)="onSearch()"
+      aria-label="Trek and Tour Search"
+      #searchForm="ngForm">
+
+      <!-- Location -->
+      <div class="field-group field-location">
+        <div class="field-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1118 0z"/><circle cx="12" cy="10" r="3"/>
+          </svg>
+        </div>
+        <div class="field-inner">
+          <label for="location" class="field-label">Where</label>
+          <input
+            id="location"
+            name="location"
+            type="text"
+            class="field-input"
+            placeholder="Himalayas, Patagonia…"
+            [(ngModel)]="searchParams.location"
+            autocomplete="off"
+            aria-label="Location"/>
+        </div>
+      </div>
+
+      <div class="field-divider" aria-hidden="true"></div>
+
+      <!-- Difficulty -->
+      <div class="field-group field-difficulty">
+        <div class="field-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 17l4-8 4 4 3-6 4 10" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="field-inner">
+          <label for="difficulty" class="field-label">Level</label>
+          <select
+            id="difficulty"
+            name="difficulty"
+            class="field-input"
+            [(ngModel)]="searchParams.difficulty"
+            aria-label="Difficulty level">
+            <option value="">Any level</option>
+            <option value="easy">🟢 Easy</option>
+            <option value="moderate">🟡 Moderate</option>
+            <option value="hard">🔴 Hard</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field-divider" aria-hidden="true"></div>
+
+      <!-- Price range -->
+      <div class="field-group field-price">
+        <div class="field-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 3.5 0 00-5 0v6a3.5 3.5 0 005 0"/><line x1="12" y1="6" x2="12" y2="7"/><line x1="12" y1="17" x2="12" y2="18"/>
+          </svg>
+        </div>
+        <div class="field-inner">
+          <label class="field-label">Budget (₹)</label>
+          <div class="price-range">
+            <input
+              id="priceMin"
+              name="priceMin"
+              type="number"
+              class="field-input price-input"
+              placeholder="Min"
+              [(ngModel)]="searchParams.priceMin"
+              aria-label="Minimum price"/>
+            <span class="price-sep" aria-hidden="true">–</span>
+            <input
+              id="priceMax"
+              name="priceMax"
+              type="number"
+              class="field-input price-input"
+              placeholder="Max"
+              [(ngModel)]="searchParams.priceMax"
+              aria-label="Maximum price"/>
+          </div>
+        </div>
+      </div>
+
+      <div class="field-divider" aria-hidden="true"></div>
+
+      <!-- Date -->
+      <div class="field-group field-date">
+        <div class="field-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+        </div>
+        <div class="field-inner">
+          <label for="date" class="field-label">When</label>
+          <input
+            id="date"
+            name="date"
+            type="date"
+            class="field-input"
+            [(ngModel)]="searchParams.date"
+            aria-label="Departure date"/>
+        </div>
+      </div>
+
+      <!-- Search button -->
+      <button
+        type="submit"
+        class="search-btn"
+        [disabled]="loading"
+        [class.loading]="loading"
+        aria-label="Search treks and tours">
+        @if (loading) {
+          <span class="btn-spinner" aria-hidden="true"></span>
+          <span>Searching…</span>
+        } @else {
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35" stroke-linecap="round"/>
+          </svg>
+          <span>Search</span>
+        }
+      </button>
+    </form>
+
+    <!-- Scroll cue -->
+    <div class="scroll-cue" aria-hidden="true">
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════
+       RESULTS SECTION
+  ════════════════════════════════════════ -->
+  <section class="results-section" aria-label="Search results">
+
+    <!-- ── Error ── -->
+    @if (error) {
+      <div class="state-error" role="alert" aria-live="assertive">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        <div>
+          <strong>Expedition failed</strong>
+          <p>{{ error }}</p>
+        </div>
+        <button class="error-retry" (click)="onSearch()">Retry</button>
+      </div>
+    }
+
+    <!-- ── Loading skeletons ── -->
+    @if (loading) {
+      <div class="results-header skeleton-header" aria-live="polite" aria-label="Loading results">
+        <div class="skeleton skeleton-text w-40"></div>
+      </div>
+      <div class="trek-grid">
+        @for (s of [1,2,3,4,5,6]; track s) {
+          <article class="trek-card skeleton-card" aria-hidden="true">
+            <div class="skeleton card-img-skel"></div>
+            <div class="card-body">
+              <div class="skeleton skeleton-text w-60"></div>
+              <div class="skeleton skeleton-text w-80" style="margin-top:8px"></div>
+              <div class="skeleton skeleton-text w-40" style="margin-top:8px"></div>
+            </div>
+          </article>
+        }
+      </div>
+    }
+
+    <!-- ── Results ── -->
+    @if (!loading && treksTours.length > 0) {
+      <header class="results-header">
+        <p class="results-count">
+          <span class="count-num">{{ treksTours.length }}</span>
+          expedition{{ treksTours.length !== 1 ? 's' : '' }} found
+        </p>
+        <div class="results-sort">
+          <span class="sort-label">Sort:</span>
+          <button class="sort-btn active">Popular</button>
+          <button class="sort-btn">Price ↑</button>
+          <button class="sort-btn">Newest</button>
+        </div>
+      </header>
+
+      <ul class="trek-grid" role="list">
+        @for (trek of treksTours; track trek.id ?? trek.name; let i = $index) {
+          <li
+            class="trek-card"
+            role="listitem"
+            [style.animation-delay]="(i * 0.08) + 's'"
+            (click)="onSelectTrek(trek)"
+            [attr.aria-label]="trek.name">
+
+            <!-- Card image / gradient -->
+            <div class="card-visual">
+              <div class="card-img-bg" [style.background]="trek.coverColor ?? 'var(--grad-default)'"></div>
+
+              <!-- SVG landscape silhouette -->
+              <svg class="card-landscape" viewBox="0 0 400 120" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+                <path [attr.d]="trek.landscapePath ?? defaultLandscape" fill="rgba(0,0,0,0.25)"/>
+              </svg>
+
+              <div class="card-badges">
+                <span class="badge-diff" [class]="'diff-' + trek.difficulty">
+                  {{ diffLabel(trek.difficulty) }}
+                </span>
+                @if (trek.featured) {
+                  <span class="badge-feat">⭐ Featured</span>
+                }
+              </div>
+
+              <div class="card-duration" *ngIf="trek.duration">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="12" height="12">
+                  <circle cx="8" cy="8" r="6.5"/><path d="M8 4.5V8l2.5 2" stroke-linecap="round"/>
+                </svg>
+                {{ trek.duration }}
+              </div>
+            </div>
+
+            <!-- Card body -->
+            <div class="card-body">
+              <div class="card-location">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="11" height="11">
+                  <path d="M8 1.5C5.5 1.5 3.5 3.5 3.5 6c0 3.5 4.5 8.5 4.5 8.5S12.5 9.5 12.5 6c0-2.5-2-4.5-4.5-4.5z"/>
+                  <circle cx="8" cy="6" r="1.5"/>
+                </svg>
+                {{ trek.location }}
+              </div>
+
+              <h3 class="card-name">{{ trek.name }}</h3>
+              <p class="card-desc">{{ trek.description }}</p>
+
+              <div class="card-meta">
+                @if (trek.rating) {
+                  <span class="meta-rating">
+                    <svg viewBox="0 0 16 16" fill="currentColor" width="12" height="12"><path d="M8 1l2 4.5H15l-4 3.5 1.5 5L8 11l-4.5 3 1.5-5-4-3.5H6z"/></svg>
+                    {{ trek.rating }}
+                    <span class="meta-rating-count">({{ trek.reviews ?? 0 }})</span>
+                  </span>
+                }
+                @if (trek.maxGroupSize) {
+                  <span class="meta-group">
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="11" height="11">
+                      <path d="M11 14v-1.5a3.5 3.5 0 00-7 0V14"/><circle cx="7.5" cy="5.5" r="2.5"/>
+                      <path d="M14 14v-1.5a3.5 3.5 0 00-2-3.17"/><circle cx="13" cy="5" r="2"/>
+                    </svg>
+                    Max {{ trek.maxGroupSize }}
+                  </span>
+                }
+              </div>
+
+              <div class="card-footer">
+                <div class="card-price">
+                  <span class="price-from">from</span>
+                  <span class="price-val">{{ trek.price | currency:'INR':'symbol':'1.0-0' }}</span>
+                  <span class="price-per">/ person</span>
+                </div>
+                <button class="book-btn" (click)="$event.stopPropagation(); onBook(trek)" [attr.aria-label]="'Book ' + trek.name">
+                  Book now
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12">
+                    <path d="M3 8h10M9 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Date ribbon -->
+            @if (trek.date) {
+              <div class="card-date-ribbon" aria-label="Departure date">
+                {{ trek.date | date:'d MMM' }}
+              </div>
+            }
+          </li>
+        }
+      </ul>
+    }
+
+    <!-- ── Empty state ── -->
+    @if (!loading && treksTours.length === 0 && !error) {
+      <div class="state-empty" aria-live="polite">
+        <div class="empty-graphic" aria-hidden="true">
+          <svg viewBox="0 0 120 80" fill="none">
+            <path d="M10 70 L35 20 L55 45 L75 5 L100 40 L115 25 L115 70Z" fill="rgba(126,167,107,0.12)" stroke="rgba(126,167,107,0.35)" stroke-width="1.5" stroke-linejoin="round"/>
+            <circle cx="95" cy="18" r="8" fill="rgba(255,178,80,0.15)" stroke="rgba(255,178,80,0.4)" stroke-width="1.5"/>
+            <path d="M30 70 Q60 55 90 70" stroke="rgba(126,167,107,0.3)" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3 class="empty-title">No expeditions found</h3>
+        <p class="empty-sub">Try adjusting your filters or explore a different region.</p>
+        <button class="empty-reset" (click)="resetSearch()">Clear filters</button>
+      </div>
+    }
+
+  </section>
+</div>

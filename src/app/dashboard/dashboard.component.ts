@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { Dashboard } from './dashboard';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 interface Filter {
   id: string;
@@ -14,7 +15,7 @@ interface Filter {
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, RouterLink],
+  imports: [IonicModule, CommonModule, RouterLink, FormsModule, ReactiveFormsModule],
 })
 export class DashboardComponent implements OnInit {
 
@@ -106,7 +107,7 @@ export class DashboardComponent implements OnInit {
   }
 
 
-  get filteredTreks() {
+  get filteredTreks() :void | any{
     if (this.selectedFilter === 'all') {
       return this.treks;
     }

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { RouterModule, Routes } from '@angular/router';
 import { TourDetailsComponent } from './tour-details.component';
-const routes: Routes = [{ path: ':id', component: TourDetailsComponent }];
+const routes: Routes = [{ path: ':uuid', component: TourDetailsComponent }];
 
 @NgModule({
   declarations: [],

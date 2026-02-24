@@ -1,3 +1,4 @@
+
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
@@ -14,6 +15,18 @@ export class TourDetails {
 
   getTrekById(trekId: number) {
     return this.http.get(`${this.API}/getTrekById/${trekId}`).pipe(
+      map((res: any) => {
+        const decrypted = this.crypto.decrypt(res.data);
+        return {
+          ...res,
+          data: decrypted
+        };
+      })
+    );
+  }
+
+  getTrekByUuid(uuid: string) {
+    return this.http.get(`${this.API}/getTrekByUuid/${uuid}`).pipe(
       map((res: any) => {
         const decrypted = this.crypto.decrypt(res.data);
         return {

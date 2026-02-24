@@ -13,7 +13,7 @@ import { AuthModalComponent } from './shared/auth-modal/auth-modal.component';
 import { AuthClickDirective } from './core/auth-click.directive';
 import { BackBlockService } from './core/back-block.service';
 import { TermsandconditionsModule } from './Quicklinks/termsandconditions/termsandconditons-module';
-import { AUTH_INTERCEPTOR_PROVIDER } from './core/auth.interceptor';
+import { AUTH_INTERCEPTOR_PROVIDER, AuthInterceptor } from './core/auth.interceptor';
 import { ERROR_INTERCEPTOR_PROVIDER } from './core/error.interceptor';
 import { Sessionexpired } from './auth/sessionexpired/sessionexpired';
 import { SessionexpiredComponent } from './auth/sessionexpired/sessionexpired.component';
@@ -40,6 +40,11 @@ import { SessionexpiredComponent } from './auth/sessionexpired/sessionexpired.co
     Sessionexpired,               // ← added
     AUTH_INTERCEPTOR_PROVIDER,
     ERROR_INTERCEPTOR_PROVIDER,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
+    }
   ],
   bootstrap: [AppComponent],
 })

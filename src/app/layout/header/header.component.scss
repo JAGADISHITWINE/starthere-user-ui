@@ -774,3 +774,179 @@
   text-transform: uppercase;
   color: #3a5c3b;
 }
+
+
+// header.component.scss — additions for Search & Notifications
+// Paste these rules into your existing header SCSS file.
+
+// ─── Token alignment with your trek theme ─────────────────────────────────────
+// (adjust if your existing vars differ)
+:host {
+  --forest:       #2d4a22;
+  --forest-mid:   #3d6130;
+  --forest-lt:    #7ea76b;
+  --amber:        #e8921a;
+  --amber-lt:     #ffb250;
+  --stone:        #f0ece4;
+  --stone-dark:   #e0d8cc;
+  --text-dark:    #1e2b18;
+  --text-muted:   #8a9e7a;
+  --header-h:     68px;
+  --ease:         cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+// ─── Scroll shadow ────────────────────────────────────────────────────────────
+.app-header {
+  transition: box-shadow 0.3s ease, background 0.3s ease;
+
+  &.scrolled {
+    box-shadow: 0 2px 24px rgba(45, 74, 34, 0.12);
+    // Optionally slightly tint when scrolled:
+    // background: rgba(255,255,255,0.98);
+    // backdrop-filter: blur(12px);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  ① HEADER SEARCH
+// ─────────────────────────────────────────────────────────────────────────────
+
+.header-search {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+// ── Collapsed icon button ─────────────────────────────────────────────────────
+.search-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px; height: 38px;
+  background: transparent;
+  border: 1.5px solid var(--stone-dark);
+  border-radius: 10px;
+  color: var(--text-dark);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, color 0.2s, opacity 0.15s;
+
+  svg { width: 17px; height: 17px; }
+
+  &:hover {
+    border-color: var(--forest-lt);
+    background: rgba(45, 74, 34, 0.05);
+    color: var(--forest);
+  }
+
+  &.hidden { opacity: 0; pointer-events: none; width: 0; overflow: hidden; }
+}
+
+// ── Expanded search bar ────────────────────────────────────────────────────────
+.search-expand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  border: 1.5px solid var(--forest-lt);
+  border-radius: 12px;
+  padding: 0 12px;
+  height: 40px;
+  box-shadow: 0 4px 20px rgba(45, 74, 34, 0.12);
+  animation: searchOpen 0.25s var(--ease) both;
+  width: min(340px, 90vw);
+}
+
+@keyframes searchOpen {
+  from { opacity: 0; transform: scaleX(0.7) translateX(16px); transform-origin: right; }
+  to   { opacity: 1; transform: scaleX(1) translateX(0); }
+}
+
+.search-expand-icon {
+  width: 15px; height: 15px;
+  color: var(--forest-lt);
+  flex-shrink: 0;
+}
+
+.search-expand-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-dark);
+  min-width: 0;
+
+  &::placeholder { color: #b0a898; font-weight: 400; }
+}
+
+.search-close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 3px;
+  border-radius: 5px;
+  flex-shrink: 0;
+  transition: color 0.2s, background 0.2s;
+
+  svg { width: 14px; height: 14px; }
+
+  &:hover {
+    color: var(--forest);
+    background: rgba(45, 74, 34, 0.06);
+  }
+}
+
+// ───────────────────────────────────────────────────────────────────────────
+//  ③ MOBILE SEARCH (inside drawer)
+// ─────────────────────────────────────────────────────────────────────────────
+
+.mobile-search-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--stone);
+  border: 1.5px solid var(--stone-dark);
+  border-radius: 12px;
+  padding: 0 14px;
+  height: 44px;
+  margin-bottom: 16px;
+
+  &:focus-within {
+    border-color: var(--forest-lt);
+    box-shadow: 0 0 0 3px rgba(126, 167, 107, 0.15);
+  }
+}
+
+.mobile-search-icon {
+  width: 16px; height: 16px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.mobile-search-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-dark);
+
+  &::placeholder { color: #b0a898; font-weight: 400; }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  header-right spacing — add gap between new items
+// ─────────────────────────────────────────────────────────────────────────────
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;  // Uniform gap between: search | bell | login/avatar
+}

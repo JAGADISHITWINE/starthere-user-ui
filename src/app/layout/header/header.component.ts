@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
@@ -27,6 +27,11 @@ export class HeaderComponent implements OnInit {
   userName = '';
   userEmail = '';
   profilePicture: string | null = null;
+  isSearchOpen = false;
+  searchQuery  = '';
+
+  isScrolled = false;
+
 
   constructor(
     private routes: Router,
@@ -117,6 +122,11 @@ export class HeaderComponent implements OnInit {
     this.userEmail = '';
     this.profilePicture = null;
     this.isLoggedIn = false;
+  }
+
+  @HostListener('window:scroll')
+  onWindowScroll() {
+    this.isScrolled = window.scrollY > 20;
   }
 }
 

@@ -1,251 +1,180 @@
-<!-- Banner -->
-<div class="position-relative">
-  <img
-    src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&h=300&fit=crop"
-    class="img-fluid w-100"
-    style="height:400px; object-fit:cover;"
-    alt="Treks Banner"
-  />
-  <div class="position-absolute top-50 start-50 translate-middle text-white text-center">
-    <h1 class="fw-bold">Upcoming Treks & Adventures</h1>
-  </div>
-</div>
+<!-- ═══════════════════════════════════════════════════════════
+     index.html <head>:
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700;800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+═══════════════════════════════════════════════════════════ -->
 
-<!-- Breadcrumb -->
-<div class="container my-3 d-flex align-items-center gap-2">
-  <a routerLink="" class="badge bg-light text-dark text-decoration-none">
-    🏠 Home
-  </a>
-  <span>›</span>
-  <span class="badge bg-success">Upcoming Treks & Adventures</span>
-</div>
+<div class="page-enter">
 
-<!-- Trek Count & Sort -->
-<div class="container my-3">
-  <div class="row align-items-center">
-    <div class="col-md-6 mb-2 mb-md-0">
-      <span *ngIf="!isLoading">
+  <!-- HERO -->
+  <section class="hero">
+    <img class="hero-img"
+      src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1400&q=80"
+      alt="Treks Banner"
+    />
+    <div class="hero-body">
+      <div class="hero-breadcrumb">
+        <a routerLink="">🏠 Home</a>
+        <span class="sep">›</span>
+        <span class="current">Upcoming Treks &amp; Adventures</span>
+      </div>
+      <h1 class="hero-title">Upcoming Treks<br />&amp; Adventures</h1>
+      <p class="hero-sub">Karnataka · Western Ghats · Expert-guided expeditions</p>
+    </div>
+  </section>
+
+  <!-- CONTROL BAR -->
+  <div class="control-bar">
+    <div class="control-left">
+      <span class="trek-count-label" *ngIf="!isLoading">
         Showing <strong>{{ trekCount }}</strong> of
         <strong>{{ allTreks.length }}</strong> trips
       </span>
-      <span *ngIf="isLoading">
-        <ion-spinner name="dots"></ion-spinner> Loading treks...
-      </span>
+      <span class="trek-count-label" *ngIf="isLoading">Loading treks…</span>
+      <div class="divider-v"></div>
+      <span class="control-month">{{ selectedMonth }} {{ selectedYear }}</span>
     </div>
-
-    <div class="col-md-6 text-md-end">
-      <select
-        class="form-select w-auto d-inline"
-        [(ngModel)]="sortBy"
-        (change)="sortTreks()"
-        [disabled]="isLoading"
-      >
-        <option *ngFor="let option of sortOptions" [value]="option.value">
-          {{ option.label }}
-        </option>
+    <div class="control-right">
+      <span class="sort-label">Sort</span>
+      <select class="sort-select" [(ngModel)]="sortBy" (change)="sortTreks()" [disabled]="isLoading">
+        <option *ngFor="let opt of sortOptions" [value]="opt.value">{{ opt.label }}</option>
       </select>
     </div>
   </div>
-</div>
 
-<!-- Error Message -->
-<div class="container my-3" *ngIf="errorMessage">
-  <div class="alert alert-danger" role="alert">
-    <i class="bi bi-exclamation-triangle-fill me-2"></i>
-    {{ errorMessage }}
-    <button class="btn btn-sm btn-outline-danger ms-3" (click)="loadTreks()">
-      Retry
-    </button>
+  <!-- ERROR -->
+  <div class="error-alert" *ngIf="errorMessage">
+    <div class="alert-inner">
+      ⚠ {{ errorMessage }}
+      <button class="retry-btn" (click)="loadTreks()">Retry</button>
+    </div>
   </div>
-</div>
 
-<!-- Year Selector - DYNAMIC -->
-<div class="container d-flex justify-content-center align-items-center gap-3 my-4">
+  <!-- YEAR NAV -->
+  <div class="year-nav">
+    <button class="year-btn" *ngIf="previousYear" (click)="changeYear('prev')" [disabled]="isLoading">← {{ previousYear }}</button>
+    <div class="year-current">{{ selectedYear }}</div>
+    <button class="year-btn" *ngIf="nextYear" (click)="changeYear('next')" [disabled]="isLoading">{{ nextYear }} →</button>
+  </div>
 
-  <!-- Previous Year -->
-  <button
-    *ngIf="previousYear"
-    class="btn btn-outline-secondary"
-    (click)="changeYear('prev')"
-    [disabled]="isLoading"
-  >
-    ← {{ previousYear }}
-  </button>
+  <div class="year-dropdown-wrap" *ngIf="years.length > 4">
+    <select class="sort-select" [(ngModel)]="selectedYear" (change)="loadTreks()" [disabled]="isLoading">
+      <option *ngFor="let y of years" [value]="y">{{ y }}</option>
+    </select>
+  </div>
 
-  <!-- Selected Year -->
-  <span class="badge bg-success fs-6 px-4">
-    {{ selectedYear }}
-    <span
-      *ngIf="yearHasData(selectedYear)"
-      class="badge bg-light text-success ms-2"
-      title="Has trek data"
-    ></span>
-  </span>
-
-  <!-- Next Year -->
-  <button
-    *ngIf="nextYear"
-    class="btn btn-outline-secondary"
-    (click)="changeYear('next')"
-    [disabled]="isLoading"
-  >
-    {{ nextYear }} →
-  </button>
-
-</div>
-
-
-<!-- Year Dropdown (Alternative) -->
-<div class="container text-center mb-3" *ngIf="years.length > 4">
-  <select
-    class="form-select w-auto d-inline-block"
-    [(ngModel)]="selectedYear"
-    (change)="loadTreks()"
-    [disabled]="isLoading"
-  >
-    <option *ngFor="let year of years" [value]="year">
-      {{ year }}
-      <span *ngIf="yearHasData(year)">✓</span>
-    </option>
-  </select>
-</div>
-
-<!-- Month Selector -->
-<div class="container mb-4">
-  <div class="d-flex overflow-auto gap-2">
+  <!-- MONTH TABS -->
+  <div class="month-tabs">
     <button
+      class="month-tab"
       *ngFor="let month of months"
-      class="btn"
-      [class.btn-success]="selectedMonth === month"
-      [class.btn-outline-success]="selectedMonth !== month"
+      [class.active]="selectedMonth === month"
       (click)="selectMonth(month)"
       [disabled]="isLoading"
     >
       {{ month }}
-      <span
-        *ngIf="getMonthCount(month) > 0"
-        class="badge bg-light text-dark ms-1"
-      >
-        {{ getMonthCount(month) }}
-      </span>
+      <span class="month-count" *ngIf="getMonthCount(month) > 0">{{ getMonthCount(month) }}</span>
     </button>
   </div>
-</div>
 
-<!-- Month Header -->
-<div class="container mb-3">
-  <h2>{{ selectedMonth }} {{ selectedYear }}</h2>
-  <p class="text-muted">{{ trekCount }} departure{{ trekCount !== 1 ? 's' : '' }}</p>
-</div>
-
-<!-- Table Header (Desktop only) -->
-<div class="container d-none d-md-block fw-semibold text-uppercase text-muted border-bottom pb-2">
-  <div class="row">
-    <div class="col-3">Date & Duration</div>
-    <div class="col-5">Trip & Location</div>
-    <div class="col-2">Availability</div>
-    <div class="col-2">Price</div>
+  <!-- LOADER -->
+  <div class="loader-wrapper" *ngIf="isLoading">
+    <div class="loader-bars">
+      <div class="loader-bar"></div>
+      <div class="loader-bar"></div>
+      <div class="loader-bar"></div>
+      <div class="loader-bar"></div>
+      <div class="loader-bar"></div>
+    </div>
+    <p class="loader-text">Loading Expeditions</p>
   </div>
-</div>
 
-<!-- Loading State -->
-<div *ngIf="isLoading" class="d-flex justify-content-center align-items-center loader-wrapper" style="min-height: 80vh">
-  <div class="text-center">
-   <img src="../../assets/assets/Bus vehicle.gif" width="180" alt="Loading" />
-    <p class="mt-3 text-muted text-center">Loading trek...</p>
-  </div>
-</div>
+  <!-- TREK LIST -->
+  <div class="content" *ngIf="!isLoading">
 
-<!-- Trek Cards -->
-<div class="container" *ngIf="!isLoading">
-  <div
-    class="card mb-3 shadow-sm trek-card"
-    *ngFor="let trek of currentMonthTreks"
-    [class.opacity-50]="trek.status === 'sold-out'"
-    (click)="viewDetails(trek.batch_id)"
-    style="cursor:pointer"
-  >
-    <div class="card-body">
-      <div class="row align-items-center">
+    <div class="month-header">
+      <h2 class="month-heading"><span>{{ selectedMonth }}</span> {{ selectedYear }}</h2>
+      <span class="month-sub">{{ trekCount }} departure{{ trekCount !== 1 ? 's' : '' }}</span>
+    </div>
 
-        <!-- Date & Duration -->
-        <div class="col-md-3 mb-3 mb-md-0">
-          <div class="fw-bold">{{ trek.date }}, {{ trek.time }}</div>
-          <small class="text-muted">⏱ {{ trek.duration }}</small>
+    <div class="table-header">
+      <div>Date &amp; Duration</div>
+      <div>Trek Details</div>
+      <div>Availability</div>
+      <div style="text-align:right">Price</div>
+    </div>
+
+    <div
+      class="trek-row"
+      *ngFor="let trek of currentMonthTreks"
+      [class.sold-out]="trek.status === 'sold-out'"
+      (click)="viewDetails(trek.batch_id)"
+    >
+      <div class="col-date">
+        <div class="date-main">{{ trek.date }}</div>
+        <div class="date-time">{{ trek.time }}</div>
+        <div class="duration-tag">⏱ {{ trek.duration }}</div>
+      </div>
+
+      <div class="col-trek">
+        <div class="trek-thumb">
+          <img [src]="'http://localhost:4001/' + trek.image" [alt]="trek.name" onerror="this.src='assets/default-trek.jpg'" />
         </div>
-
-        <!-- Trek Info -->
-        <div class="col-md-5 mb-3 mb-md-0 d-flex gap-3">
-          <img [src]="'http://localhost:4001/' + trek.image"
-            class="rounded"
-            style="width:90px; height:70px; object-fit:cover"
-            [alt]="trek.name"
-            onerror="this.src='assets/default-trek.jpg'"
-          />
-          <div>
-            <h5 class="mb-1">{{ trek.name }}</h5>
-            <small class="text-muted">📍 {{ trek.location }}</small><br />
-            <span class="badge bg-light text-dark mt-1">
-              {{ trek.category }}
-            </span>
-          </div>
+        <div class="trek-info-text">
+          <h3>{{ trek.name }}</h3>
+          <div class="trek-location">📍 {{ trek.location }}</div>
+          <span class="category-tag">{{ trek.category }}</span>
         </div>
+      </div>
 
-        <!-- Status -->
-        <div class="col-md-2 mb-3 mb-md-0">
-          <span
-            class="badge"
-            [ngClass]="{
-              'bg-success': trek.status === 'available',
-              'bg-warning text-dark': trek.status === 'selling-fast',
-              'bg-danger': trek.status === 'last-seat',
-              'bg-secondary': trek.status === 'sold-out'
-            }"
-          >
-            {{ getStatusText(trek.status) }}
-          </span>
+      <div class="col-status">
+        <span class="status-badge"
+          [ngClass]="{
+            'status-available': trek.status === 'available',
+            'status-fast':      trek.status === 'selling-fast',
+            'status-last':      trek.status === 'last-seat',
+            'status-soldout':   trek.status === 'sold-out'
+          }"
+        >{{ getStatusText(trek.status) }}</span>
+      </div>
+
+      <div class="col-price">
+        <div>
+          <div class="price-amount">₹{{ trek.price | number:'1.0-0' }}</div>
+          <div class="price-per">Per Person</div>
         </div>
-
-        <!-- Price -->
-        <div class="col-md-2 text-md-end">
-          <div class="fw-bold">₹ {{ trek.price | number:'1.0-0' }}</div>
-          <small class="text-muted">Per Person</small>
-          <button
-            class="btn btn-sm w-100 mt-2"
-            [class.btn-success]="trek.status !== 'sold-out'"
-            [class.btn-secondary]="trek.status === 'sold-out'"
-            [disabled]="trek.status === 'sold-out'"
-            (click)="$event.stopPropagation(); viewDetails(trek.batch_id)"
-          >
-            {{ trek.status === 'sold-out' ? 'SOLD OUT' : 'VIEW DETAILS' }}
-          </button>
-        </div>
-
+        <button
+          class="view-btn"
+          [class.available]="trek.status !== 'sold-out'"
+          [class.soldout]="trek.status === 'sold-out'"
+          [disabled]="trek.status === 'sold-out'"
+          (click)="$event.stopPropagation(); viewDetails(trek.batch_id)"
+        >
+          {{ trek.status === 'sold-out' ? 'Sold Out' : 'View' }}
+          <span class="btn-arrow" *ngIf="trek.status !== 'sold-out'">→</span>
+        </button>
       </div>
     </div>
-  </div>
-</div>
 
-<!-- Empty State -->
-<div *ngIf="!isLoading && trekCount === 0" class="text-center my-5">
-  <div class="empty-state-icon mb-3">
-    <i class="bi bi-calendar-x" style="font-size: 4rem; color: #ccc;"></i>
-  </div>
-  <h3>No treks scheduled for {{ selectedMonth }} {{ selectedYear }}</h3>
-  <p class="text-muted">Check other months or years for available treks</p>
-</div>
+    <div class="empty-state" *ngIf="trekCount === 0">
+      <div class="empty-icon">🏔</div>
+      <h3>No treks in {{ selectedMonth }} {{ selectedYear }}</h3>
+      <p>Try a different month or year.</p>
+    </div>
 
-<!-- Custom Trip Card -->
-<div class="container my-5">
-  <div class="card text-center shadow">
-    <div class="card-body">
-      <h2>Can't find what you're looking for?</h2>
-      <p class="text-muted">
-        We also organize customized trips and corporate outings
-      </p>
-      <a routerLink="/contact" class="btn btn-primary w-100">
-        Contact Us for Custom Trips
-      </a>
+  </div>
+
+  <!-- BOTTOM CTA -->
+  <div class="bottom-cta">
+    <div class="cta-card">
+      <div>
+        <div class="cta-eyebrow">Custom Expeditions</div>
+        <h2 class="cta-heading">Can't find what you're looking for?</h2>
+        <p class="cta-body">We organise tailored group treks, corporate outings, and private expeditions. Tell us where you want to go.</p>
+      </div>
+      <a routerLink="/contact" class="cta-btn">Get in Touch <span>→</span></a>
     </div>
   </div>
+
 </div>

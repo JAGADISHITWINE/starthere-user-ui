@@ -87,7 +87,7 @@ interface MappedTour {
 export class TourDetailsComponent implements OnInit {
   tour: MappedTour | null = null;
   isLoading = true;
-  tourId: number = 0;
+  tourUuid: string = '';
   selectedSegment: string = 'overview';
 
   baseUrl = 'http://localhost:4001/';
@@ -102,12 +102,11 @@ export class TourDetailsComponent implements OnInit {
 
   ngOnInit() {
     this.route.paramMap.subscribe(params => {
-      const id = Number(params.get('id'));
-      if (!id) return;
-      this.tourId = +id;
+      const uuid = params.get('uuid');
+      if (!uuid) return;
+      this.tourUuid = uuid;
       this.isLoading = true;
       this.tour = null;
-
       this.loadTrekDetails();
     });
   }
@@ -115,8 +114,7 @@ export class TourDetailsComponent implements OnInit {
 
   loadTrekDetails() {
     this.isLoading = true;
-
-    this.tourDetailsService.getTrekById(this.tourId).subscribe((res: any) => {
+    this.tourDetailsService.getTrekByUuid(this.tourUuid).subscribe((res: any) => {
       if (res.success) {
         this.isLoading = false;
         this.mapTourData(res.data);
@@ -129,7 +127,7 @@ export class TourDetailsComponent implements OnInit {
     this.tour = {
       id: firstBatch?.batchId,
       name: result.name,
-      location: result.location,  
+      location: result.location,
       category: result.category,
       difficulty: result.difficulty,
       fitnessLevel: result.fitness_level,
@@ -226,31 +224,41 @@ export class TourDetailsComponent implements OnInit {
 
   // Add these methods to your component
 
-getBadgeClass(tour: any): string {
-  const remaining = tour.availableSlots;
-  
-  if (remaining <= 0) {
-    return 'bg-danger';
-  } else if (remaining <= 3) {
-    return 'bg-warning text-dark';
-  } else if (remaining <= 10) {
-    return 'bg-info text-dark';
-  } else {
-    return 'bg-success';
-  }
-}
+  getBadgeClass(tour: any): string {
+    const remaining = tour.availableSlots;
 
-getBadgeText(tour: any): string {
-  const remaining = tour.availableSlots;
-  
-  if (remaining <= 0) {
-    return 'Sold Out';
-  } else if (remaining <= 3) {
-    return `Only ${remaining} seat${remaining === 1 ? '' : 's'} left!`;
-  } else if (remaining <= 10) {
-    return `Selling Fast - ${remaining} slots left`;
-  } else {
-    return `${remaining} slots available`;
+    if (remaining <= 0) {
+      return 'bg-danger';
+    } else if (remaining <= 3) {
+      return 'bg-warning text-dark';
+    } else if (remaining <= 10) {
+      return 'bg-info text-dark';
+    } else {
+      return 'bg-success';
+    }
   }
-}
+
+  getBadgeText(tour: any): string {
+    const remaining = tour.availableSlots;
+
+    if (remaining <= 0) {
+      return 'Sold Out';
+    } else if (remaining <= 3) {
+      return `Only ${remaining} seat${remaining === 1 ? '' : 's'} left!`;
+    } else if (remaining <= 10) {
+      return `Selling Fast - ${remaining} slots left`;
+    } else {
+      return `${remaining} slots available`;
+    }
+  }
+  openDay: any;
+
+  toggleDay(day: number) {
+    if (this.openDay === day) {
+      this.openDay = null; // Close if already open
+    } else {
+      this.openDay = day; // Open the selected day
+    }
+  }
+
 }

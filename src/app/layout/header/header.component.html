@@ -1,6 +1,6 @@
 <!-- header.component.html -->
 
-<header class="app-header">
+<header class="app-header" [class.scrolled]="isScrolled">
   <div class="header-content">
 
     <!-- ── Logo Section ─────────────────────────────────────────────── -->
@@ -18,8 +18,27 @@
       </a>
     </div>
 
-    <!-- ── Right Section ─────────────────────────────────────────────── -->
+    <!-- ══════════════════════════════════════════════════════════════
+         ── Right Section ──────────────────────────────────────────
+    ═══════════════════════════════════════════════════════════════ -->
     <div class="header-right">
+      <div class="header-search" [class.expanded]="isSearchOpen">
+        <!-- Collapsed state: icon button -->
+        <button
+          class="search-icon-btn"
+          [class.hidden]="isSearchOpen"
+          aria-label="Open search"
+          title="Search treks & tours"
+          routerLink="/search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="M21 21l-4.35-4.35" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+      <!-- END SEARCH -->
+
+      <!-- LOGIN / USER MENU (unchanged) ──────────────────────────── -->
 
       <!-- Logged Out → Login button -->
       <button class="login-btn" *ngIf="!isLoggedIn" (click)="openLoginPanel()">
@@ -29,20 +48,23 @@
 
       <!-- Logged In → User Menu -->
       <div class="user-menu" *ngIf="isLoggedIn">
-        <button class="user-avatar-btn" [class.show]="isUserDropdownOpen" (click)="toggleUserDropdown()"
-          aria-haspopup="true" [attr.aria-expanded]="isUserDropdownOpen">
+        <button
+          class="user-avatar-btn"
+          [class.show]="isUserDropdownOpen"
+          (click)="toggleUserDropdown()"
+          aria-haspopup="true"
+          [attr.aria-expanded]="isUserDropdownOpen">
           <div class="user-avatar" *ngIf="!profilePicture">{{ getUserInitials() }}</div>
-          <img *ngIf="profilePicture" [src]="profilePicture" alt="Profile" class="user-avatar-img" />
+          <img *ngIf="profilePicture" [src]="profilePicture" alt="Profile" class="user-avatar-img"/>
           <span class="user-name">{{ userName }}</span>
           <i class="bi bi-chevron-down"></i>
         </button>
 
         <!-- Dropdown -->
         <div class="user-dropdown" [class.show]="isUserDropdownOpen" (clickOutside)="closeUserDropdown()">
-          <!-- Dropdown Header -->
           <div class="dropdown-header">
             <div class="user-avatar-large" *ngIf="!profilePicture">{{ getUserInitials() }}</div>
-            <img *ngIf="profilePicture" [src]="profilePicture" alt="Profile" class="user-avatar-img-large" />
+            <img *ngIf="profilePicture" [src]="profilePicture" alt="Profile" class="user-avatar-img-large"/>
             <div class="user-info">
               <div class="user-name-large">{{ userName }}</div>
               <div class="user-email">{{ userEmail }}</div>
@@ -64,31 +86,40 @@
           </a>
         </div>
       </div>
+      <!-- END ③ USER MENU -->
 
     </div>
+    <!-- END header-right -->
+
   </div>
 
-  <!-- ── Mobile Nav ────────────────────────────────────────────────────── -->
+  <!-- ── Mobile Nav (unchanged, search added inside) ──────────────── -->
   <div class="mobile-overlay" [class.show]="isMobileMenuOpen" (click)="closeMobileMenu()"></div>
 
   <nav class="mobile-nav" [class.show]="isMobileMenuOpen">
     <div class="mobile-nav-content">
 
+      <!-- Mobile search at top of drawer -->
+      <div class="mobile-search-row">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mobile-search-icon">
+          <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35" stroke-linecap="round"/>
+        </svg>
+        <input
+          class="mobile-search-input"
+          type="text"
+          placeholder="Search treks & tours…"
+          [(ngModel)]="searchQuery"
+          aria-label="Search"/>
+      </div>
+
       <!-- Logged-in user section -->
       <div class="mobile-user-section" *ngIf="isLoggedIn">
         <div class="mobile-user-avatar" *ngIf="!profilePicture">{{ getUserInitials() }}</div>
-        <img *ngIf="profilePicture" [src]="profilePicture" alt="Profile" class="mobile-user-avatar-img" />
+        <img *ngIf="profilePicture" [src]="profilePicture" alt="Profile" class="mobile-user-avatar-img"/>
         <div class="mobile-user-info">
           <div class="mobile-user-name">{{ userName }}</div>
           <div class="mobile-user-email">{{ userEmail }}</div>
         </div>
-      </div>
-
-      <!-- Nav links -->
-      <div class="mobile-nav-links">
-        <a class="mobile-nav-link" routerLink="/my-bookings" *ngIf="isLoggedIn" (click)="closeMobileMenu()">
-          <i class="bi bi-calendar-check"></i> My Bookings
-        </a>
       </div>
 
       <!-- Logged-in actions -->

@@ -1,102 +1,126 @@
-<div class="bg-light text-center py-5 border-bottom">
-  <div class="container">
-    <h1 class="fw-bold">Exploring Karnataka's Wilderness Since 2011</h1>
-    <p class="text-muted fs-5">
-      Your trusted partner for adventure and exploration
-    </p>
-  </div>
-</div>
-<div class="container my-5">
-  <div class="card">
-    <div class="card-body">
-      <h3 class="card-title fw-semibold">Our Story</h3>
+<div class="page">
 
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-year">2011</div>
+    <div class="hero-inner">
+      <div class="hero-label">Our Story</div>
+      <h1 class="hero-title">
+        Exploring Karnataka's<br /><em>Wilderness</em><br />Since 2011
+      </h1>
+      <p class="hero-sub">Your trusted partner for adventure and exploration in the Western Ghats</p>
+    </div>
+  </section>
+
+  <!-- STORY -->
+  <section class="story-section">
+    <div class="story-aside">
+      <div class="section-number">01</div>
+      <span class="section-tag">Our Story</span>
+      <h2 class="section-heading">Born from<br />a love of<br /><em>wild places</em></h2>
+    </div>
+    <div class="story-text">
       <p>
-        Karnataka Adventures was born out of a passion for the Western Ghats and a
-        desire to share its beauty with fellow adventurers. What started as
-        weekend treks with friends has grown into one of Karnataka's most trusted
-        trekking organizations.
+        Karnataka Adventures was born out of a passion for the Western Ghats and a desire to share its beauty with fellow adventurers. What started as weekend treks with friends has grown into one of Karnataka's most trusted trekking organisations.
       </p>
-
+      <div class="pull-quote">
+        <p>"We've introduced thousands of people to the majestic peaks, dense forests, and hidden waterfalls of Karnataka."</p>
+      </div>
       <p>
-        Over the years, we've introduced thousands of people to the majestic
-        peaks, dense forests, and hidden waterfalls of Karnataka. Our mission
-        remains simple: to create safe, memorable, and responsible trekking
-        experiences while preserving the natural beauty that makes these
-        adventures possible.
+        Our mission remains simple: to create safe, memorable, and responsible trekking experiences while preserving the natural beauty that makes these adventures possible.
       </p>
     </div>
-  </div>
-</div>
-<div class="bg-primary text-white py-5">
-  <div class="container">
-    <div class="row text-center">
-      <div class="col-6 col-md-3 mb-4" *ngFor="let stat of stats">
-        <h2 class="fw-bold">{{ stat.number }}</h2>
-        <p class="mb-0">{{ stat.label }}</p>
+  </section>
+
+  <!-- STATS -->
+  <section class="stats-section">
+    <div class="stats-grid">
+      <div class="stat-item" *ngFor="let stat of stats">
+        <span class="stat-number">{{ stat.number }}<span class="stat-accent">{{ stat.suffix }}</span></span>
+        <span class="stat-label">{{ stat.label }}</span>
       </div>
     </div>
-  </div>
-</div>
-<div class="container my-5">
-  <h2 class="text-center fw-bold mb-4">Our Values</h2>
+  </section>
 
-  <div class="row g-4">
-    <div class="col-md-4" *ngFor="let value of values">
-      <div class="card h-100 text-center">
-        <div class="card-body">
-          <div class="fs-1 mb-3 text-success">
-            <i class="bi bi-{{ value.icon }}"></i>
+  <!-- VALUES -->
+  <section class="values-section">
+    <div class="values-header">
+      <div class="section-number" style="margin-bottom:0">02</div>
+      <div>
+        <span class="section-tag" style="margin-bottom:6px">What drives us</span>
+        <h2 class="section-heading">Our <em>Values</em></h2>
+      </div>
+    </div>
+    <div class="values-grid">
+      <div class="value-card" *ngFor="let value of values">
+        <span class="value-icon">{{ value.icon }}</span>
+        <div class="value-title">{{ value.title }}</div>
+        <p class="value-desc">{{ value.description }}</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider">
+    <div class="divider-line"></div>
+    <div class="divider-mark"></div>
+    <div class="divider-line"></div>
+  </div>
+
+  <!-- TEAM -->
+  <section class="team-section">
+    <div class="team-header-wrap">
+      <div class="values-header">
+        <div class="section-number" style="margin-bottom:0">03</div>
+        <div>
+          <span class="section-tag" style="margin-bottom:6px">The people behind the trails</span>
+          <h2 class="section-heading">Meet Our <em>Team</em></h2>
+        </div>
+      </div>
+    </div>
+    <div class="team-grid">
+      <div class="team-card" *ngFor="let member of team">
+        <div class="team-img">
+          <img [src]="member.image" [alt]="member.name" />
+          <span class="team-role-tag">{{ member.role }}</span>
+        </div>
+        <div class="team-body">
+          <h3 class="team-name">{{ member.name }}</h3>
+          <p class="team-bio">{{ member.bio }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SAFETY -->
+  <section class="safety-section">
+    <div class="safety-inner">
+      <div class="safety-aside">
+        <div class="section-number">04</div>
+        <span class="section-tag">Non-negotiable</span>
+        <h2 class="section-heading">Our <em>Safety</em><br />Standards</h2>
+        <p class="safety-desc">
+          Every measure below is a baseline, not an aspiration. We review and upgrade our protocols every season.
+        </p>
+      </div>
+      <ul class="safety-list">
+        <li class="safety-item" *ngFor="let item of safetyItems; let i = index">
+          <span class="safety-num">{{ (i + 1).toString().padStart(2, '0') }}</span>
+          <div class="safety-text">
+            <strong>{{ item.title }}</strong>
+            {{ item.description }}
           </div>
-          <h5 class="fw-semibold">{{ value.title }}</h5>
-          <p class="text-muted">{{ value.description }}</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-<div class="container my-5">
-  <h2 class="text-center fw-bold mb-4">Meet Our Team</h2>
-
-  <div class="row g-4">
-    <div class="col-md-4" *ngFor="let member of team">
-      <div class="card h-100">
-        <img [src]="member.image" [alt]="member.name" class="card-img-top" />
-
-        <div class="card-body text-center">
-          <h5 class="fw-semibold">{{ member.name }}</h5>
-          <p class="text-muted">{{ member.role }}</p>
-          <p class="small">{{ member.bio }}</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-<div class="container my-5">
-  <div class="card border-success">
-    <div class="card-body">
-      <h3 class="fw-bold text-success mb-3">
-        <i class="bi bi-shield-check"></i>
-        Our Safety Standards
-      </h3>
-
-      <ul class="list-group list-group-flush">
-        <li class="list-group-item">
-          ✔ All guides are certified in wilderness first aid
-        </li>
-        <li class="list-group-item">
-          ✔ Comprehensive safety briefings before every trek
-        </li>
-        <li class="list-group-item">
-          ✔ Emergency communication equipment on all treks
-        </li>
-        <li class="list-group-item">
-          ✔ Maximum group sizes for personalized attention
-        </li>
-        <li class="list-group-item">
-          ✔ Regular equipment checks and maintenance
         </li>
       </ul>
     </div>
-  </div>
+  </section>
+
+  <!-- FOOTER CTA -->
+  <section class="footer-cta">
+    <div class="footer-cta-inner">
+      <h2>Ready to find your trail?</h2>
+      <p>Browse our upcoming treks and join thousands of adventurers who've trusted Karnataka Adventures.</p>
+      <a routerLink="/upcoming-treks" class="cta-btn">Explore Upcoming Treks →</a>
+    </div>
+  </section>
+
 </div>

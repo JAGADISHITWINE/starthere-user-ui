@@ -1,103 +1,116 @@
-import { NgModule } from '@angular/core';
-import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
-import { MainpageComponent } from './layout/mainpage/mainpage.component';
-import { ResetPasswordComponent } from './auth/reset-password/reset-password.component';
+import { NgModule } from "@angular/core";
+import { PreloadAllModules, RouterModule, Routes } from "@angular/router";
+import { MainpageComponent } from "./layout/mainpage/mainpage.component";
+import { ResetPasswordComponent } from "./auth/reset-password/reset-password.component";
 
 const routes: Routes = [
   // ✅ Standalone route — outside MainpageComponent so no navbar/header shows
   {
-    path: 'reset-password',
-    component: ResetPasswordComponent
+    path: "reset-password",
+    component: ResetPasswordComponent,
   },
 
   {
-    path: '',
+    path: "",
     component: MainpageComponent,
     children: [
       {
-        path: '',
+        path: "",
         loadChildren: () =>
-          import('./dashboard/dashboard-module').then(m => m.DashboardModule)
+          import("./dashboard/dashboard-module").then((m) => m.DashboardModule),
       },
       {
-        path: 'upcomingtours',
+        path: "upcomingtours",
         loadChildren: () =>
-          import('./upcomingtours/tours-module').then(m => m.ToursModule)
+          import("./upcomingtours/tours-module").then((m) => m.ToursModule),
       },
       {
-        path: 'tour-details',
+        path: "tour-details",
         loadChildren: () =>
-          import('./tour-details/tour-details-module').then(m => m.TourDetailsModule)
+          import("./tour-details/tour-details-module").then(
+            (m) => m.TourDetailsModule,
+          ),
       },
       {
-        path: 'booking',
+        path: "booking",
         loadChildren: () =>
-          import('./booking/booking-module').then(m => m.BookingModule)
+          import("./booking/booking-module").then((m) => m.BookingModule),
       },
       {
-        path: 'about',
+        path: "about",
         loadChildren: () =>
-          import('./about/about-module').then(m => m.AboutModule)
+          import("./about/about-module").then((m) => m.AboutModule),
       },
       {
-        path: 'faqs',
+        path: "faqs",
         loadChildren: () =>
-          import('./faqs/faqs-module').then(m => m.FaqsModule)
+          import("./faqs/faqs-module").then((m) => m.FaqsModule),
       },
       {
-        path: 'blog',
+        path: "blog",
         loadChildren: () =>
-          import('./blog/blog-module').then(m => m.BlogModule)
+          import("./blog/blog-module").then((m) => m.BlogModule),
       },
       {
-        path: 'blog-details',
+        path: "blog-details",
         loadChildren: () =>
-          import('./blog-detail/blog-detail-module').then(m => m.BlogDetailModule)
+          import("./blog-detail/blog-detail-module").then(
+            (m) => m.BlogDetailModule,
+          ),
       },
       {
-        path: 'my-bookings',
+        path: "my-bookings",
         loadChildren: () =>
-          import('./my-bookings/my-bookings-module').then(m => m.MyBookingsModule)
+          import("./my-bookings/my-bookings-module").then(
+            (m) => m.MyBookingsModule,
+          ),
       },
       {
-        path: 'cancle-bookings',
+        path: "cancle-bookings",
         loadChildren: () =>
-          import('./cancle-bookings/cancle-bookings-module').then(m => m.CancleBookingsModule)
+          import("./cancle-bookings/cancle-bookings-module").then(
+            (m) => m.CancleBookingsModule,
+          ),
       },
       {
-        path: 'termsandcondition',
+        path: "termsandcondition",
         loadChildren: () =>
-          import('./Quicklinks/termsandconditions/termsandconditons-module')
-            .then(m => m.TermsandconditionsModule)
+          import("./Quicklinks/termsandconditions/termsandconditons-module").then(
+            (m) => m.TermsandconditionsModule,
+          ),
       },
       {
-        path: 'cancellation',
+        path: "cancellation",
         loadChildren: () =>
-          import('./Quicklinks/termsandconditions/termsandconditons-module')
-            .then(m => m.TermsandconditionsModule)
+          import("./Quicklinks/termsandconditions/termsandconditons-module").then(
+            (m) => m.TermsandconditionsModule,
+          ),
       },
       {
-        path:'blog-post',
-        loadChildren:()=>
-          import('./blog-post/blog-post-module')
-         .then(m => m.BlogPostModule)
-      }
-
-    ]
+        path: "blog-post",
+        loadChildren: () =>
+          import("./blog-post/blog-post-module").then((m) => m.BlogPostModule),
+      },
+      {
+        path: "search",
+        loadChildren: () =>
+          import("./search/search.module").then((m) => m.SearchModule),
+      },
+    ],
   },
 
   // ✅ Wildcard must always be last
-  { path: '**', redirectTo: '' }
+  { path: "**", redirectTo: "" },
 ];
 @NgModule({
   imports: [
     RouterModule.forRoot(routes, {
       preloadingStrategy: PreloadAllModules,
-      scrollPositionRestoration: 'enabled',
-      anchorScrolling: 'enabled',
-      scrollOffset: [0, 0]
-    })
+      scrollPositionRestoration: "enabled",
+      anchorScrolling: "enabled",
+      scrollOffset: [0, 0],
+    }),
   ],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

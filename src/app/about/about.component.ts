@@ -19,25 +19,29 @@ export class AboutComponent implements OnInit {
       name: "Rajesh Kumar",
       role: "Founder & Lead Trek Leader",
       image: "https://ui-avatars.com/api/?name=Rajesh+Kumar&size=200",
-      bio: "15+ years of trekking experience in the Western Ghats"
+      bio: "15+ years of trekking experience in the Western Ghats",
+      suffix: "Founder & Lead Trek Leader"
     },
     {
       name: "Priya Sharma",
       role: "Operations Manager",
       image: "https://ui-avatars.com/api/?name=Priya+Sharma&size=200",
-      bio: "Expert in trek logistics and safety protocols"
+      bio: "Expert in trek logistics and safety protocols",
+      suffix: "Operations Manager"
     },
     {
       name: "Arjun Menon",
       role: "Senior Trek Guide",
       image: "https://ui-avatars.com/api/?name=Arjun+Menon&size=200",
-      bio: "Certified wilderness first responder and mountaineer"
+      bio: "Certified wilderness first responder and mountaineer",
+      suffix: "Senior Trek Guide"
     },
     {
       name: "Meera Reddy",
       role: "Trek Guide & Naturalist",
       image: "https://ui-avatars.com/api/?name=Meera+Reddy&size=200",
-      bio: "Wildlife enthusiast with deep knowledge of Western Ghats flora & fauna"
+      bio: "Wildlife enthusiast with deep knowledge of Western Ghats flora & fauna",
+      suffix: "Trek Guide & Naturalist"
     }
   ];
 
@@ -65,10 +69,18 @@ export class AboutComponent implements OnInit {
   ];
 
   stats = [
-    { number: "10,000+", label: "Happy Trekkers" },
-    { number: "50+", label: "Trek Routes" },
-    { number: "15", label: "Years Experience" },
-    { number: "4.8", label: "Average Rating" }
+    { number: "10,000+", label: "Happy Trekkers", suffix: "Happy Trekkers" },
+    { number: "50+", label: "Trek Routes", suffix: "Trek Routes" },
+    { number: "15", label: "Years Experience", suffix: "Years Experience" },
+    { number: "4.8", label: "Average Rating", suffix: "Average Rating" }
   ];
+
+  safetyItems = [
+    { icon: "shield-checkmark", title: "Certified Guides", description: "All treks led by certified guides with wilderness first aid training" },
+    { icon: "medkit", title: "Safety Briefings", description: "Comprehensive safety briefings before each trek" },
+    { icon: "call", title: "Emergency Communication", description: "Emergency communication devices on all treks" },
+    { icon: "cloudy-night", title: "Weather Monitoring", description: "Strict adherence to weather and trail conditions" }
+  ];
+    
 
 }
