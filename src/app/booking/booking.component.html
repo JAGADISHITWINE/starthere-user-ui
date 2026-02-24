@@ -1,4 +1,4 @@
-<nav class="navbar navbar-dark bg-primary sticky-top">
+<nav class="navbar navbar-dark bg-primary">
   <div class="container-fluid">
     <button class="btn btn-outline-light" [routerLink]="['/tour-details', trekId]">←</button>
     <span class="navbar-brand mx-auto fw-semibold">Book Your Trek</span>
@@ -124,13 +124,13 @@
         <div class="mb-3 col-md-6">
           <label class="form-label">Phone <span class="text-danger">*</span></label>
           <input type="tel" class="form-control" [(ngModel)]="booking.phone" placeholder="+91 XXXXX XXXXX"
-            minlength="10" maxlength="10" />
+            minlength="10" maxlength="10"  onlyNumber/>
         </div>
 
         <div class="mb-3 col-md-6">
           <label class="form-label">Emergency Contact <span class="text-danger">*</span></label>
           <input type="tel" class="form-control" [(ngModel)]="booking.emergencyContact" placeholder="+91 XXXXX XXXXX"
-            minlength="10" maxlength="10" />
+            minlength="10" maxlength="10" onlyNumber/>
         </div>
 
         <div class="mb-3 col-12">

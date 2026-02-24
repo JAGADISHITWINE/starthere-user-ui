@@ -5,6 +5,7 @@ import { Router, RouterLink } from "@angular/router";
 import { Auth } from "../core/auth";
 import { MyBookings } from "./my-bookings";
 import { AuthModalService } from "../auth/auth-modal.service";
+import { TokenService } from 'src/app/core/token.service';
 
 interface Booking {
   id: number;
@@ -54,20 +55,16 @@ export class MyBookingsComponent implements OnInit {
   constructor(
     private bookingService: MyBookings,
     private authModal: AuthModalService,
-    private router: Router
+    private router: Router,
+  private tokenService: TokenService,
   ) { }
 
   ngOnInit() {
-    const token = sessionStorage.getItem("token");
-    let user: any = {};
-    if (token) {
-      try {
-        user = JSON.parse(atob(token.split(".")[1]));
-        this.userId = user.id
-      } catch (e) {
-        console.error("Invalid JWT", e);
-        user = {};
-      }
+    // Use TokenService to read and decode the token in a single place
+    try {
+      this.userId = this.tokenService.getUserId();
+    } catch (e) {
+      this.userId = null as any;
     }
     this.loadBookings();
   }
@@ -303,7 +300,7 @@ export class MyBookingsComponent implements OnInit {
     // attach userId to the booking payload so the cancel modal and service have context
     const payload = { ...booking, userId: this.userId };
     try {
-      const result: any = await this.authModal.openCancel(payload);
+      const result: any = await this.authModal.openCancle(payload);
       // If modal resolved with cancellation, refresh bookings (keeps UI in sync)
       if (result?.cancelled) {
         this.loadBookings();

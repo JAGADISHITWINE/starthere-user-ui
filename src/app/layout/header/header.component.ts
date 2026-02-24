@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { Auth } from 'src/app/core/auth';
+import { TokenService } from 'src/app/core/token.service';
 import { AuthModalService } from 'src/app/auth/auth-modal.service';
 
 @Component({
@@ -30,7 +31,8 @@ export class HeaderComponent implements OnInit {
   constructor(
     private routes: Router,
     private authService: Auth,
-    private authModal: AuthModalService
+    private authModal: AuthModalService,
+    private tokenService: TokenService
   ) {}
 
   ngOnInit() {
@@ -38,17 +40,9 @@ export class HeaderComponent implements OnInit {
       this.isLoggedIn = isLoggedIn;
 
       if (isLoggedIn) {
-        const token = sessionStorage.getItem('token');
-          let user: any = {};
-          if (token) {
-            try {
-              user = JSON.parse(atob(token.split('.')[1]));
-            } catch (e) {
-              user = {};
-            }
-          }
-          this.userName = user.name || 'User';
-          this.userEmail = user.email || '';
+        const decoded = this.tokenService.decode();
+        this.userName = decoded?.name || decoded?.username || 'User';
+        this.userEmail = decoded?.email || '';
 
       } else {
         this.resetUserData();
@@ -67,8 +61,7 @@ export class HeaderComponent implements OnInit {
   }
 
   logout() {
-    sessionStorage.removeItem('token');
-    sessionStorage.removeItem('userData');
+    this.tokenService.clear();
 
     this.resetUserData();
 

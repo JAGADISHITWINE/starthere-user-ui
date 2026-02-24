@@ -17,6 +17,7 @@ import {
 import { ActivatedRoute, Router } from "@angular/router";
 import { BlogPost } from "./blog-post";
 import { AuthModalService } from "../auth/auth-modal.service";
+import { TokenService } from 'src/app/core/token.service';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatInputModule } from '@angular/material/input';
@@ -296,6 +297,7 @@ export class BlogPostComponent implements OnInit {
     private toastController: ToastController,
     private loadingController: LoadingController,
     private authModal: AuthModalService,
+    private tokenService: TokenService,
   ) { }
 
   ngOnInit() {
@@ -584,8 +586,7 @@ export class BlogPostComponent implements OnInit {
   }
 
   async savePost() {
-    const token = sessionStorage.getItem("token");
-    if (!token) {
+    if (!this.tokenService.isValid()) {
       this.openLoginPanel();
       return;
     } else {
@@ -594,17 +595,8 @@ export class BlogPostComponent implements OnInit {
       });
       await loading.present();
 
-      const token = sessionStorage.getItem("token");
-      let user: any = {};
-
-      if (token) {
-        try {
-          user = JSON.parse(atob(token.split(".")[1]));
-          this.userId = user.id;
-        } catch (e) {
-          user = {};
-        }
-      }
+      const decoded = this.tokenService.decode();
+      this.userId = decoded ? (decoded.id ?? decoded.userId ?? null) : null;
 
       const formValue = { ...this.postForm.value };
 

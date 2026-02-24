@@ -6,7 +6,10 @@ import { IonicModule } from "@ionic/angular";
 import { TourDetails } from "../tour-details/tour-details";
 import { Booking, BookingData } from "./booking";
 import { Auth } from "../core/auth";
+import { TokenService } from 'src/app/core/token.service';
 import { AuthModalService } from "../auth/auth-modal.service";
+import { Sessionexpired } from "../auth/sessionexpired/sessionexpired";
+import { OnlyNumberDirective } from "../shared/Only number.directive";
 
 // Participant interface
 interface Participant {
@@ -30,6 +33,7 @@ interface Participant {
     IonicModule,
     ReactiveFormsModule,
     RouterLink,
+    OnlyNumberDirective
   ],
 })
 export class BookingComponent implements OnInit {
@@ -77,6 +81,8 @@ export class BookingComponent implements OnInit {
     private auth: Auth,
     private authModal: AuthModalService,
     private router: Router,
+    private tokenService: TokenService,
+    private sessionService: Sessionexpired, 
   ) {}
 
   ngOnInit() {
@@ -117,21 +123,11 @@ export class BookingComponent implements OnInit {
             this.onBatchSelect(batchIdValue);
           }
 
-          // Pre-fill user data from token
-          const token = sessionStorage.getItem("token");
-          let user: any = {};
-
-          if (token) {
-            try {
-              user = JSON.parse(atob(token.split(".")[1]));
-            } catch (e) {
-              user = {};
-            }
-          }
-
-          this.booking.name = user.name || "";
-          this.booking.email = user.email || "";
-          this.booking.phone = user.phone || "";
+          // Pre-fill user data from token (centralized)
+          const decoded = this.tokenService.decode();
+          this.booking.name = decoded?.name || "";
+          this.booking.email = decoded?.email || "";
+          this.booking.phone = decoded?.phone || "";
 
           // Initialize participants array
           this.initializeParticipants();
@@ -282,43 +278,53 @@ export class BookingComponent implements OnInit {
     return this.basePrice + this.addOnsPrice;
   }
 
-  nextStep() {
-    // Validate current step
-    if (!this.canProceedToNextStep()) {
-      if (this.currentStep === 1) {
-        alert("Please select a batch and number of participants");
-      } else if (this.currentStep === 2) {
-        alert("Please fill all required contact information");
-      } else if (this.currentStep === 3) {
-        alert("Please fill all required participant details");
-      }
+nextStep() {
+  // Validate current step
+  if (!this.canProceedToNextStep()) {
+    if (this.currentStep === 1) {
+      alert("Please select a batch and number of participants");
+    } else if (this.currentStep === 2) {
+      alert("Please fill all required contact information");
+    } else if (this.currentStep === 3) {
+      alert("Please fill all required participant details");
+    }
+    return;
+  }
+
+  // Check authentication before step 3
+  if (this.currentStep === 2) {
+    // Sync primary contact to first participant before moving forward
+    this.syncPrimaryContactToParticipant();
+
+    const hasToken   = !!this.tokenService.getToken();     // token exists (even if expired)
+    const isValid    = this.tokenService.isValid();         // token exists AND not expired
+
+    if (hasToken && !isValid) {
+      // Token exists but is expired → show session expired modal
+      this.sessionService.notifyExpired();
       return;
     }
 
-    // Check authentication before step 3
-    if (this.currentStep === 2) {
-      // Sync primary contact to first participant before moving forward
-      this.syncPrimaryContactToParticipant();
-
-      if (!this.auth.isLoggedIn()) {
-        this.authModal
-          .openLogin()
-          .then((result: any) => {
-            if (result && result.success) {
-              this.currentStep++;
-            }
-          })
-          .catch(() => {
-            // User cancelled login
-          });
-        return;
-      }
-    }
-
-    if (this.currentStep < 4) {
-      this.currentStep++;
+    if (!hasToken) {
+      // No token at all → fresh login flow
+      this.authModal
+        .openLogin()
+        .then((result: any) => {
+          if (result && result.success) {
+            this.currentStep++;
+          }
+        })
+        .catch(() => {
+          // User cancelled login
+        });
+      return;
     }
   }
+
+  if (this.currentStep < 4) {
+    this.currentStep++;
+  }
+}
 
   prevStep() {
     if (this.currentStep > 1) {
@@ -331,17 +337,8 @@ export class BookingComponent implements OnInit {
     this.errorMessage = "";
     this.isSubmitting = true;
 
-    const token = sessionStorage.getItem("token");
-    let user: any = {};
-
-    if (token) {
-      try {
-        user = JSON.parse(atob(token.split(".")[1]));
-        this.userId = user.id;
-      } catch (e) {
-        user = {};
-      }
-    }
+    // Centralized token handling
+    this.userId = this.tokenService.getUserId();
 
     const bookingData: BookingData = {
       userId: this.userId,

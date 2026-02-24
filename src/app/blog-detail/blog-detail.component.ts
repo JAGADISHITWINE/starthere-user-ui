@@ -3,6 +3,7 @@ import { CommonModule } from "@angular/common";
 import { IonicModule } from "@ionic/angular";
 import { ActivatedRoute, Router } from "@angular/router";
 import { BlogDetail } from "./blog-detail";
+import { TokenService } from 'src/app/core/token.service';
 import { FormsModule } from "@angular/forms";
 import { AuthModalService } from "../auth/auth-modal.service";
 
@@ -70,6 +71,7 @@ export class BlogDetailComponent implements OnInit {
     private router: Router,
     private blogDetailService: BlogDetail,
     private authModal: AuthModalService,
+    private tokenService: TokenService,
   ) {}
 
   ngOnInit() {
@@ -79,23 +81,16 @@ export class BlogDetailComponent implements OnInit {
       this.loadComments();
       this.setCurrentUser();
     });
-    const token = sessionStorage.getItem("token");
   }
 
   setCurrentUser() {
-    const token = sessionStorage.getItem("token");
-
-    if (!token) {
+    if (!this.tokenService.isValid()) {
       this.currentUserId = null;
       return;
     }
 
-    try {
-      const decoded: any = JSON.parse(atob(token.split(".")[1]));
-      this.currentUserId = Number(decoded?.id); // 🔥 FORCE NUMBER
-    } catch {
-      this.currentUserId = null;
-    }
+    const decoded = this.tokenService.decode();
+    this.currentUserId = decoded ? Number(decoded?.id ?? decoded?.userId ?? null) : null;
   }
 
   loadPost() {
@@ -117,7 +112,8 @@ export class BlogDetailComponent implements OnInit {
         readTime: res.read_time || "5 min read",
         views: res.views || 0,
         likes: res.likes || 0,
-        content: res.content,
+        // sanitize HTML coming from server before binding to [innerHTML]
+        content: res.content || '',
       };
 
       // Load related posts after getting the post data
@@ -184,21 +180,12 @@ export class BlogDetailComponent implements OnInit {
   postComment() {
     if (!this.newComment?.trim()) return;
 
-    const token = sessionStorage.getItem("token");
-
-    if (!token) {
+    if (!this.tokenService.isValid()) {
       this.openLoginPanel();
       return; // 🚀 hard stop
     }
 
-    let decodedUser: any;
-
-    try {
-      decodedUser = JSON.parse(atob(token.split(".")[1]));
-    } catch (e) {
-      this.openLoginPanel();
-      return; // 🚀 stop if invalid token
-    }
+    const decodedUser: any = this.tokenService.decode();
 
     if (!decodedUser?.id) {
       this.openLoginPanel();

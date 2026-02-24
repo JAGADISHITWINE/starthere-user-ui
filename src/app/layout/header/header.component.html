@@ -5,73 +5,44 @@
 
     <!-- ── Logo Section ─────────────────────────────────────────────── -->
     <div class="header-left">
-      <img
-        class="logo"
-        src="../../../assets/assets/logo.png"
-        alt="Logo"
-        routerLink="/"
-      />
-      <!-- Uncomment if you have a title image -->
-      <!-- <img class="title" src="../../../assets/assets/titlename.png" alt="Title" routerLink="/" /> -->
+      <img class="logo" src="../../../assets/assets/logo.png" alt="Logo" routerLink="/" />
+
+      <a class="gw-logo logo-dark" href="#">
+        <div class="gw-words">
+          <div class="gw-top">
+            <span class="gw-go">go</span>
+            <span class="gw-wild">WILD</span>
+          </div>
+          <span class="gw-sub">Karunadu</span>
+        </div>
+      </a>
     </div>
-  
+
     <!-- ── Right Section ─────────────────────────────────────────────── -->
     <div class="header-right">
 
-      <!-- Mobile menu button -->
-      <button
-        class="mobile-menu-btn"
-        (click)="toggleMobileMenu()"
-        aria-label="Open menu"
-      >
-        <i class="bi bi-list"></i>
-      </button>
-
       <!-- Logged Out → Login button -->
-      <button
-        class="login-btn"
-        *ngIf="!isLoggedIn"
-        (click)="openLoginPanel()"
-      >
+      <button class="login-btn" *ngIf="!isLoggedIn" (click)="openLoginPanel()">
         <i class="bi bi-person-fill"></i>
         <span>Login</span>
       </button>
 
       <!-- Logged In → User Menu -->
       <div class="user-menu" *ngIf="isLoggedIn">
-        <button
-          class="user-avatar-btn"
-          [class.show]="isUserDropdownOpen"
-          (click)="toggleUserDropdown()"
-          aria-haspopup="true"
-          [attr.aria-expanded]="isUserDropdownOpen"
-        >
+        <button class="user-avatar-btn" [class.show]="isUserDropdownOpen" (click)="toggleUserDropdown()"
+          aria-haspopup="true" [attr.aria-expanded]="isUserDropdownOpen">
           <div class="user-avatar" *ngIf="!profilePicture">{{ getUserInitials() }}</div>
-          <img
-            *ngIf="profilePicture"
-            [src]="profilePicture"
-            alt="Profile"
-            class="user-avatar-img"
-          />
+          <img *ngIf="profilePicture" [src]="profilePicture" alt="Profile" class="user-avatar-img" />
           <span class="user-name">{{ userName }}</span>
           <i class="bi bi-chevron-down"></i>
         </button>
 
         <!-- Dropdown -->
-        <div
-          class="user-dropdown"
-          [class.show]="isUserDropdownOpen"
-          (clickOutside)="closeUserDropdown()"
-        >
+        <div class="user-dropdown" [class.show]="isUserDropdownOpen" (clickOutside)="closeUserDropdown()">
           <!-- Dropdown Header -->
           <div class="dropdown-header">
             <div class="user-avatar-large" *ngIf="!profilePicture">{{ getUserInitials() }}</div>
-            <img
-              *ngIf="profilePicture"
-              [src]="profilePicture"
-              alt="Profile"
-              class="user-avatar-img-large"
-            />
+            <img *ngIf="profilePicture" [src]="profilePicture" alt="Profile" class="user-avatar-img-large" />
             <div class="user-info">
               <div class="user-name-large">{{ userName }}</div>
               <div class="user-email">{{ userEmail }}</div>
@@ -106,12 +77,7 @@
       <!-- Logged-in user section -->
       <div class="mobile-user-section" *ngIf="isLoggedIn">
         <div class="mobile-user-avatar" *ngIf="!profilePicture">{{ getUserInitials() }}</div>
-        <img
-          *ngIf="profilePicture"
-          [src]="profilePicture"
-          alt="Profile"
-          class="mobile-user-avatar-img"
-        />
+        <img *ngIf="profilePicture" [src]="profilePicture" alt="Profile" class="mobile-user-avatar-img" />
         <div class="mobile-user-info">
           <div class="mobile-user-name">{{ userName }}</div>
           <div class="mobile-user-email">{{ userEmail }}</div>

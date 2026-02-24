@@ -1,9 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, Validators, ReactiveFormsModule } from '@angular/forms';
-import {IonicModule } from '@ionic/angular';
+import { IonicModule } from '@ionic/angular';
 import { Login } from './login';
 import { Auth } from 'src/app/core/auth';
+import { jwtDecode } from 'jwt-decode';
+import { TokenService } from 'src/app/core/token.service';
+import { Sessionexpired } from '../sessionexpired/sessionexpired';
 
 @Component({
   selector: 'app-login',
@@ -43,6 +46,8 @@ export class LoginComponent implements OnInit {
   constructor(
     private loginService: Login,
     private authService: Auth,
+    private tokenService: TokenService,
+    private sessionService: Sessionexpired
   ) { }
 
 
@@ -53,7 +58,7 @@ export class LoginComponent implements OnInit {
         let user: any = {};
         if (token) {
           try {
-            user = JSON.parse(atob(token.split('.')[1]));
+            user = jwtDecode(token as string);
           } catch (e) {
             console.error('Invalid JWT', e);
             user = {};
@@ -63,23 +68,18 @@ export class LoginComponent implements OnInit {
           localStorage.setItem('userData', JSON.stringify({ email: user.email }));
         }
 
-        // Show success message
         this.successMessage = 'Login successful! Redirecting...';
-        this.errorMessage = ''; // Clear any previous errors
+        this.errorMessage = '';
 
-        // Optional: Auto-dismiss after 2 seconds
         setTimeout(() => {
           this.successMessage = '';
-          // mark auth and close modal with token
+          this.errorMessage = '';
           this.authService.loginSuccess(res.token);
-          // notify host (embedded modal container or parent) of success
           this.authSuccess.emit({ success: true, token: res.token });
         }, 2000);
 
-
       }
     }, (error) => {
-      // Handle error case
       this.errorMessage = 'Login failed. Please check your credentials.';
       this.successMessage = '';
     });
@@ -88,6 +88,7 @@ export class LoginComponent implements OnInit {
   // Called from template to close modal or embedded panel
   async closeModal() {
     this.cancel.emit();
+    this.sessionService.reset(); 
   }
 
   // Request host to switch to register (embedded or modal)

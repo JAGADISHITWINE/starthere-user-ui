@@ -1,0 +1,84 @@
+// ── Session-specific additions only ───────────────────────────────────────────
+// The auth-card, logo-section, auth-body, btn, btn-link styles
+// come from your shared auth stylesheet — no need to redefine them.
+
+// Lock icon circle
+.session-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 8px auto 20px;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(235, 90, 70, 0.10);
+  border: 1.5px solid rgba(235, 90, 70, 0.28);
+
+  svg {
+    width: 28px;
+    height: 28px;
+    stroke: #eb5a46;
+    color: #eb5a46;
+  }
+}
+
+/* Logo */
+.logo-section {
+  text-align: center;
+  margin-bottom: 0px;
+}
+
+.logo-section img {
+  max-width: 120px;
+  margin-bottom: 10px;
+}
+
+// Subtitle text
+.session-subtitle {
+  font-size: 14px;
+  color: #6b7280;
+  text-align: center;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+// Countdown pill
+.countdown-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: #fef2f0;
+  border: 1px solid rgba(235, 90, 70, 0.18);
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.countdown-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #eb5a46;
+  flex-shrink: 0;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1;   transform: scale(1);   }
+  50%       { opacity: 0.4; transform: scale(0.7); }
+}
+
+.countdown-text {
+  font-size: 12.5px;
+  color: #9ca3af;
+  flex: 1;
+}
+
+.countdown-num {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #eb5a46;
+  font-variant-numeric: tabular-nums;
+  min-width: 26px;
+  text-align: right;
+}

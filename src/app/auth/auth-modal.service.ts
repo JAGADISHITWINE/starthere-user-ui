@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
-type AuthView = 'login' | 'register' | 'forgotPassword' | 'cancle' | null;
+type AuthView = 'login' | 'register' | 'forgotPassword' | 'cancle' | 'sessionExpired' | null;
 
 interface ModalState {
   open: boolean;
@@ -12,63 +12,35 @@ interface ModalState {
 
 @Injectable({ providedIn: 'root' })
 export class AuthModalService {
-  private state = new BehaviorSubject<ModalState>({ open: false, view: null, payload: null });
-  state$ = this.state.asObservable();
+  private stateSubject = new BehaviorSubject<ModalState>({ open: false, view: null });
+  state$ = this.stateSubject.asObservable();
 
-  // resolver for the current open modal promise
-  private resolver: ((value: any) => void) | null = null;
-  private rejecter: ((reason?: any) => void) | null = null;
+  private resolveFn?: (value: any) => void;
+  private rejectFn?: (reason?: any) => void;
 
-  constructor() { }
-
-  openLogin(): Promise<any> {
-    return this.open('login');
-  }
-
-  openRegister(): Promise<any> {
-    return this.open('register');
-  }
-
-  openCancel(booking: any): Promise<any> {
-    return this.open('cancle', booking);
-  }
-
-  private open(view: AuthView, payload: any | null = null): Promise<any> {
-    // open modal with optional payload
-    this.state.next({ open: true, view, payload });
-
+  private open(view: ModalState['view'], payload?: any): Promise<any> {
+    this.stateSubject.next({ open: true, view, payload });
     return new Promise((resolve, reject) => {
-      this.resolver = resolve;
-      this.rejecter = reject;
+      this.resolveFn = resolve;
+      this.rejectFn  = reject;
     });
   }
 
-  // Called by the modal container when auth succeeds
-  resolve(payload: any) {
-    if (this.resolver) {
-      this.resolver(payload);
-    }
-    this.clear();
+  openLogin(): Promise<any>          { return this.open('login'); }
+  openRegister(): Promise<any>       { return this.open('register'); }
+  openForgotPassword(): Promise<any> { return this.open('forgotPassword'); }
+  openCancle(booking: any): Promise<any> { return this.open('cancle', booking); }
+
+  /** Triggered by ErrorInterceptor / SessionService on 401 with existing token */
+  openSessionExpired(): Promise<any> { return this.open('sessionExpired'); }
+
+  resolve(value: any): void {
+    this.stateSubject.next({ open: false, view: null });
+    this.resolveFn?.(value);
   }
 
-  // Called to cancel/dismiss modal
-  cancel() {
-    if (this.rejecter) {
-      this.rejecter(null);
-    }
-    this.clear();
+  cancel(): void {
+    this.stateSubject.next({ open: false, view: null });
+    this.rejectFn?.('cancelled');
   }
-
-  private clear() {
-    this.resolver = null;
-    this.rejecter = null;
-    this.state.next({ open: false, view: null, payload: null });
-  }
-
-  // Add this method
-  openForgotPassword() {
-    this.state.next({ open: true, view: 'forgotPassword' });
-  }
-
-
 }

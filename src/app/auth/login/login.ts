@@ -2,13 +2,14 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { catchError, map, tap, throwError } from 'rxjs';
 import { EncryptionService } from 'src/app/core/encryption.service';
+import { TokenService } from 'src/app/core/token.service';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class Login {
-  constructor(private http: HttpClient, private crypto: EncryptionService) { }
+  constructor(private http: HttpClient, private crypto: EncryptionService, private tokenService: TokenService) { }
   private API = environment.baseUrl
 
   login(data: any) {
@@ -25,7 +26,7 @@ export class Login {
           try {
             const decrypted = this.crypto.decrypt(res.data);
             if (decrypted && decrypted.token) {
-              sessionStorage.setItem('token', decrypted.token);
+              this.tokenService.setToken(decrypted.token);
 
               return decrypted;
             } else {
