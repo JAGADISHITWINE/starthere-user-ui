@@ -14,7 +14,7 @@ export class TourDetails {
   constructor(private http: HttpClient, private crypto: EncryptionService) { }
 
   getTrekById(trekId: number) {
-    return this.http.get(`${this.API}/getTrekById/${trekId}`).pipe(
+    return this.http.get(`${this.API}/getTrekByUuid/${trekId}`).pipe(
       map((res: any) => {
         const decrypted = this.crypto.decrypt(res.data);
         return {

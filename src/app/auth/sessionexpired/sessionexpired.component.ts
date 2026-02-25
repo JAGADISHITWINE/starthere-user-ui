@@ -43,7 +43,6 @@ export class SessionexpiredComponent implements OnInit, OnDestroy {
     this.timerSub?.unsubscribe();
     this.loginAgain.emit();
     this.openLoginPanel();
-
   }
 
   onDismiss(): void {

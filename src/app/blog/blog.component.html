@@ -1,184 +1,199 @@
-<!-- Hero Section -->
-<div class="blog-hero">
-  <h1>Trek Tales & Tips</h1>
-  <p>Stories, guides, and insights from the trails of Karnataka</p>
-</div>
+<div class="page">
 
-<!-- Category Pills -->
-<div class="category-section">
-  <div class="category-scroll">
-    <ion-chip *ngFor="let category of categories" [color]="selectedCategory === category.value ? 'success' : ''"
-      [outline]="selectedCategory !== category.value" (click)="selectedCategory = category.value" class="category-chip">
-      <ion-icon [name]="category.icon"></ion-icon>
-      <ion-label>{{ category.label }}</ion-label>
-    </ion-chip>
-  </div>
-</div>
-
-<!-- Featured Posts -->
-<div class="featured-section" *ngIf="selectedCategory === 'all' && !searchQuery">
-  <div class="section-header">
-    <h2>
-      <ion-icon name="star"></ion-icon>
-      Featured Articles
-    </h2>
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <div class="top-bar-left">
+      <a class="top-brand" routerLink="/">Karnataka Adventures</a>
+      <div class="top-divider"></div>
+      <span class="top-label">Trail Journal</span>
+    </div>
+    <div class="top-bar-right">
+      <div class="top-search">
+        <span class="si">⌕</span>
+        <input [(ngModel)]="searchQuery" placeholder="Search articles…" />
+      </div>
+      <button class="write-btn" (click)="createPost()">+ Write</button>
+    </div>
   </div>
 
-  <div class="featured-grid">
-    <ion-card *ngFor="let post of featuredPosts" class="featured-card" button (click)="viewPost(post.id)">
-      <div class="featured-image">
-        <img [src]="'http://localhost:4001/' + post.image" [alt]="post.title" />
-        <div class="featured-badge">
-          <ion-icon name="star"></ion-icon>
-          Featured
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-text">
+      <div>
+        <div class="hero-eyebrow">Stories from the trail</div>
+        <h1 class="hero-title">Trek<br /><em>Tales</em><br />&amp; Tips</h1>
+        <p class="hero-sub">Guides, stories, and hard-won wisdom from the trails of the Western Ghats.</p>
+      </div>
+    </div>
+    <!-- Hero post — first featured -->
+    <div class="hero-post" *ngIf="featuredPosts[0]" (click)="viewPost(featuredPosts[0].id)">
+      <div class="hp-img-wrap">
+        <img class="hp-img" [src]="featuredPosts[0].image" [alt]="featuredPosts[0].title" />
+      </div>
+      <div class="hp-overlay"></div>
+      <div class="hp-content">
+        <div>
+          <span class="hp-cat">{{ featuredPosts[0].category }}</span>
+          <h2 class="hp-title">{{ featuredPosts[0].title }}</h2>
+          <div class="hp-byline">{{ featuredPosts[0].author.name }} · {{ featuredPosts[0].date }} · {{ featuredPosts[0].readTime }}</div>
         </div>
       </div>
+    </div>
+  </section>
 
+  <!-- CATEGORY RAIL -->
+  <nav class="cat-rail">
+    <div class="cat-inner">
+      <button
+        class="cat-btn"
+        *ngFor="let category of categories"
+        [class.active]="selectedCategory === category.value"
+        (click)="selectedCategory = category.value"
+      >
+        {{ category.label }}
+      </button>
+    </div>
+  </nav>
 
-      <div class="post-meta">
-        <ion-chip [color]="getCategoryColor(post.category)" size="small">
-          <ion-icon [name]="getCategoryIcon(post.category)"></ion-icon>
-          <ion-label>{{ post.category.replace('-', ' ') }}</ion-label>
-        </ion-chip>
-        <span class="read-time">
-          <ion-icon name="time-outline"></ion-icon>
-          {{ post.readTime }}
-        </span>
-      </div>
+  <!-- BODY -->
+  <div class="body-wrap">
 
-      <h3>{{ post.title }}</h3>
-      <p class="excerpt">{{ post.excerpt }}</p>
+    <!-- MAIN -->
+    <div class="main-col">
 
-      <div class="post-footer">
-        <div class="author-info">
-          <img [src]="post.author.avatar" [alt]="post.author.name" class="author-avatar" />
-          <div>
-            <div class="author-name">{{ post.author.name }}</div>
-            <div class="post-date">{{ post.date }}</div>
-          </div>
-        </div>
-        <div class="post-stats">
-          <span>
-            <ion-icon name="eye-outline"></ion-icon>
-            {{ post.views }}
-          </span>
-        </div>
-      </div>
-    </ion-card>
-  </div>
-</div>
-
-<!-- All Posts -->
-<div class="posts-section">
-  <div class="section-header">
-    <h2>{{ categoryTitle }}</h2>
-
-    <ion-text color="medium">
-      {{ filteredPosts.length }} articles
-    </ion-text>
-  </div>
-
-  <!-- Posts Grid -->
-  <div class="posts-grid">
-    <ion-card *ngFor="let post of filteredPosts" class="post-card" button (click)="viewPost(post.id)">
-      <div class="post-image">
-        <img [src]="post.image" [alt]="post.title" />
-      </div>
-
-      <ion-card-content>
-        <div class="post-meta">
-          <ion-chip [color]="getCategoryColor(post.category)" size="small" outline="true">
-            <ion-icon [name]="getCategoryIcon(post.category)"></ion-icon>
-            <ion-label>{{ post.category.replace('-', ' ') }}</ion-label>
-          </ion-chip>
-          <span class="read-time">
-            <ion-icon name="time-outline"></ion-icon>
-            {{ post.readTime }}
-          </span>
+      <!-- Featured strip -->
+      <ng-container *ngIf="selectedCategory === 'all' && !searchQuery && featuredPosts.length > 1">
+        <div class="sec-head">
+          <span class="sec-num">01</span>
+          <span class="sec-title">Featured Articles</span>
+          <span class="sec-count">{{ featuredPosts.length - 1 }} picks</span>
         </div>
 
-        <h3>{{ post.title }}</h3>
-        <p class="excerpt">{{ post.excerpt }}</p>
-
-        <!-- Tags -->
-        <div class="tags">
-          <ion-chip *ngFor="let tag of post.tags.slice(0, 3)" size="small" outline="true"
-            (click)="filterByTag(tag); $event.stopPropagation()">
-            <ion-label>{{ tag }}</ion-label>
-          </ion-chip>
-        </div>
-
-        <div class="post-footer">
-          <div class="author-info">
-            <img [src]="post.author.avatar" [alt]="post.author.name" class="author-avatar" />
-            <div>
-              <div class="author-name">{{ post.author.name }}</div>
-              <div class="post-date">{{ post.date }}</div>
+        <div class="featured-strip">
+          <div class="fs-card" *ngFor="let post of featuredPosts.slice(1, 4)" (click)="viewPost(post.id)">
+            <div class="fs-img">
+              <img [src]="post.image" [alt]="post.title" />
+            </div>
+            <div class="fs-body">
+              <span class="fs-cat">{{ post.category }}</span>
+              <h3 class="fs-title">{{ post.title }}</h3>
+              <div class="fs-meta">{{ post.author.name }} · {{ post.date }} · {{ post.readTime }}</div>
             </div>
           </div>
-          <div class="post-stats">
-            <span>
-              <ion-icon name="eye-outline"></ion-icon>
-              {{ post.views }}
-            </span>
+        </div>
+      </ng-container>
+
+      <!-- All articles -->
+      <div class="sec-head">
+        <span class="sec-num">{{ selectedCategory === 'all' && !searchQuery ? '02' : '01' }}</span>
+        <span class="sec-title">{{ categoryTitle }}</span>
+        <span class="sec-count">{{ filteredPosts.length }} articles</span>
+      </div>
+
+      <!-- Empty state -->
+      <div class="empty-state" *ngIf="filteredPosts.length === 0">
+        <div class="empty-num">?</div>
+        <h3>No Articles Found</h3>
+        <p>Try a different search term or category</p>
+        <button class="clear-btn" (click)="searchQuery = ''; selectedCategory = 'all'">Clear Filters</button>
+      </div>
+
+      <!-- Article rows -->
+      <div class="article-list">
+        <div
+          class="article-row"
+          [class.big]="i === 0"
+          *ngFor="let post of filteredPosts; let i = index"
+          (click)="viewPost(post.id)"
+        >
+          <div class="ar-img-wrap">
+            <img [src]="post.image" [alt]="post.title" />
+          </div>
+          <div class="ar-body">
+            <div class="ar-top">
+              <span class="ar-cat">{{ post.category }}</span>
+              <h3 class="ar-title">{{ post.title }}</h3>
+              <p class="ar-excerpt">{{ post.excerpt }}</p>
+              <div class="ar-tags">
+                <span
+                  class="ar-tag"
+                  *ngFor="let tag of post.tags.slice(0, 3)"
+                  (click)="filterByTag(tag); $event.stopPropagation()"
+                >{{ tag }}</span>
+              </div>
+            </div>
+            <div class="ar-footer">
+              <div class="ar-author">
+                <img class="ar-avatar" [src]="post.author.avatar" [alt]="post.author.name" />
+                <div>
+                  <div class="ar-author-name">{{ post.author.name }}</div>
+                  <div class="ar-date">{{ post.date }}</div>
+                </div>
+              </div>
+              <div class="ar-right">
+                <span class="ar-read-time">{{ post.readTime }}</span>
+                <span class="ar-views">{{ post.views }} views</span>
+              </div>
+            </div>
           </div>
         </div>
-      </ion-card-content>
-    </ion-card>
+      </div>
+
+    </div>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+      <!-- Most read -->
+      <!-- <div class="sidebar-block">
+        <div class="sb-head">
+          <span class="sb-title">Most Read</span>
+          <span class="sb-count">This Week</span>
+        </div>
+        <div class="sb-articles">
+          <div class="sb-article" *ngFor="let post of popularPosts.slice(0, 4)" (click)="viewPost(post.id)">
+            <div class="sba-img">
+              <img [src]="'http://localhost:4001/' + post.image" [alt]="post.title" />
+            </div>
+            <div>
+              <span class="sba-cat">{{ post.category }}</span>
+              <div class="sba-title">{{ post.title }}</div>
+              <div class="sba-meta">{{ post.readTime }} · {{ post.views }} views</div>
+            </div>
+          </div>
+        </div>
+      </div> -->
+
+      <!-- Tags -->
+      <div class="sidebar-block">
+        <div class="sb-head">
+          <span class="sb-title">Topics</span>
+          <span class="sb-count">{{ popularTags.length }} tags</span>
+        </div>
+        <div class="tag-grid">
+          <span
+            class="tag-item"
+            *ngFor="let tag of popularTags"
+            (click)="filterByTag(tag)"
+          >{{ tag }}</span>
+        </div>
+      </div>
+
+      <!-- Newsletter -->
+      <div class="newsletter">
+        <div class="nl-eyebrow">Newsletter</div>
+        <h3 class="nl-head">Never Miss a Story</h3>
+        <p class="nl-desc">Trail stories and guides, delivered every fortnight.</p>
+        <input class="nl-input" type="email" #nlEmail placeholder="your@email.com" />
+        <button class="nl-btn">Subscribe →</button>
+        <p class="nl-privacy">Unsubscribe anytime. No spam.</p>
+      </div>
+
+    </aside>
+
   </div>
 
-  <!-- No Results -->
-  <div *ngIf="filteredPosts.length === 0" class="no-results">
-    <ion-icon name="search-outline"></ion-icon>
-    <h3>No articles found</h3>
-    <p>Try a different search term or category</p>
-    <ion-button fill="outline" (click)="searchQuery = ''; selectedCategory = 'all'">
-      Clear Filters
-    </ion-button>
-  </div>
+  <!-- FAB -->
+  <button class="fab" (click)="createPost()" title="Write an article">+</button>
+
 </div>
-
-<!-- Popular Tags -->
-<div class="tags-section">
-  <div class="section-header">
-    <h2>
-      <ion-icon name="pricetag"></ion-icon>
-      Popular Tags
-    </h2>
-  </div>
-  <div class="tags-cloud">
-    <ion-chip *ngFor="let tag of popularTags" outline="true" (click)="filterByTag(tag)">
-      <ion-label>{{ tag }}</ion-label>
-    </ion-chip>
-  </div>
-</div>
-
-<!-- Newsletter Subscription -->
-<div class="newsletter-section">
-  <ion-card class="newsletter-card">
-    <ion-card-content>
-      <ion-icon name="mail-outline" color="primary"></ion-icon>
-      <h2>Never Miss a Story</h2>
-      <p>Get the latest trekking guides, tips, and travel stories delivered to your inbox</p>
-
-      <ion-item lines="none">
-        <ion-input type="email" placeholder="Enter your email" class="newsletter-input"></ion-input>
-      </ion-item>
-
-      <button class="btn btn-outline-secondary">
-        Subscribe Now
-        <ion-icon slot="end" name="arrow-forward"></ion-icon>
-      </button>
-
-      <ion-text color="medium" class="privacy-text">
-        <small>We respect your privacy. Unsubscribe anytime.</small>
-      </ion-text>
-    </ion-card-content>
-  </ion-card>
-</div>
-
-<!-- FLOATING ADD BUTTON -->
-<button class="btn btn-success position-fixed bottom-0 end-0 m-4 rounded-circle shadow-lg"
-  style="width: 56px; height: 56px; z-index: 1000;" (click)="createPost()">
-  <ion-icon name="add" style="font-size: 24px;"></ion-icon>
-</button>

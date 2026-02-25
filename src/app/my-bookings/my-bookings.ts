@@ -45,4 +45,25 @@ viewBookingDetails(bookingId:any){
     }
   );
 }
+
+submitTrekRating(
+  bookingId: any,
+  userId: any,
+  payload: { rating: number; review?: string }
+) {
+  const encryptedPayload = this.crypto.encrypt(payload);
+  return this.http
+    .post(`${this.API}/bookings/${userId}/${bookingId}/rating`, { encryptedPayload })
+    .pipe(
+      map((res: any) => {
+        if (!res?.data) return res;
+        try {
+          const decrypted = this.crypto.decrypt(res.data);
+          return { ...res, data: decrypted };
+        } catch {
+          return res;
+        }
+      })
+    );
+}
 }

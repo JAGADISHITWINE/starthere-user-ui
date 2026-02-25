@@ -1,267 +1,237 @@
-<!-- client-dashboard.component.html -->
-<nav class="navbar navbar-dark bg-primary">
-  <div class="container-fluid">
-    <button class="btn btn-outline-light" routerLink="">←</button>
-    <span class="navbar-brand mx-auto fw-semibold">My Bookings</span>
-  </div>
-</nav>
-<div class="dashboard-container" *ngIf="!isLoading">
-  <!-- Stats Cards -->
-  <div class="stats-section">
-    <div class="container">
-      <div class="stats-grid">
+<div class="page">
 
-        <div class="stat-card">
-          <div class="stat-icon upcoming">
-            <i class="bi bi-calendar-check"></i>
-          </div>
-          <div class="stat-content">
-            <div class="stat-value">{{ upcomingTrips }}</div>
-            <div class="stat-label">Upcoming Trips</div>
-          </div>
-        </div>
+  <!-- NAV -->
+  <nav class="nav">
+    <a class="nav-back" routerLink="">← Back</a>
+    <div class="nav-title">My Bookings</div>
+  </nav>
 
-        <div class="stat-card">
-          <div class="stat-icon completed">
-            <i class="bi bi-check-circle"></i>
-          </div>
-          <div class="stat-content">
-            <div class="stat-value">{{ completedTrips }}</div>
-            <div class="stat-label">Completed</div>
-          </div>
-        </div>
+  <!-- HERO HEADER -->
+  <div class="hero-header">
+    <div class="hero-greeting">Welcome back</div>
+    <h1 class="hero-title">Your Adventures</h1>
 
-        <div class="stat-card">
-          <div class="stat-icon total">
-            <i class="bi bi-grid"></i>
-          </div>
-          <div class="stat-content">
-            <div class="stat-value">{{ totalBookings }}</div>
-            <div class="stat-label">Total Bookings</div>
-          </div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-icon spent">
-            <i class="bi bi-currency-rupee"></i>
-          </div>
-          <div class="stat-content">
-            <div class="stat-value">₹{{ totalSpent | number:'1.0-0' }}</div>
-            <div class="stat-label">Total Spent</div>
-          </div>
-        </div>
-
+    <div class="stats-strip" *ngIf="!isLoading">
+      <div class="stat-cell">
+        <div class="stat-tag"><span class="stat-dot dot-blue"></span>Upcoming</div>
+        <div class="stat-val">{{ upcomingTrips }}</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-tag"><span class="stat-dot dot-emerald"></span>Completed</div>
+        <div class="stat-val">{{ completedTrips }}</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-tag"><span class="stat-dot dot-violet"></span>Total Bookings</div>
+        <div class="stat-val">{{ totalBookings }}</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-tag"><span class="stat-dot dot-amber"></span>Total Spent</div>
+        <div class="stat-val">₹{{ totalSpent | number:'1.0-0' }}</div>
       </div>
     </div>
   </div>
 
-  <!-- Tabs -->
-  <div class="tabs-section">
-    <div class="container">
-      <div class="tabs-wrapper">
-        <button class="tab-button" [class.active]="activeTab === 'upcoming'" (click)="switchTab('upcoming')">
-          <i class="bi bi-calendar-check me-2"></i>
-          Upcoming
-          <span class="tab-badge" *ngIf="upcomingBookings.length > 0">
-            {{ upcomingBookings.length }}
-          </span>
-        </button>
+  <!-- BODY -->
+  <div class="body-wrap" *ngIf="!isLoading">
 
-        <button class="tab-button" [class.active]="activeTab === 'past'" (click)="switchTab('past')">
-          <i class="bi bi-clock-history me-2"></i>
-          Past
-          <span class="tab-badge" *ngIf="pastBookings.length > 0">
-            {{ pastBookings.length }}
-          </span>
-        </button>
+    <!-- SIDEBAR TABS -->
+    <aside class="sidebar">
+      <div class="sidebar-label">Filter</div>
 
-        <button class="tab-button" [class.active]="activeTab === 'cancelled'" (click)="switchTab('cancelled')">
-          <i class="bi bi-x-circle me-2"></i>
-          Cancelled
-          <span class="tab-badge" *ngIf="cancelledBookings.length > 0">
-            {{ cancelledBookings.length }}
-          </span>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Loading State -->
-  <div *ngIf="errorMessage && !isLoading" class="d-flex justify-content-center loader-wrapper" style="min-height: 80vh">
-    <div class="text-center">
-      <img src="../../assets/assets/Bus vehicle.gif" width="180" alt="Loading" />
-      <p class="mt-3 text-muted text-center">{{ errorMessage }}</p>
-      <button class="btn btn-sm btn-outline-danger ms-3" (click)="loadBookings()">
-        Retry
+      <button class="tab-item" [class.active]="activeTab === 'upcoming'" (click)="switchTab('upcoming')">
+        <div class="tab-left">
+          <div class="tab-icon">🗓</div>
+          <span class="tab-name">Upcoming</span>
+        </div>
+        <span class="tab-count" *ngIf="upcomingBookings.length">{{ upcomingBookings.length }}</span>
       </button>
+
+      <button class="tab-item" [class.active]="activeTab === 'past'" (click)="switchTab('past')">
+        <div class="tab-left">
+          <div class="tab-icon">✅</div>
+          <span class="tab-name">Past</span>
+        </div>
+        <span class="tab-count" *ngIf="pastBookings.length">{{ pastBookings.length }}</span>
+      </button>
+
+      <button class="tab-item" [class.active]="activeTab === 'cancelled'" (click)="switchTab('cancelled')">
+        <div class="tab-left">
+          <div class="tab-icon">✕</div>
+          <span class="tab-name">Cancelled</span>
+        </div>
+        <span class="tab-count" *ngIf="cancelledBookings.length">{{ cancelledBookings.length }}</span>
+      </button>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main-content">
+
+      <!-- ERROR -->
+      <div class="error-state" *ngIf="errorMessage">
+        <p>{{ errorMessage }}</p>
+        <button class="retry-btn" (click)="loadBookings()">Retry</button>
+      </div>
+
+      <ng-container *ngIf="!errorMessage">
+
+        <div class="section-head">
+          <h2>{{ activeTab | titlecase }} Trips</h2>
+          <span class="count">{{ currentBookings.length }} bookings</span>
+        </div>
+
+        <!-- BOOKING CARDS -->
+        <div class="booking-card" *ngFor="let booking of currentBookings">
+
+          <div class="card-image-strip">
+            <img [src]="'http://localhost:4001/' + booking.cover_image"
+              [alt]="booking.trek_name"
+              onerror="this.src='assets/default-trek.jpg'" />
+            <div class="image-overlay">
+              <div class="booking-ref">{{ booking.booking_reference }}</div>
+              <div class="badge-stack">
+                <span class="status-badge" [ngClass]="getStatusClass(booking.booking_status)">
+                  {{ booking.booking_status | titlecase }}
+                </span>
+                <span class="status-badge" [ngClass]="getPaymentStatusClass(booking.payment_status)">
+                  {{ booking.payment_status | titlecase }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <div class="trek-name">{{ booking.trek_name }}</div>
+            <div class="trek-location">📍 {{ booking.location }}</div>
+            <div class="user-rating-chip" *ngIf="hasUserRated(booking)">
+              Your rating: {{ booking.user_rating }} / 5
+            </div>
+
+            <div class="info-grid">
+              <div class="info-cell">
+                <div class="info-label">Trek Dates</div>
+                <div class="info-val">{{ formatDate(booking.start_date) }} – {{ formatDate(booking.end_date) }}</div>
+              </div>
+              <div class="info-cell">
+                <div class="info-label">Participants</div>
+                <div class="info-val">{{ booking.participants }} people</div>
+              </div>
+              <div class="info-cell" *ngIf="activeTab === 'upcoming'; else bookedOn">
+                <div class="info-label">Days Until Trek</div>
+                <div class="countdown-val">{{ getDaysUntilTrek(booking.start_date) }} days</div>
+              </div>
+              <ng-template #bookedOn>
+                <div class="info-cell">
+                  <div class="info-label">Booked On</div>
+                  <div class="info-val">{{ formatDate(booking.created_at) }}</div>
+                </div>
+              </ng-template>
+            </div>
+
+            <div class="payment-strip">
+              <div class="pay-cell">
+                <div class="pay-label">Total Amount</div>
+                <div class="pay-amount">₹{{ booking.total_amount | number:'1.0-0' }}</div>
+              </div>
+              <div class="pay-cell">
+                <div class="pay-label">Paid</div>
+                <div class="pay-amount positive">₹{{ booking.amount_paid | number:'1.0-0' }}</div>
+              </div>
+              <div class="pay-cell" *ngIf="booking.balance_due > 0">
+                <div class="pay-label">Balance Due</div>
+                <div class="pay-amount danger">₹{{ booking.balance_due | number:'1.0-0' }}</div>
+              </div>
+            </div>
+
+            <div class="addons-row" *ngIf="booking.addons?.length">
+              <span class="addon-chip" *ngFor="let addon of booking.addons">
+                {{ addon.addon_name }} × {{ addon.quantity }}
+              </span>
+            </div>
+
+            <div class="warn-bar" *ngIf="activeTab === 'upcoming' && canCancel(booking)">
+              <span class="warn-icon">⚠</span>
+              <div><strong>Cancellation policy:</strong> {{ getCancellationFeeMessage(booking) }}</div>
+            </div>
+          </div>
+
+          <div class="card-actions">
+            <button class="action-btn" *ngIf="activeTab === 'upcoming'" (click)="viewBookingDetails(booking)">
+              👁 View Details
+            </button>
+            <button class="action-btn" *ngIf="activeTab === 'upcoming'" (click)="downloadReceipt(booking)">
+              ↓ Receipt
+            </button>
+            <button class="action-btn danger" *ngIf="activeTab === 'upcoming' && canCancel(booking)" (click)="openCancelModal(booking)">
+              ✕ Cancel
+            </button>
+            <button class="action-btn primary pay-btn" *ngIf="booking.balance_due > 0 && activeTab === 'upcoming'">
+              💳 Pay Balance
+            </button>
+            <button
+              class="action-btn"
+              *ngIf="activeTab === 'past' && booking.booking_status === 'completed'"
+              (click)="openRatingModal(booking)"
+            >
+              ⭐ {{ hasUserRated(booking) ? 'Update Rating' : 'Rate Trek' }}
+            </button>
+          </div>
+
+        </div>
+
+        <!-- EMPTY STATE -->
+        <div class="empty-state" *ngIf="currentBookings.length === 0">
+          <div class="empty-glyph">?</div>
+          <h3>No {{ activeTab }} bookings</h3>
+          <p *ngIf="activeTab === 'upcoming'">Start planning your next adventure!</p>
+          <p *ngIf="activeTab === 'past'">You haven't completed any treks yet.</p>
+          <p *ngIf="activeTab === 'cancelled'">No cancelled bookings.</p>
+          <a routerLink="/upcomingtours" class="browse-btn">Browse Treks →</a>
+        </div>
+
+      </ng-container>
+    </main>
+  </div>
+
+  <!-- LOADER -->
+  <div class="error-state" *ngIf="isLoading" style="min-height:80vh">
+    <p>Loading your adventures…</p>
+  </div>
+
+  <div class="rating-backdrop" *ngIf="ratingModalOpen" (click)="closeRatingModal()"></div>
+  <div class="rating-modal" *ngIf="ratingModalOpen" role="dialog" aria-modal="true">
+    <div class="rating-card" (click)="$event.stopPropagation()">
+      <h3>Rate Your Trek</h3>
+      <p class="rating-subtitle">{{ selectedBookingForRating?.trek_name }}</p>
+
+      <div class="stars-row">
+        <button
+          type="button"
+          class="star-btn"
+          *ngFor="let star of [1,2,3,4,5]"
+          [class.active]="star <= selectedRating"
+          (click)="setRating(star)"
+        >
+          ★
+        </button>
+      </div>
+
+      <textarea
+        class="review-input"
+        rows="4"
+        maxlength="500"
+        placeholder="Share your experience (optional)"
+        [(ngModel)]="selectedReview"
+      ></textarea>
+
+      <p class="rating-error" *ngIf="ratingErrorMessage">{{ ratingErrorMessage }}</p>
+
+      <div class="rating-actions">
+        <button type="button" class="action-btn" (click)="closeRatingModal()">Cancel</button>
+        <button type="button" class="action-btn primary" [disabled]="isSubmittingRating" (click)="submitRating()">
+          {{ isSubmittingRating ? 'Submitting...' : 'Submit Rating' }}
+        </button>
+      </div>
     </div>
   </div>
 
-  <!-- Bookings List -->
-  <div class="bookings-section" *ngIf="!isLoading && !errorMessage">
-    <div class="container">
-
-      <!-- Booking Cards -->
-      <div class="booking-card" *ngFor="let booking of currentBookings">
-
-        <!-- Card Header with Image -->
-        <div class="booking-header">
-          <img [src]="'http://localhost:4001/' + booking.cover_image" [alt]="booking.trek_name" class="trek-image"
-            onerror="this.src='assets/default-trek.jpg'" />
-          <div class="booking-header-overlay">
-            <div class="booking-reference">
-              {{ booking.booking_reference }}
-            </div>
-            <div class="booking-badges">
-              <span class="badge" [ngClass]="getStatusClass(booking.booking_status)">
-                {{ booking.booking_status | titlecase }}
-              </span>
-              <span class="badge" [ngClass]="getPaymentStatusClass(booking.payment_status)">
-                {{ booking.payment_status | titlecase }}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Card Body -->
-        <div class="booking-body">
-
-          <!-- Trek Info -->
-          <div class="trek-info">
-            <h3 class="trek-name">{{ booking.trek_name }}</h3>
-            <p class="trek-location">
-              <i class="bi bi-geo-alt-fill me-1"></i>
-              {{ booking.location }}
-            </p>
-          </div>
-
-          <!-- Date & Participants -->
-          <div class="booking-details">
-            <div class="detail-row">
-              <div class="detail-item">
-                <i class="bi bi-calendar3 text-primary"></i>
-                <div class="detail-content">
-                  <span class="detail-label">Trek Dates</span>
-                  <span class="detail-value">
-                    {{ formatDate(booking.start_date) }} - {{ formatDate(booking.end_date) }}
-                  </span>
-                </div>
-              </div>
-
-              <div class="detail-item">
-                <i class="bi bi-people-fill text-success"></i>
-                <div class="detail-content">
-                  <span class="detail-label">Participants</span>
-                  <span class="detail-value">{{ booking.participants }}</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="detail-row">
-              <div class="detail-item">
-                <i class="bi bi-calendar-plus text-info"></i>
-                <div class="detail-content">
-                  <span class="detail-label">Booked On</span>
-                  <span class="detail-value">{{ formatDate(booking.created_at) }}</span>
-                </div>
-              </div>
-
-              <div class="detail-item" *ngIf="activeTab === 'upcoming'">
-                <i class="bi bi-hourglass-split text-warning"></i>
-                <div class="detail-content">
-                  <span class="detail-label">Days Until Trek</span>
-                  <span class="detail-value">{{ getDaysUntilTrek(booking.start_date) }} days</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Payment Info -->
-          <div class="payment-info">
-            <div class="payment-row">
-              <span class="payment-label">Total Amount:</span>
-              <span class="payment-value">₹{{ booking.total_amount | number:'1.0-0' }}</span>
-            </div>
-            <div class="payment-row">
-              <span class="payment-label">Paid:</span>
-              <span class="payment-value text-success">₹{{ booking.amount_paid | number:'1.0-0' }}</span>
-            </div>
-            <div class="payment-row" *ngIf="booking.balance_due > 0">
-              <span class="payment-label">Balance Due:</span>
-              <span class="payment-value text-danger">₹{{ booking.balance_due | number:'1.0-0' }}</span>
-            </div>
-          </div>
-
-          <!-- Add-ons -->
-          <div class="addons-section" *ngIf="booking.addons && booking.addons.length > 0">
-            <div class="addons-label">
-              <i class="bi bi-plus-circle me-1"></i>
-              Add-ons:
-            </div>
-            <div class="addons-list">
-              <span class="addon-tag" *ngFor="let addon of booking.addons">
-                {{ addon.addon_name }} ({{ addon.quantity }})
-              </span>
-            </div>
-          </div>
-
-          <!-- Cancellation Warning -->
-          <div class="cancellation-warning" *ngIf="activeTab === 'upcoming' && canCancel(booking)">
-            <i class="bi bi-info-circle-fill me-2"></i>
-            <div>
-              <strong>Cancellation Policy:</strong>
-              {{ getCancellationFeeMessage(booking) }}
-            </div>
-          </div>
-
-        </div>
-
-        <!-- Card Actions -->
-        <div class="booking-actions">
-          <button *ngIf="activeTab === 'upcoming'" class="btn btn-outline-primary" (click)="viewBookingDetails(booking)">
-            <i class="bi bi-eye me-2"></i>
-            View Details
-          </button>
-
-          <button *ngIf="activeTab === 'upcoming'" class="btn btn-outline-success" (click)="downloadReceipt(booking)">
-            <i class="bi bi-download me-2"></i>
-            Receipt
-          </button>
-
-          <button *ngIf="activeTab === 'upcoming' && canCancel(booking)" class="btn btn-outline-danger"
-            (click)="openCancelModal(booking)">
-            <i class="bi bi-x-circle me-2"></i>
-            Cancel
-          </button>
-
-          <button *ngIf="booking.balance_due > 0 && activeTab === 'upcoming'" class="btn btn-primary">
-            <i class="bi bi-credit-card me-2"></i>
-            Pay Balance
-          </button>
-        </div>
-
-      </div>
-
-      <!-- Empty State -->
-      <div class="empty-state" *ngIf="currentBookings.length === 0">
-        <div class="empty-icon">
-          <i class="bi bi-inbox"></i>
-        </div>
-        <h3>No {{ activeTab }} bookings</h3>
-        <p *ngIf="activeTab === 'upcoming'">
-          Start planning your next adventure!
-        </p>
-        <p *ngIf="activeTab === 'past'">
-          You haven't completed any treks yet.
-        </p>
-        <p *ngIf="activeTab === 'cancelled'">
-          You don't have any cancelled bookings.
-        </p>
-        <a routerLink="/upcomingtours" class="btn btn-primary mt-3">
-          <i class="bi bi-search me-2"></i>
-          Browse Treks
-        </a>
-      </div>
-    </div>
-  </div>
 </div>

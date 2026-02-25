@@ -34,6 +34,8 @@ export class BlogComponent implements OnInit {
   selectedCategory: string = "all";
   searchQuery: string = "";
   isLoading: boolean = false;
+  readonly imageBaseUrl = "http://localhost:4001";
+  readonly fallbackImage = "assets/assets/logo.png";
 
   categories = [
     { value: "all", label: "All Posts", icon: "apps" },
@@ -111,9 +113,7 @@ export class BlogComponent implements OnInit {
       title: post.title,
       excerpt: post.excerpt,
       content: post.content,
-      image: post.featured_image
-        ? `http://localhost:4001/${post.featured_image}`
-        : null,
+      image: this.resolveImageUrl(post.featured_image),
       author: {
         name: post.author_name || "Admin",
         avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(post.author_name || "Admin")}&size=100`,
@@ -125,6 +125,12 @@ export class BlogComponent implements OnInit {
       views: post.views || 0,
       featured: post.views > 2000,
     };
+  }
+
+  resolveImageUrl(imagePath: string | null | undefined): string {
+    if (!imagePath) return this.fallbackImage;
+    if (/^https?:\/\//i.test(imagePath)) return imagePath;
+    return `${this.imageBaseUrl}/${String(imagePath).replace(/^\/+/, "")}`;
   }
 
   slugify(text: string): string {

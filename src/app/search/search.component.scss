@@ -1,40 +1,12 @@
-/* Styles for Search Component */
-// ─────────────────────────────────────────────────────────
-//  Trek & Tour · Search Component
-//  Aesthetic: Cinematic Alpine · Dark hero + earthy cards
-// ─────────────────────────────────────────────────────────
-
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@500;600;700&display=swap');
 
-:root {
-  --night:       #0b0f14;
-  --night-mid:   #111820;
-  --night-light: #1a2535;
-  --forest:      #2d4a22;
-  --forest-mid:  #3d6130;
-  --forest-lt:   #7ea76b;
-  --stone:       #f0ece4;
-  --stone-dark:  #e0d8cc;
-  --stone-deeper:#c8bfb0;
-  --amber:       #e8921a;
-  --amber-lt:    #ffb250;
-  --amber-pale:  #fff4e0;
-  --sky:         #4a9bbe;
-  --danger:      #c0392b;
-  --text-hero:   rgba(255,255,255,0.95);
-  --text-sub:    rgba(255,255,255,0.55);
-  --text-dark:   #1e2b18;
-  --text-mid:    #5a6e4a;
-  --text-muted:  #8a9e7a;
-  --grad-default:linear-gradient(135deg,#2d4a22,#7ea76b);
-  --ease-out:    cubic-bezier(0.22, 1, 0.36, 1);
-}
+
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 .search-page {
   font-family: 'Barlow', sans-serif;
-  background: var(--stone);
+  background: #f0ece4;
   min-height: 100vh;
 }
 
@@ -56,7 +28,7 @@
 .hero-bg {
   position: absolute;
   inset: 0;
-  background: linear-gradient(175deg, var(--night) 0%, #0f2030 55%, #1a3520 100%);
+  background: linear-gradient(175deg, #0b0f14 0%, #0f2030 55%, #1a3520 100%);
   z-index: 0;
 }
 
@@ -109,7 +81,7 @@
   position: relative;
   z-index: 1;
   text-align: center;
-  animation: heroIn 0.9s var(--ease-out) both;
+  animation: heroIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 @keyframes heroIn {
@@ -123,7 +95,7 @@
   font-weight: 600;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--amber-lt);
+  color: #ffb250;
   margin-bottom: 16px;
 }
 
@@ -131,13 +103,13 @@
   font-family: 'Playfair Display', serif;
   font-size: clamp(42px, 8vw, 78px);
   font-weight: 700;
-  color: var(--text-hero);
+  color: rgba(255,255,255,0.95);
   line-height: 1.05;
   letter-spacing: -0.02em;
 
   &-accent {
     font-style: italic;
-    color: var(--amber-lt);
+    color: #ffb250;
     display: block;
   }
 }
@@ -145,7 +117,7 @@
 .hero-sub {
   font-size: 15px;
   font-weight: 400;
-  color: var(--text-sub);
+  color: rgba(255,255,255,0.55);
   margin-top: 16px;
   letter-spacing: 0.02em;
 }
@@ -166,7 +138,7 @@
   width: 100%;
   max-width: 900px;
   overflow: hidden;
-  animation: formRise 1s var(--ease-out) 0.2s both;
+  animation: formRise 1s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
   backdrop-filter: blur(20px);
 }
 
@@ -191,7 +163,7 @@
 .field-icon {
   flex-shrink: 0;
   width: 20px; height: 20px;
-  color: var(--forest-lt);
+  color: #7ea76b;
 
   svg { width: 100%; height: 100%; }
 }
@@ -205,7 +177,7 @@
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: #8a9e7a;
   margin-bottom: 2px;
 }
 
@@ -218,7 +190,7 @@
   font-family: 'Barlow', sans-serif;
   font-size: 14px;
   font-weight: 500;
-  color: var(--text-dark);
+  color: #1e2b18;
   padding: 0;
 
   &::placeholder { color: #b0a898; font-weight: 400; }
@@ -248,11 +220,11 @@ select.field-input {
   &::-webkit-outer-spin-button { -webkit-appearance: none; }
 }
 
-.price-sep { color: var(--stone-deeper); font-size: 16px; }
+.price-sep { color: #c8bfb0; font-size: 16px; }
 
 .field-divider {
   width: 1px;
-  background: var(--stone-dark);
+  background: #e0d8cc;
   margin: 12px 0;
   flex-shrink: 0;
 }
@@ -263,7 +235,7 @@ select.field-input {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background: var(--forest);
+  background: #2d4a22;
   color: #fff;
   border: none;
   font-family: 'Barlow Condensed', sans-serif;
@@ -279,11 +251,11 @@ select.field-input {
 
   svg { width: 18px; height: 18px; }
 
-  &:hover:not(:disabled) { background: var(--forest-mid); }
+  &:hover:not(:disabled) { background: #3d6130; }
 
   &:disabled { opacity: 0.7; cursor: not-allowed; }
 
-  &.loading { background: var(--forest-mid); }
+  &.loading { background: #3d6130; }
 }
 
 .btn-spinner {
@@ -338,14 +310,14 @@ select.field-input {
 
 .results-count {
   font-size: 15px;
-  color: var(--text-mid);
+  color: #5a6e4a;
   font-weight: 400;
 
   .count-num {
     font-family: 'Playfair Display', serif;
     font-size: 28px;
     font-weight: 700;
-    color: var(--text-dark);
+    color: #1e2b18;
     margin-right: 6px;
     vertical-align: middle;
   }
@@ -359,7 +331,7 @@ select.field-input {
 
 .sort-label {
   font-size: 12px;
-  color: var(--text-muted);
+  color: #8a9e7a;
   font-family: 'Barlow Condensed', sans-serif;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -367,18 +339,18 @@ select.field-input {
 
 .sort-btn {
   background: none;
-  border: 1px solid var(--stone-dark);
+  border: 1px solid #e0d8cc;
   font-family: 'Barlow', sans-serif;
   font-size: 12px;
   font-weight: 500;
-  color: var(--text-muted);
+  color: #8a9e7a;
   padding: 5px 12px;
   border-radius: 8px;
   cursor: pointer;
   transition: .2s;
 
-  &:hover { border-color: var(--forest-lt); color: var(--text-dark); }
-  &.active { background: var(--forest); color: #fff; border-color: var(--forest); }
+  &:hover { border-color: #7ea76b; color: #1e2b18; }
+  &.active { background: #2d4a22; color: #fff; border-color: #2d4a22; }
 }
 
 // ── Trek Grid ───────────────────────────────────────────
@@ -395,12 +367,12 @@ select.field-input {
   background: #fff;
   border-radius: 16px;
   overflow: hidden;
-  border: 1px solid var(--stone-dark);
+  border: 1px solid #e0d8cc;
   box-shadow: 0 2px 8px rgba(45,74,34,0.06);
   cursor: pointer;
   position: relative;
-  transition: transform 0.25s var(--ease-out), box-shadow 0.25s;
-  animation: cardIn 0.5s var(--ease-out) both;
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s;
+  animation: cardIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 
   &:hover {
     transform: translateY(-4px);
@@ -423,7 +395,7 @@ select.field-input {
 .card-img-bg {
   position: absolute;
   inset: 0;
-  transition: transform 0.4s var(--ease-out);
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .trek-card:hover .card-img-bg {
@@ -469,7 +441,7 @@ select.field-input {
   padding: 3px 9px;
   border-radius: 6px;
   background: rgba(0,0,0,0.45);
-  color: var(--amber-lt);
+  color: #ffb250;
   backdrop-filter: blur(8px);
 }
 
@@ -499,7 +471,7 @@ select.field-input {
   gap: 4px;
   font-size: 11px;
   font-weight: 500;
-  color: var(--text-muted);
+  color: #8a9e7a;
   font-style: italic;
   margin-bottom: 6px;
 
@@ -510,14 +482,14 @@ select.field-input {
   font-family: 'Playfair Display', serif;
   font-size: 18px;
   font-weight: 700;
-  color: var(--text-dark);
+  color: #1e2b18;
   line-height: 1.2;
   letter-spacing: -0.01em;
 }
 
 .card-desc {
   font-size: 13px;
-  color: var(--text-mid);
+  color: #5a6e4a;
   line-height: 1.55;
   margin-top: 6px;
   display: -webkit-box;
@@ -539,9 +511,9 @@ select.field-input {
   gap: 4px;
   font-size: 12px;
   font-weight: 600;
-  color: var(--amber);
+  color: #e8921a;
 
-  .meta-rating-count { color: var(--text-muted); font-weight: 400; font-size: 11px; }
+  .meta-rating-count { color: #8a9e7a; font-weight: 400; font-size: 11px; }
 }
 
 .meta-group {
@@ -549,7 +521,7 @@ select.field-input {
   align-items: center;
   gap: 4px;
   font-size: 11px;
-  color: var(--text-muted);
+  color: #8a9e7a;
 }
 
 // ── Card Footer ─────────────────────────────────────────
@@ -559,7 +531,7 @@ select.field-input {
   justify-content: space-between;
   margin-top: 16px;
   padding-top: 14px;
-  border-top: 1px solid var(--stone-dark);
+  border-top: 1px solid #e0d8cc;
 }
 
 .card-price {
@@ -567,16 +539,16 @@ select.field-input {
   align-items: baseline;
   gap: 4px;
 
-  .price-from { font-size: 11px; color: var(--text-muted); font-style: italic; }
-  .price-val  { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: var(--text-dark); }
-  .price-per  { font-size: 11px; color: var(--text-muted); }
+  .price-from { font-size: 11px; color: #8a9e7a; font-style: italic; }
+  .price-val  { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: #1e2b18; }
+  .price-per  { font-size: 11px; color: #8a9e7a; }
 }
 
 .book-btn {
   display: flex;
   align-items: center;
   gap: 6px;
-  background: var(--forest);
+  background: #2d4a22;
   color: #fff;
   border: none;
   font-family: 'Barlow Condensed', sans-serif;
@@ -589,14 +561,14 @@ select.field-input {
   cursor: pointer;
   transition: background 0.2s, gap 0.2s;
 
-  &:hover { background: var(--forest-mid); gap: 9px; }
+  &:hover { background: #3d6130; gap: 9px; }
 }
 
 // ── Date Ribbon ─────────────────────────────────────────
 .card-date-ribbon {
   position: absolute;
   top: 14px; right: 12px;
-  background: var(--amber);
+  background: #e8921a;
   color: #fff;
   font-family: 'Barlow Condensed', sans-serif;
   font-size: 11px;
@@ -612,7 +584,7 @@ select.field-input {
 .skeleton-header { min-height: 36px; }
 
 .skeleton {
-  background: linear-gradient(90deg, var(--stone-dark) 25%, var(--stone-deeper) 50%, var(--stone-dark) 75%);
+  background: linear-gradient(90deg, #e0d8cc 25%, #c8bfb0 50%, #e0d8cc 75%);
   background-size: 200% 100%;
   border-radius: 6px;
   animation: shimmer 1.4s infinite;
@@ -642,7 +614,7 @@ select.field-input {
   background: #fdecea;
   border: 1px solid rgba(192,57,43,0.15);
   border-radius: 14px;
-  color: var(--danger);
+  color: #c0392b;
   margin-bottom: 28px;
 
   svg { width: 22px; height: 22px; flex-shrink: 0; margin-top: 2px; }
@@ -652,7 +624,7 @@ select.field-input {
 
 .error-retry {
   margin-left: auto;
-  background: var(--danger);
+  background: #c0392b;
   color: #fff;
   border: none;
   font-family: 'Barlow Condensed', sans-serif;
@@ -683,19 +655,19 @@ select.field-input {
   font-family: 'Playfair Display', serif;
   font-size: 24px;
   font-weight: 700;
-  color: var(--text-dark);
+  color: #1e2b18;
 }
 
 .empty-sub {
   font-size: 14px;
-  color: var(--text-muted);
+  color: #8a9e7a;
   max-width: 280px;
   line-height: 1.6;
 }
 
 .empty-reset {
   margin-top: 8px;
-  background: var(--forest);
+  background: #2d4a22;
   color: #fff;
   border: none;
   font-family: 'Barlow Condensed', sans-serif;
@@ -707,7 +679,7 @@ select.field-input {
   border-radius: 10px;
   cursor: pointer;
   transition: background 0.2s;
-  &:hover { background: var(--forest-mid); }
+  &:hover { background: #3d6130; }
 }
 
 // ══════════════════════════════════════════════════════

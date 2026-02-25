@@ -20,6 +20,8 @@ interface Participant {
   idNumber: string;
   phone: string;
   medicalInfo: string;
+  idError?: string;
+  ageError?: string;
 }
 
 @Component({
@@ -68,7 +70,7 @@ export class BookingComponent implements OnInit {
     { id: 2, name: "Sleeping Bag", price: 300, selected: false },
     { id: 3, name: "Travel Insurance", price: 500, selected: false },
   ];
-  
+
   userId: any;
   successMessage: any;
   errorMessage: any;
@@ -82,8 +84,8 @@ export class BookingComponent implements OnInit {
     private authModal: AuthModalService,
     private router: Router,
     private tokenService: TokenService,
-    private sessionService: Sessionexpired, 
-  ) {}
+    private sessionService: Sessionexpired,
+  ) { }
 
   ngOnInit() {
     // Get trek ID from route
@@ -93,7 +95,11 @@ export class BookingComponent implements OnInit {
         this.loadTrekData();
       }
     });
+    if (!this.booking.participants) {
+      this.booking.participants = 1;
+    }
   }
+
 
   loadTrekData() {
     this.isLoading = true;
@@ -102,6 +108,7 @@ export class BookingComponent implements OnInit {
       next: (response: any) => {
         if (response.success) {
           this.trek = response.data || [];
+          console.log("Trek data loaded:", this.trek);
 
           // Convert single batch to array for consistent handling
           if (this.trek.batch && !Array.isArray(this.trek.batch)) {
@@ -161,7 +168,7 @@ export class BookingComponent implements OnInit {
    */
   initializeParticipants() {
     this.participants = [];
-    
+
     for (let i = 0; i < this.booking.participants; i++) {
       if (i === 0) {
         // First participant is the primary contact
@@ -226,7 +233,7 @@ export class BookingComponent implements OnInit {
    * Check if all participants have required fields filled
    */
   areAllParticipantsValid(): boolean {
-    return this.participants.every(participant => 
+    return this.participants.every(participant =>
       participant.name.trim() !== '' &&
       participant.age !== null &&
       participant.age > 0 &&
@@ -242,19 +249,19 @@ export class BookingComponent implements OnInit {
   canProceedToNextStep(): boolean {
     switch (this.currentStep) {
       case 1:
-        return this.booking.batchId > 0 && 
-               this.booking.participants >= 1 &&
-               this.selectedBatch !== null;
-      
+        return this.booking.batchId > 0 &&
+          this.booking.participants >= 1 &&
+          this.selectedBatch !== null;
+
       case 2:
         return this.booking.name.trim() !== '' &&
-               this.booking.email.trim() !== '' &&
-               this.booking.phone.length === 10 &&
-               this.booking.emergencyContact.length === 10;
-      
+          this.booking.email.trim() !== '' &&
+          this.booking.phone.length === 10 &&
+          this.booking.emergencyContact.length === 10;
+
       case 3:
         return this.areAllParticipantsValid();
-      
+
       default:
         return true;
     }
@@ -278,53 +285,53 @@ export class BookingComponent implements OnInit {
     return this.basePrice + this.addOnsPrice;
   }
 
-nextStep() {
-  // Validate current step
-  if (!this.canProceedToNextStep()) {
-    if (this.currentStep === 1) {
-      alert("Please select a batch and number of participants");
-    } else if (this.currentStep === 2) {
-      alert("Please fill all required contact information");
-    } else if (this.currentStep === 3) {
-      alert("Please fill all required participant details");
-    }
-    return;
-  }
-
-  // Check authentication before step 3
-  if (this.currentStep === 2) {
-    // Sync primary contact to first participant before moving forward
-    this.syncPrimaryContactToParticipant();
-
-    const hasToken   = !!this.tokenService.getToken();     // token exists (even if expired)
-    const isValid    = this.tokenService.isValid();         // token exists AND not expired
-
-    if (hasToken && !isValid) {
-      // Token exists but is expired → show session expired modal
-      this.sessionService.notifyExpired();
+  nextStep() {
+    // Validate current step
+    if (!this.canProceedToNextStep()) {
+      if (this.currentStep === 1) {
+        alert("Please select a batch and number of participants");
+      } else if (this.currentStep === 2) {
+        alert("Please fill all required contact information");
+      } else if (this.currentStep === 3) {
+        alert("Please fill all required participant details");
+      }
       return;
     }
 
-    if (!hasToken) {
-      // No token at all → fresh login flow
-      this.authModal
-        .openLogin()
-        .then((result: any) => {
-          if (result && result.success) {
-            this.currentStep++;
-          }
-        })
-        .catch(() => {
-          // User cancelled login
-        });
-      return;
+    // Check authentication before step 3
+    if (this.currentStep === 2) {
+      // Sync primary contact to first participant before moving forward
+      this.syncPrimaryContactToParticipant();
+
+      const hasToken = !!this.tokenService.getToken();     // token exists (even if expired)
+      const isValid = this.tokenService.isValid();         // token exists AND not expired
+
+      if (hasToken && !isValid) {
+        // Token exists but is expired → show session expired modal
+        this.sessionService.notifyExpired();
+        return;
+      }
+
+      if (!hasToken) {
+        // No token at all → fresh login flow
+        this.authModal
+          .openLogin()
+          .then((result: any) => {
+            if (result && result.success) {
+              this.currentStep++;
+            }
+          })
+          .catch(() => {
+            // User cancelled login
+          });
+        return;
+      }
+    }
+
+    if (this.currentStep < 4) {
+      this.currentStep++;
     }
   }
-
-  if (this.currentStep < 4) {
-    this.currentStep++;
-  }
-}
 
   prevStep() {
     if (this.currentStep > 1) {
@@ -397,4 +404,100 @@ nextStep() {
     this.participants = [];
     this.initializeParticipants();
   }
+
+  decrementParticipants() {
+    if (this.booking.participants > 1) this.booking.participants--;
+  }
+
+  incrementParticipants() {
+    if (this.booking.participants < this.selectedBatch.availableSlots) this.booking.participants++;
+  }
+
+validateId(participant: Participant) {
+
+  participant.idError = '';
+  if (!participant.idType || !participant.idNumber) return;
+
+  const rawValue = participant.idNumber.replace(/\s/g, '');
+
+  switch (participant.idType) {
+
+    case 'aadhaar':
+      if (!/^\d{12}$/.test(rawValue)) {
+        participant.idError = 'Aadhaar must be 12 digits';
+      }
+      break;
+
+    case 'pan':
+      if (!/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(rawValue)) {
+        participant.idError = 'Invalid PAN format (ABCDE1234F)';
+      }
+      break;
+
+    case 'passport':
+      if (!/^[A-Z][0-9]{7}$/.test(rawValue)) {
+        participant.idError = 'Invalid Passport format (A1234567)';
+      }
+      break;
+
+    case 'driving':
+      if (rawValue.length < 10) {
+        participant.idError = 'Invalid Driving License number';
+      }
+      break;
+  }
+}
+
+formatIdInput(participant: Participant) {
+
+  if (!participant.idType) return;
+
+  let value = participant.idNumber || '';
+
+  switch (participant.idType) {
+
+    case 'pan':
+      participant.idNumber = value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+      break;
+
+    case 'aadhaar':
+      // Remove non-digits
+      let digits = value.replace(/\D/g, '').substring(0, 12);
+
+      // Add spaces every 4 digits
+      participant.idNumber = digits.replace(/(\d{4})(?=\d)/g, '$1 ');
+      break;
+
+    case 'passport':
+      participant.idNumber = value.toUpperCase().replace(/[^A-Z0-9]/g, '').substring(0, 8);
+      break;
+
+    case 'driving':
+      participant.idNumber = value.toUpperCase().replace(/[^A-Z0-9]/g, '').substring(0, 15);
+      break;
+  }
+
+  this.validateId(participant);
+}
+
+validateAge(participant: Participant) {
+
+  participant.ageError = '';
+
+  if (participant.age === null) return;
+
+  if (participant.age < 12) {
+    participant.ageError = 'Minimum age is 12 years';
+  }
+}
+
+getIdMaxLength(idType: string): number {
+  switch (idType) {
+    case 'aadhaar': return 14; // 12 digits + 2 spaces
+    case 'pan': return 10;
+    case 'passport': return 8;
+    case 'driving': return 15;
+    default: return 20;
+  }
+}
 }

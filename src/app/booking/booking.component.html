@@ -1,370 +1,437 @@
-<nav class="navbar navbar-dark bg-primary">
-  <div class="container-fluid">
-    <button class="btn btn-outline-light" [routerLink]="['/tour-details', trekId]">←</button>
-    <span class="navbar-brand mx-auto fw-semibold">Book Your Trek</span>
-  </div>
-</nav>
+<div class="checkout-shell">
 
-<!-- Progress Steps (Updated to 4 steps) -->
-<div class="py-2 border-bottom progress-steps">
-  <div class="container d-flex justify-content-center align-items-center gap-2">
-    <div class="text-center">
-      <div class="rounded-circle border fw-bold px-3 py-2" [class.bg-primary]="currentStep >= 1"
-        [class.text-white]="currentStep >= 1">
-        1
+  <!-- ═══ LEFT PANEL ═══════════════════════════════════════ -->
+  <aside class="left-panel" *ngIf="trek">
+
+    <div class="trek-thumb" style="position:relative">
+      <div class="panel-nav">
+        <a class="back-btn" [routerLink]="['/tour-details', trekId]">← Trek Details</a>
       </div>
-      <small>Details</small>
+      <img [src]="'http://localhost:4001/' + trek.cover_image" [alt]="trek.name" />
     </div>
-    <div class="flex-grow-1 border-top"></div>
-    <div class="text-center">
-      <div class="rounded-circle border fw-bold px-3 py-2" [class.bg-primary]="currentStep >= 2"
-        [class.text-white]="currentStep >= 2">
-        2
-      </div>
-      <small>Contact</small>
+
+    <div class="trek-info">
+      <div class="trek-label">You're booking</div>
+      <div class="trek-name">{{ trek.name }}</div>
+      <div class="trek-location">📍 {{ trek.location }}</div>
     </div>
-    <div class="flex-grow-1 border-top"></div>
-    <div class="text-center">
-      <div class="rounded-circle border fw-bold px-3 py-2" [class.bg-primary]="currentStep >= 3"
-        [class.text-white]="currentStep >= 3">
-        3
-      </div>
-      <small>Participants</small>
-    </div>
-    <div class="flex-grow-1 border-top"></div>
-    <div class="text-center">
-      <div class="rounded-circle border fw-bold px-3 py-2" [class.bg-primary]="currentStep >= 4"
-        [class.text-white]="currentStep >= 4">
-        4
-      </div>
-      <small>Review</small>
-    </div>
-  </div>
-</div>
 
-<!-- Trek Summary -->
-<div class="container tour-summary py-3" *ngIf="trek">
-  <h3 class="fw-bold">{{ trek.name }}</h3>
-  <p class="text-muted mb-0">
-    <i class="bi bi-geo-alt"></i> {{ trek.location }}
-  </p>
-</div>
+    <div class="panel-divider"></div>
 
-<!-- Loading State -->
-<div class="container text-center py-5" *ngIf="isLoading">
-  <div class="spinner-border text-primary" role="status">
-    <span class="visually-hidden">Loading...</span>
-  </div>
-  <p class="mt-3">Loading trek details...</p>
-</div>
-
-<!-- STEP 1: Select Date & Participants -->
-<div class="container booking-step py-3" *ngIf="currentStep === 1 && !isLoading">
-  <div class="card">
-    <div class="card-body">
-      <h5 class="card-title mb-3">Select Batch & Participants</h5>
-
-      <div class="row">
-        <div class="mb-3 col-sm-12">
-          <label class="form-label">Select Batch <span class="text-danger">*</span></label>
-          <select class="form-select" [(ngModel)]="booking.batchId" (change)="onBatchSelect(booking.batchId)">
-            <option value="0" disabled>Select Batch</option>
-            <option *ngFor="let batch of batches" [value]="batch.batchId"
-              [disabled]="batch.status !== 'active' || batch.availableSlots === 0">
-              {{ batch.startDate | date:'MMM dd' }} - {{ batch.endDate | date:'MMM dd, yyyy' }}
-              ({{ batch.duration }}) - ₹{{ batch.price }}
-              {{ batch.availableSlots === 0 ? ' (Full)' : ' (' + batch.availableSlots + ' slots)' }}
-            </option>
-          </select>
-        </div>
-        <div class="mb-3 col-sm-6" *ngIf="selectedBatch">
-          <label class="form-label">Number of Participants <span class="text-danger">*</span></label>
-          <input type="number" class="form-control" [value]="booking.participants" min="1"
-            (input)="onParticipantsInput($event)" />
-          <small class="text-muted">
-            Max: {{ selectedBatch.availableSlots }} available
-          </small>
-        </div>
-
-        <div class="mb-3 col-sm-6" *ngIf="selectedBatch">
-          <label class="form-label">Price per Person</label>
-          <input type="text" class="form-control" [value]="'₹' + selectedBatch.price" readonly />
+    <!-- Vertical stepper -->
+    <div class="stepper">
+      <div class="step-row" [class.completed]="currentStep > 1" [class.active]="currentStep === 1">
+        <div class="step-node">{{ currentStep > 1 ? '✓' : '1' }}</div>
+        <div class="step-text">
+          <div class="step-title">Batch &amp; Dates</div>
+          <div class="step-sub" *ngIf="selectedBatch">
+            {{ selectedBatch.startDate | date:'MMM dd' }} · {{ booking.participants }} participant{{
+            booking.participants !== 1 ? 's' : '' }}
+          </div>
+          <div class="step-sub" *ngIf="!selectedBatch">Choose departure date</div>
         </div>
       </div>
 
-      <h6 class="mt-4">Add-ons (Optional)</h6>
-      <div class="form-check mb-2" *ngFor="let addon of addOns">
-        <input class="form-check-input" type="checkbox" [(ngModel)]="addon.selected" [id]="'addon-' + addon.id" />
-        <label class="form-check-label" [for]="'addon-' + addon.id">
-          {{ addon.name }} — ₹{{ addon.price }}
+      <div class="step-row" [class.completed]="currentStep > 2" [class.active]="currentStep === 2">
+        <div class="step-node">{{ currentStep > 2 ? '✓' : '2' }}</div>
+        <div class="step-text">
+          <div class="step-title">Contact Info</div>
+          <div class="step-sub" *ngIf="currentStep > 2">{{ booking.name }}</div>
+          <div class="step-sub" *ngIf="currentStep <= 2">Primary contact details</div>
+        </div>
+      </div>
+
+      <div class="step-row" [class.completed]="currentStep > 3" [class.active]="currentStep === 3">
+        <div class="step-node">{{ currentStep > 3 ? '✓' : '3' }}</div>
+        <div class="step-text">
+          <div class="step-title">Participants</div>
+          <div class="step-sub">Details for all trekkers</div>
+        </div>
+      </div>
+
+      <div class="step-row" [class.active]="currentStep === 4">
+        <div class="step-node">4</div>
+        <div class="step-text">
+          <div class="step-title">Review &amp; Pay</div>
+          <div class="step-sub">Confirm your booking</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live price summary -->
+    <div class="price-summary" *ngIf="selectedBatch">
+      <div class="price-row">
+        <span class="price-label">Trek ({{ booking.participants }} × ₹{{ selectedBatch.price }})</span>
+        <span class="price-amt">₹{{ basePrice | number:'1.0-0' }}</span>
+      </div>
+      <ng-container *ngFor="let addon of addOns">
+        <div class="price-row" *ngIf="addon.selected">
+          <span class="price-label">{{ addon.name }} × {{ booking.participants }}</span>
+          <span class="price-amt">₹{{ addon.price * booking.participants | number:'1.0-0' }}</span>
+        </div>
+      </ng-container>
+      <div class="price-row total">
+        <span class="price-label">Total</span>
+        <span class="price-amt">₹{{ totalPrice | number:'1.0-0' }}</span>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- ═══ RIGHT PANEL ══════════════════════════════════════ -->
+  <div class="right-panel">
+
+    <!-- Mobile nav -->
+    <div class="mobile-nav">
+      <a class="mobile-back" [routerLink]="['/tour-details', trekId]">← Back</a>
+      <div class="mobile-title">Book Your Trek</div>
+      <div style="width:60px"></div>
+    </div>
+
+    <!-- Mobile steps strip -->
+    <div class="mobile-steps">
+      <div class="mob-step" [class.completed]="currentStep > 1" [class.active]="currentStep === 1">
+        <div class="mob-num">{{ currentStep > 1 ? '✓' : '1' }}</div>Batch
+      </div>
+      <div class="mob-step" [class.completed]="currentStep > 2" [class.active]="currentStep === 2">
+        <div class="mob-num">{{ currentStep > 2 ? '✓' : '2' }}</div>Contact
+      </div>
+      <div class="mob-step" [class.completed]="currentStep > 3" [class.active]="currentStep === 3">
+        <div class="mob-num">{{ currentStep > 3 ? '✓' : '3' }}</div>Participants
+      </div>
+      <div class="mob-step" [class.active]="currentStep === 4">
+        <div class="mob-num">4</div>Review
+      </div>
+    </div>
+
+    <!-- Alerts -->
+    <div class="form-area" style="padding-bottom:0; padding-top:20px" *ngIf="successMessage || errorMessage">
+      <div class="success-bar" *ngIf="successMessage">
+        ✓ {{ successMessage }}
+        <button class="alert-close" (click)="successMessage = ''">✕</button>
+      </div>
+      <div class="error-bar" *ngIf="errorMessage">
+        ⚠ {{ errorMessage }}
+        <button class="alert-close" (click)="errorMessage = ''">✕</button>
+      </div>
+    </div>
+
+    <!-- LOADER -->
+    <div class="loader-overlay" *ngIf="isLoading">
+      <div class="loader-ring"></div>
+      <div class="loader-text">Loading trek details…</div>
+    </div>
+
+    <!-- FORM AREA -->
+    <div class="form-area" *ngIf="!isLoading">
+
+      <!-- ──────────────── STEP 1 ──────────────── -->
+      <ng-container *ngIf="currentStep === 1">
+        <div class="step-headline">
+          <div class="step-eyebrow">Step 1 of 4</div>
+          <h1 class="step-h1">Select Your Batch</h1>
+          <p class="step-desc">Choose a departure date and set your group size.</p>
+        </div>
+
+        <div style="margin-bottom:28px">
+          <label
+            style="font-size:0.75rem;font-weight:700;letter-spacing:0.04em;color:var(--body);display:block;margin-bottom:10px">
+            Available Batches <span class="req">*</span>
+          </label>
+          <div class="batch-options">
+            <label class="batch-option" *ngFor="let batch of batches"
+              [class.selected]="booking.batchId == batch.batchId"
+              [class.disabled]="batch.status !== 'active' || batch.availableSlots === 0">
+              <input type="radio" name="batch" [value]="batch.batchId" [(ngModel)]="booking.batchId"
+                (change)="onBatchSelect(batch.batchId)"
+                [disabled]="batch.status !== 'active' || batch.availableSlots === 0" checked/>
+              <div class="batch-radio">
+                <div *ngIf="booking.batchId == batch.batchId"
+                  style="width:8px;height:8px;border-radius:50%;background:#3d6b4a"></div>
+              </div>
+              <div class="batch-info">
+                <div class="batch-dates">{{ batch.startDate | date:'MMM dd' }} – {{ batch.endDate | date:'MMM dd, yyyy'
+                  }}</div>
+                <div class="batch-meta">{{ batch.duration }} · {{ batch.availableSlots }} slots remaining</div>
+              </div>
+              <div class="batch-price">₹{{ batch.price }}</div>
+              <span class="batch-status" [class.status-ok]="batch.availableSlots > 5"
+                [class.status-few]="batch.availableSlots > 0 && batch.availableSlots <= 5"
+                [class.status-full]="batch.availableSlots === 0">
+                {{ batch.availableSlots === 0 ? 'Full' : batch.availableSlots <= 5 ? 'Few Left' : 'Open' }} </span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-row" *ngIf="selectedBatch">
+          <div class="field">
+            <label>Participants <span class="req">*</span></label>
+            <div class="counter-row">
+              <button class="counter-btn" (click)="decrementParticipants()" type="button">−</button>
+              <div class="counter-val">{{ booking.participants }}</div>
+              <button class="counter-btn" (click)="incrementParticipants()" type="button">+</button>
+            </div>
+            <div class="field-hint">Max {{ selectedBatch.availableSlots }} available in this batch</div>
+          </div>
+          <div class="field">
+            <label>Price per Person</label>
+            <input class="form-input" [value]="'₹' + selectedBatch.price" readonly />
+          </div>
+        </div>
+
+        <div
+          style="margin-top:8px;margin-bottom:12px;font-size:0.75rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)"
+          *ngIf="addOns.length">
+          Add-ons (Optional)
+        </div>
+        <div class="addons-grid">
+          <label class="addon-card" *ngFor="let addon of addOns" [class.checked]="addon.selected">
+            <input type="checkbox" [(ngModel)]="addon.selected" />
+            <div class="addon-top">
+              <div class="addon-name">{{ addon.name }}</div>
+              <div class="addon-check">{{ addon.selected ? '✓' : '' }}</div>
+            </div>
+            <div class="addon-price">₹{{ addon.price }} / person</div>
+          </label>
+        </div>
+      </ng-container>
+
+      <!-- ──────────────── STEP 2 ──────────────── -->
+      <ng-container *ngIf="currentStep === 2">
+        <div class="step-headline">
+          <div class="step-eyebrow">Step 2 of 4</div>
+          <h1 class="step-h1">Contact Information</h1>
+          <p class="step-desc">This person will be the main point of contact for the booking.</p>
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label>Full Name <span class="req">*</span></label>
+            <input class="form-input" [(ngModel)]="booking.name" placeholder="Enter full name" />
+          </div>
+          <div class="field">
+            <label>Email <span class="req">*</span></label>
+            <input class="form-input" type="email" [(ngModel)]="booking.email" placeholder="your@email.com" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label>Phone <span class="req">*</span></label>
+            <input class="form-input" type="tel" [(ngModel)]="booking.phone" placeholder="+91 XXXXX XXXXX"
+              minlength="10" maxlength="10" onlyNumber />
+          </div>
+          <div class="field">
+            <label>Emergency Contact <span class="req">*</span></label>
+            <input class="form-input" type="tel" [(ngModel)]="booking.emergencyContact" placeholder="+91 XXXXX XXXXX"
+              minlength="10" maxlength="10" onlyNumber />
+          </div>
+        </div>
+
+        <div class="form-row full">
+          <div class="field">
+            <label>Special Requests / Medical Info</label>
+            <textarea class="form-textarea" [(ngModel)]="booking.specialRequests"
+              placeholder="Any allergies, dietary restrictions, or special requirements…"></textarea>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- ──────────────── STEP 3 ──────────────── -->
+      <ng-container *ngIf="currentStep === 3">
+        <div class="step-headline">
+          <div class="step-eyebrow">Step 3 of 4</div>
+          <h1 class="step-h1">Participant Details</h1>
+          <p class="step-desc">Please provide details for all {{ booking.participants }} participant(s).</p>
+        </div>
+
+        <div class="info-bar" *ngIf="!areAllParticipantsValid()">
+          ⚠ Please fill all required fields for every participant before continuing.
+        </div>
+
+        <div class="participant-block" *ngFor="let participant of participants; let i = index">
+          <div class="participant-header">
+            <div class="p-num">{{ i + 1 }}</div>
+            <div class="p-name">Participant {{ i + 1 }}</div>
+            <span class="p-badge" *ngIf="i === 0">Primary Contact</span>
+          </div>
+          <div class="participant-fields">
+            <div class="field">
+              <label>Full Name <span class="req">*</span></label>
+              <input class="form-input" [(ngModel)]="participant.name" placeholder="Enter full name"
+                [disabled]="i === 0" />
+              <div class="field-hint" *ngIf="i === 0">Auto-filled from contact info</div>
+            </div>
+            <div class="field">
+              <label>Age <span class="req">*</span></label>
+              <input class="form-input" type="number" [(ngModel)]="participant.age" placeholder="e.g. 28"
+                (input)="validateAge(participant)" min="18" max="100" />
+              <div class="error" *ngIf="participant.ageError">{{ participant.ageError }}</div>
+            </div>
+            <div class="field">
+              <label>Gender <span class="req">*</span></label>
+              <select class="form-select" [(ngModel)]="participant.gender">
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>ID Proof Type <span class="req">*</span></label>
+              <select class="form-select" [(ngModel)]="participant.idType"
+                (change)="participant.idNumber=''; validateId(participant)">
+                <option value="">Select ID</option>
+                <option value="Aadhar">Aadhar Card</option>
+                <option value="PAN">PAN Card</option>
+                <option value="Passport">Passport</option>
+                <option value="Driving License">Driving License</option>
+                <option value="Voter ID">Voter ID</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>ID Number <span class="req">*</span></label>
+              <input class="form-input" [(ngModel)]="participant.idNumber"
+                [maxlength]="getIdMaxLength(participant.idType)" (input)="formatIdInput(participant)"
+                placeholder="Enter ID number" />
+              <div class="error" *ngIf="participant.idError">{{ participant.idError }}</div>
+            </div>
+            <div class="field">
+              <label>Phone</label>
+              <input class="form-input" type="tel" [(ngModel)]="participant.phone" placeholder="+91 XXXXX XXXXX"
+                [disabled]="i === 0" />
+              <div class="field-hint" *ngIf="i === 0">Auto-filled from contact info</div>
+            </div>
+            <div class="field full">
+              <label>Medical Conditions / Allergies</label>
+              <textarea class="form-textarea" [(ngModel)]="participant.medicalInfo"
+                placeholder="Any conditions, allergies, or medications…"></textarea>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- ──────────────── STEP 4 ──────────────── -->
+      <ng-container *ngIf="currentStep === 4">
+        <div class="step-headline">
+          <div class="step-eyebrow">Step 4 of 4</div>
+          <h1 class="step-h1">Review Your Booking</h1>
+          <p class="step-desc">Please verify all details before proceeding to payment.</p>
+        </div>
+
+        <div class="review-block">
+          <div class="review-header">
+            <div class="review-header-title">Trek Details</div>
+            <a class="edit-link" (click)="currentStep = 1">Edit</a>
+          </div>
+          <div class="review-body">
+            <div class="review-row"><span class="review-key">Trek</span><span class="review-val">{{ trek.name }}</span>
+            </div>
+            <div class="review-row"><span class="review-key">Dates</span><span class="review-val">{{
+                selectedBatch?.startDate | date:'MMM dd' }} – {{ selectedBatch?.endDate | date:'MMM dd, yyyy' }}</span>
+            </div>
+            <div class="review-row"><span class="review-key">Duration</span><span class="review-val">{{
+                selectedBatch?.duration }}</span></div>
+            <div class="review-row"><span class="review-key">Participants</span><span class="review-val">{{
+                booking.participants }}</span></div>
+          </div>
+        </div>
+
+        <div class="review-block">
+          <div class="review-header">
+            <div class="review-header-title">Primary Contact</div>
+            <a class="edit-link" (click)="currentStep = 2">Edit</a>
+          </div>
+          <div class="review-body">
+            <div class="review-row"><span class="review-key">Name</span><span class="review-val">{{ booking.name
+                }}</span></div>
+            <div class="review-row"><span class="review-key">Email</span><span class="review-val">{{ booking.email
+                }}</span></div>
+            <div class="review-row"><span class="review-key">Phone</span><span class="review-val">{{ booking.phone
+                }}</span></div>
+            <div class="review-row"><span class="review-key">Emergency</span><span class="review-val">{{
+                booking.emergencyContact }}</span></div>
+          </div>
+        </div>
+
+        <div class="review-block">
+          <div class="review-header">
+            <div class="review-header-title">Participants</div>
+            <a class="edit-link" (click)="currentStep = 3">Edit</a>
+          </div>
+          <table class="p-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Age</th>
+                <th>Gender</th>
+                <th>ID Type</th>
+                <th>ID Number</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let p of participants; let i = index">
+                <td>{{ i + 1 }}</td>
+                <td>{{ p.name }}<span class="primary-tag" *ngIf="i === 0">Primary</span></td>
+                <td>{{ p.age }}</td>
+                <td>{{ p.gender }}</td>
+                <td>{{ p.idType }}</td>
+                <td>{{ p.idNumber }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="price-breakdown">
+          <div class="pb-row">
+            <span class="pb-label">Trek ({{ booking.participants }} × ₹{{ selectedBatch?.price }})</span>
+            <span class="pb-val">₹{{ basePrice | number:'1.0-0' }}</span>
+          </div>
+          <ng-container *ngFor="let addon of addOns">
+            <div class="pb-row" *ngIf="addon.selected">
+              <span class="pb-label">{{ addon.name }} ({{ booking.participants }} × ₹{{ addon.price }})</span>
+              <span class="pb-val">₹{{ addon.price * booking.participants | number:'1.0-0' }}</span>
+            </div>
+          </ng-container>
+          <div class="pb-row total">
+            <span class="pb-label">Total Amount</span>
+            <span class="pb-val">₹{{ totalPrice | number:'1.0-0' }}</span>
+          </div>
+        </div>
+
+        <label class="terms-check">
+          <input type="checkbox" [(ngModel)]="termsAccepted" />
+          <div class="terms-text">
+            I agree to the <a routerLink="/terms">Terms &amp; Conditions</a> and
+            <a routerLink="/cancellation">Cancellation Policy</a> of Karnataka Adventures.
+          </div>
         </label>
-      </div>
+      </ng-container>
+
     </div>
-  </div>
-</div>
+    <!-- /form-area -->
 
-<!-- STEP 2: Primary Contact Information -->
-<div class="container booking-step py-3" *ngIf="currentStep === 2">
-  <div class="card">
-    <div class="card-body">
-      <h5 class="card-title mb-3">Primary Contact Information</h5>
-      <p class="text-muted">This person will be the main point of contact for the booking</p>
+    <!-- Bottom bar -->
+    <div class="bottom-bar w-100">
+      <button class="btn-back" *ngIf="currentStep > 1" (click)="prevStep()">← Back</button>
 
-      <div class="row">
-        <div class="mb-3 col-md-6">
-          <label class="form-label">Full Name <span class="text-danger">*</span></label>
-          <input class="form-control" [(ngModel)]="booking.name" placeholder="Enter full name" />
-        </div>
-
-        <div class="mb-3 col-md-6">
-          <label class="form-label">Email <span class="text-danger">*</span></label>
-          <input type="email" class="form-control" [(ngModel)]="booking.email" placeholder="your@email.com" />
-        </div>
-
-        <div class="mb-3 col-md-6">
-          <label class="form-label">Phone <span class="text-danger">*</span></label>
-          <input type="tel" class="form-control" [(ngModel)]="booking.phone" placeholder="+91 XXXXX XXXXX"
-            minlength="10" maxlength="10"  onlyNumber/>
-        </div>
-
-        <div class="mb-3 col-md-6">
-          <label class="form-label">Emergency Contact <span class="text-danger">*</span></label>
-          <input type="tel" class="form-control" [(ngModel)]="booking.emergencyContact" placeholder="+91 XXXXX XXXXX"
-            minlength="10" maxlength="10" onlyNumber/>
-        </div>
-
-        <div class="mb-3 col-12">
-          <label class="form-label">Special Requests / Medical Info</label>
-          <textarea class="form-control" rows="3" [(ngModel)]="booking.specialRequests"
-            placeholder="Any allergies, dietary restrictions, or special requirements..."></textarea>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- STEP 3: Participant Details -->
-<div class="container booking-step py-3" *ngIf="currentStep === 3">
-  <div class="card">
-    <div class="card-body">
-      <h5 class="card-title mb-3">Participant Details</h5>
-      <p class="text-muted">
-        Please provide details for all {{ booking.participants }} participant(s)
-      </p>
-
-      <!-- Participant Forms -->
-      <div *ngFor="let participant of participants; let i = index" class="participant-form mb-4 pb-4 border-bottom">
-        <h6 class="mb-3">
-          <i class="bi bi-person-fill"></i>
-          Participant #{{ i + 1 }}
-          <span *ngIf="i === 0" class="badge bg-primary ms-2">Primary Contact</span>
-        </h6>
-
-        <div class="row">
-          <div class="mb-3 col-md-6">
-            <label class="form-label">Full Name <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" [(ngModel)]="participant.name"
-              placeholder="Enter full name" 
-              [disabled]="i === 0" />
-            <small class="text-muted" *ngIf="i === 0">Auto-filled from contact info</small>
-          </div>
-
-          <div class="mb-3 col-md-6">
-            <label class="form-label">Age <span class="text-danger">*</span></label>
-            <input type="number" class="form-control" [(ngModel)]="participant.age"
-              placeholder="Enter age" min="1" max="100" />
-          </div>
-
-          <div class="mb-3 col-md-6">
-            <label class="form-label">Gender <span class="text-danger">*</span></label>
-            <select class="form-select" [(ngModel)]="participant.gender">
-              <option value="">Select Gender</option>
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
-              <option value="Other">Other</option>
-            </select>
-          </div>
-
-          <div class="mb-3 col-md-6">
-            <label class="form-label">ID Proof Type <span class="text-danger">*</span></label>
-            <select class="form-select" [(ngModel)]="participant.idType">
-              <option value="">Select ID Type</option>
-              <option value="Aadhar">Aadhar Card</option>
-              <option value="PAN">PAN Card</option>
-              <option value="Passport">Passport</option>
-              <option value="Driving License">Driving License</option>
-              <option value="Voter ID">Voter ID</option>
-            </select>
-          </div>
-
-          <div class="mb-3 col-md-6">
-            <label class="form-label">ID Number <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" [(ngModel)]="participant.idNumber"
-              placeholder="Enter ID number" />
-          </div>
-
-          <div class="mb-3 col-md-6">
-            <label class="form-label">Phone</label>
-            <input type="tel" class="form-control" [(ngModel)]="participant.phone"
-              placeholder="+91 XXXXX XXXXX" minlength="10" maxlength="10" 
-              [disabled]="i === 0" />
-            <small class="text-muted" *ngIf="i === 0">Auto-filled from contact info</small>
-          </div>
-
-          <div class="mb-3 col-12">
-            <label class="form-label">Medical Conditions / Allergies</label>
-            <textarea class="form-control" rows="2" [(ngModel)]="participant.medicalInfo"
-              placeholder="Any medical conditions, allergies, or medications..."></textarea>
-          </div>
-        </div>
+      <div class="bar-price" *ngIf="selectedBatch">
+        <div class="bar-price-label">Total</div>
+        <div class="bar-price-amount">₹{{ totalPrice | number:'1.0-0' }}</div>
       </div>
 
-      <!-- Validation Alert -->
-      <div class="alert alert-info" *ngIf="!areAllParticipantsValid()">
-        <i class="bi bi-info-circle"></i>
-        Please fill all required fields (*) for all participants
-      </div>
-    </div>
-  </div>
-</div>
+      <button class="btn-next" *ngIf="currentStep < 4" (click)="nextStep()" [disabled]="!canProceedToNextStep()">
+        Continue →
+      </button>
 
-<!-- STEP 4: Review Booking -->
-<div class="container booking-step py-3" *ngIf="currentStep === 4">
-  <div class="card mb-3">
-    <div class="card-body">
-      <h5 class="card-title">Review Your Booking</h5>
-
-      <div class="row">
-        <div class="col-md-6">
-          <h6 class="mt-3">Trek Details</h6>
-          <ul class="list-group mb-3">
-            <li class="list-group-item">
-              <strong>Trek:</strong> {{ trek.name }}
-            </li>
-            <li class="list-group-item">
-              <strong>Dates:</strong> {{ selectedBatch?.startDate | date:'MMM dd' }} -
-              {{ selectedBatch?.endDate | date:'MMM dd, yyyy' }}
-            </li>
-            <li class="list-group-item">
-              <strong>Duration:</strong> {{ selectedBatch?.duration }}
-            </li>
-            <li class="list-group-item">
-              <strong>Participants:</strong> {{ booking.participants }}
-            </li>
-          </ul>
-        </div>
-
-        <div class="col-md-6">
-          <h6 class="mt-3">Primary Contact</h6>
-          <ul class="list-group mb-3">
-            <li class="list-group-item">
-              <strong>Name:</strong> {{ booking.name }}
-            </li>
-            <li class="list-group-item">
-              <strong>Email:</strong> {{ booking.email }}
-            </li>
-            <li class="list-group-item">
-              <strong>Phone:</strong> {{ booking.phone }}
-            </li>
-            <li class="list-group-item">
-              <strong>Emergency:</strong> {{ booking.emergencyContact }}
-            </li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- Participants List -->
-      <h6 class="mt-3">All Participants</h6>
-      <div class="table-responsive">
-        <table class="table table-bordered">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Name</th>
-              <th>Age</th>
-              <th>Gender</th>
-              <th>ID Type</th>
-              <th>ID Number</th>
-              <th>Phone</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let participant of participants; let i = index">
-              <td>{{ i + 1 }}</td>
-              <td>
-                {{ participant.name }}
-                <span *ngIf="i === 0" class="badge bg-primary ms-1">Primary</span>
-              </td>
-              <td>{{ participant.age }}</td>
-              <td>{{ participant.gender }}</td>
-              <td>{{ participant.idType }}</td>
-              <td>{{ participant.idNumber }}</td>
-              <td>{{ participant.phone || '-' }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <h6 class="mt-3">Price Breakdown</h6>
-      <ul class="list-group">
-        <li class="list-group-item d-flex justify-content-between">
-          <span>Trek ({{ booking.participants }} × ₹{{ selectedBatch?.price }})</span>
-          <strong>₹{{ basePrice }}</strong>
-        </li>
-        <ng-container *ngFor="let addon of addOns">
-          <li class="list-group-item d-flex justify-content-between" *ngIf="addon.selected">
-            <span>{{ addon.name }} ({{ booking.participants }} × ₹{{ addon.price }})</span>
-            <strong>₹{{ addon.price * booking.participants }}</strong>
-          </li>
-        </ng-container>
-        <li class="list-group-item d-flex justify-content-between bg-light">
-          <strong>Total Amount</strong>
-          <strong class="text-primary">₹{{ totalPrice }}</strong>
-        </li>
-      </ul>
-    </div>
-  </div>
-
-  <div class="form-check mb-4">
-    <input class="form-check-input" type="checkbox" id="terms" [(ngModel)]="termsAccepted" />
-    <label class="form-check-label" for="terms">
-      I agree to <a routerLink="/terms">Terms & Conditions</a> and
-      <a routerLink="/cancellation">Cancellation Policy</a>
-    </label>
-  </div>
-</div>
-
-<!-- Bottom Action Bar -->
-<div class="fixed-bottom bg-light border-top p-3">
-  <div class="container d-flex align-items-center gap-2">
-    <button *ngIf="currentStep > 1" class="btn btn-outline-secondary" (click)="prevStep()">
-      ← Back
-    </button>
-
-    <div class="ms-auto fw-bold text-primary">
-      Total: ₹{{ totalPrice }}
+      <button class="btn-next btn-pay" *ngIf="currentStep === 4" [disabled]="isSubmitting || !termsAccepted"
+        (click)="proceedToPayment()">
+        {{ isSubmitting ? 'Processing…' : '💳 Pay Now' }}
+      </button>
     </div>
 
-    <button *ngIf="currentStep < 4" class="btn btn-primary" (click)="nextStep()"
-      [disabled]="!canProceedToNextStep()">
-      Continue →
-    </button>
-
-    <button *ngIf="currentStep === 4" class="btn btn-success" [disabled]="isSubmitting || !termsAccepted"
-      (click)="proceedToPayment()">
-      {{ isSubmitting ? 'Processing...' : 'Proceed to Payment 💳' }}
-    </button>
   </div>
-</div>
+  <!-- /right-panel -->
 
-<div class="container mt-3">
-  <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show">
-    {{ successMessage }}
-    <button type="button" class="btn-close" (click)="successMessage = ''"></button>
-  </div>
-
-  <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show">
-    {{ errorMessage }}
-    <button type="button" class="btn-close" (click)="errorMessage = ''"></button>
-  </div>
 </div>

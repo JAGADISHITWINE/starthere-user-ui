@@ -2,6 +2,7 @@ import { CommonModule } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
 import { IonicModule } from "@ionic/angular";
 import { Router, RouterLink } from "@angular/router";
+import { FormsModule } from "@angular/forms";
 import { Auth } from "../core/auth";
 import { MyBookings } from "./my-bookings";
 import { AuthModalService } from "../auth/auth-modal.service";
@@ -25,6 +26,9 @@ interface Booking {
   addons: any[];
   can_cancel: boolean;
   days_until_trek: number;
+  user_rating?: number | null;
+  user_review?: string | null;
+  rated_at?: string | null;
 }
 
 @Component({
@@ -32,7 +36,7 @@ interface Booking {
   templateUrl: "./my-bookings.component.html",
   styleUrls: ["./my-bookings.component.scss"],
   standalone: true,
-  imports: [CommonModule, IonicModule, RouterLink],
+  imports: [CommonModule, IonicModule, RouterLink, FormsModule],
 })
 export class MyBookingsComponent implements OnInit {
   activeTab: "upcoming" | "past" | "cancelled" = "upcoming";
@@ -51,6 +55,12 @@ export class MyBookingsComponent implements OnInit {
   upcomingTrips = 0;
   completedTrips = 0;
   userId: any;
+  ratingModalOpen = false;
+  isSubmittingRating = false;
+  ratingErrorMessage = "";
+  selectedBookingForRating: Booking | null = null;
+  selectedRating = 0;
+  selectedReview = "";
 
   constructor(
     private bookingService: MyBookings,
@@ -308,5 +318,64 @@ export class MyBookingsComponent implements OnInit {
     } catch (e) {
       // modal dismissed/cancelled — no action
     }
+  }
+
+  hasUserRated(booking: Booking): boolean {
+    const rating = Number(booking.user_rating || 0);
+    return rating >= 1 && rating <= 5;
+  }
+
+  openRatingModal(booking: Booking) {
+    this.selectedBookingForRating = booking;
+    this.selectedRating = Number(booking.user_rating || 0);
+    this.selectedReview = booking.user_review || "";
+    this.ratingErrorMessage = "";
+    this.ratingModalOpen = true;
+  }
+
+  closeRatingModal() {
+    if (this.isSubmittingRating) return;
+    this.ratingModalOpen = false;
+    this.selectedBookingForRating = null;
+    this.selectedRating = 0;
+    this.selectedReview = "";
+    this.ratingErrorMessage = "";
+  }
+
+  setRating(stars: number) {
+    this.selectedRating = stars;
+  }
+
+  submitRating() {
+    if (!this.selectedBookingForRating) return;
+    if (this.selectedRating < 1 || this.selectedRating > 5) {
+      this.ratingErrorMessage = "Please select a star rating.";
+      return;
+    }
+
+    this.isSubmittingRating = true;
+    this.ratingErrorMessage = "";
+
+    const payload = {
+      rating: this.selectedRating,
+      review: this.selectedReview?.trim() || "",
+    };
+
+    this.bookingService
+      .submitTrekRating(this.selectedBookingForRating.id, this.userId, payload)
+      .subscribe({
+        next: () => {
+          if (!this.selectedBookingForRating) return;
+          this.selectedBookingForRating.user_rating = this.selectedRating;
+          this.selectedBookingForRating.user_review = payload.review;
+          this.selectedBookingForRating.rated_at = new Date().toISOString();
+          this.isSubmittingRating = false;
+          this.closeRatingModal();
+        },
+        error: () => {
+          this.isSubmittingRating = false;
+          this.ratingErrorMessage = "Could not submit rating. Please try again.";
+        },
+      });
   }
 }

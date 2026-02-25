@@ -81,39 +81,6 @@
 
       <div class="field-divider" aria-hidden="true"></div>
 
-      <!-- Price range -->
-      <div class="field-group field-price">
-        <div class="field-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 3.5 0 00-5 0v6a3.5 3.5 0 005 0"/><line x1="12" y1="6" x2="12" y2="7"/><line x1="12" y1="17" x2="12" y2="18"/>
-          </svg>
-        </div>
-        <div class="field-inner">
-          <label class="field-label">Budget (₹)</label>
-          <div class="price-range">
-            <input
-              id="priceMin"
-              name="priceMin"
-              type="number"
-              class="field-input price-input"
-              placeholder="Min"
-              [(ngModel)]="searchParams.priceMin"
-              aria-label="Minimum price"/>
-            <span class="price-sep" aria-hidden="true">–</span>
-            <input
-              id="priceMax"
-              name="priceMax"
-              type="number"
-              class="field-input price-input"
-              placeholder="Max"
-              [(ngModel)]="searchParams.priceMax"
-              aria-label="Maximum price"/>
-          </div>
-        </div>
-      </div>
-
-      <div class="field-divider" aria-hidden="true"></div>
-
       <!-- Date -->
       <div class="field-group field-date">
         <div class="field-icon" aria-hidden="true">
@@ -204,12 +171,6 @@
           <span class="count-num">{{ treksTours.length }}</span>
           expedition{{ treksTours.length !== 1 ? 's' : '' }} found
         </p>
-        <div class="results-sort">
-          <span class="sort-label">Sort:</span>
-          <button class="sort-btn active">Popular</button>
-          <button class="sort-btn">Price ↑</button>
-          <button class="sort-btn">Newest</button>
-        </div>
       </header>
 
       <ul class="trek-grid" role="list">
@@ -218,18 +179,19 @@
             class="trek-card"
             role="listitem"
             [style.animation-delay]="(i * 0.08) + 's'"
-            (click)="onSelectTrek(trek)"
+            (click)="onSelectTrek(trek)"  
             [attr.aria-label]="trek.name">
 
             <!-- Card image / gradient -->
             <div class="card-visual">
-              <div class="card-img-bg" [style.background]="trek.coverColor ?? 'var(--grad-default)'"></div>
-
-              <!-- SVG landscape silhouette -->
-              <svg class="card-landscape" viewBox="0 0 400 120" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
-                <path [attr.d]="trek.landscapePath ?? defaultLandscape" fill="rgba(0,0,0,0.25)"/>
-              </svg>
-
+              <div class="card-img-bg"></div>
+              @if (trek.cover_image) {
+                <img
+                  class="card-img"
+                  [src]="trek.cover_image"
+                  [alt]="trek.name + ' cover image'"
+                  loading="lazy"/>
+              }
               <div class="card-badges">
                 <span class="badge-diff" [class]="'diff-' + trek.difficulty">
                   {{ diffLabel(trek.difficulty) }}
