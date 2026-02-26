@@ -1,18 +1,9 @@
-<!-- ═══════════════════════════════════════════════════════════
-     index.html <head>:
-     <link rel="preconnect" href="https://fonts.googleapis.com">
-     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700;800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
-═══════════════════════════════════════════════════════════ -->
-
 <div class="page-enter">
 
   <!-- HERO -->
   <section class="hero">
-    <img class="hero-img"
-      src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1400&q=80"
-      alt="Treks Banner"
-    />
+    <img class="hero-img" src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1400&q=80"
+      alt="Treks Banner" />
     <div class="hero-body">
       <div class="hero-breadcrumb">
         <a routerLink="">🏠 Home</a>
@@ -35,12 +26,6 @@
       <div class="divider-v"></div>
       <span class="control-month">{{ selectedMonth }} {{ selectedYear }}</span>
     </div>
-    <div class="control-right">
-      <span class="sort-label">Sort</span>
-      <select class="sort-select" [(ngModel)]="sortBy" (change)="sortTreks()" [disabled]="isLoading">
-        <option *ngFor="let opt of sortOptions" [value]="opt.value">{{ opt.label }}</option>
-      </select>
-    </div>
   </div>
 
   <!-- ERROR -->
@@ -53,9 +38,11 @@
 
   <!-- YEAR NAV -->
   <div class="year-nav">
-    <button class="year-btn" *ngIf="previousYear" (click)="changeYear('prev')" [disabled]="isLoading">← {{ previousYear }}</button>
+    <button class="year-btn" *ngIf="previousYear" (click)="changeYear('prev')" [disabled]="isLoading">← {{ previousYear
+      }}</button>
     <div class="year-current">{{ selectedYear }}</div>
-    <button class="year-btn" *ngIf="nextYear" (click)="changeYear('next')" [disabled]="isLoading">{{ nextYear }} →</button>
+    <button class="year-btn" *ngIf="nextYear" (click)="changeYear('next')" [disabled]="isLoading">{{ nextYear }}
+      →</button>
   </div>
 
   <div class="year-dropdown-wrap" *ngIf="years.length > 4">
@@ -66,13 +53,8 @@
 
   <!-- MONTH TABS -->
   <div class="month-tabs">
-    <button
-      class="month-tab"
-      *ngFor="let month of months"
-      [class.active]="selectedMonth === month"
-      (click)="selectMonth(month)"
-      [disabled]="isLoading"
-    >
+    <button class="month-tab" *ngFor="let month of months" [class.active]="selectedMonth === month"
+      (click)="selectMonth(month)" [disabled]="isLoading">
       {{ month }}
       <span class="month-count" *ngIf="getMonthCount(month) > 0">{{ getMonthCount(month) }}</span>
     </button>
@@ -105,12 +87,8 @@
       <div style="text-align:right">Price</div>
     </div>
 
-    <div
-      class="trek-row"
-      *ngFor="let trek of currentMonthTreks"
-      [class.sold-out]="trek.status === 'sold-out'"
-      (click)="viewDetails(trek.batch_id)"
-    >
+    <div class="trek-row" *ngFor="let trek of currentMonthTreks" [class.sold-out]="trek.status === 'sold-out'"
+      (click)="viewDetails(trek.batch_id)">
       <div class="col-date">
         <div class="date-main">{{ trek.date }}</div>
         <div class="date-time">{{ trek.time }}</div>
@@ -119,7 +97,8 @@
 
       <div class="col-trek">
         <div class="trek-thumb">
-          <img [src]="'http://localhost:4001/' + trek.image" [alt]="trek.name" onerror="this.src='assets/default-trek.jpg'" />
+          <img [src]="'http://localhost:4001/' + trek.image" [alt]="trek.name"
+            onerror="this.src='assets/default-trek.jpg'" />
         </div>
         <div class="trek-info-text">
           <h3>{{ trek.name }}</h3>
@@ -129,14 +108,12 @@
       </div>
 
       <div class="col-status">
-        <span class="status-badge"
-          [ngClass]="{
+        <span class="status-badge" [ngClass]="{
             'status-available': trek.status === 'available',
             'status-fast':      trek.status === 'selling-fast',
             'status-last':      trek.status === 'last-seat',
             'status-soldout':   trek.status === 'sold-out'
-          }"
-        >{{ getStatusText(trek.status) }}</span>
+          }">{{ getStatusText(trek.status) }}</span>
       </div>
 
       <div class="col-price">
@@ -144,13 +121,9 @@
           <div class="price-amount">₹{{ trek.price | number:'1.0-0' }}</div>
           <div class="price-per">Per Person</div>
         </div>
-        <button
-          class="view-btn"
-          [class.available]="trek.status !== 'sold-out'"
-          [class.soldout]="trek.status === 'sold-out'"
-          [disabled]="trek.status === 'sold-out'"
-          (click)="$event.stopPropagation(); viewDetails(trek.batch_id)"
-        >
+        <button class="view-btn" [class.available]="trek.status !== 'sold-out'"
+          [class.soldout]="trek.status === 'sold-out'" [disabled]="trek.status === 'sold-out'"
+          (click)="$event.stopPropagation(); viewDetails(trek.batch_id)">
           {{ trek.status === 'sold-out' ? 'Sold Out' : 'View' }}
           <span class="btn-arrow" *ngIf="trek.status !== 'sold-out'">→</span>
         </button>
@@ -171,7 +144,8 @@
       <div>
         <div class="cta-eyebrow">Custom Expeditions</div>
         <h2 class="cta-heading">Can't find what you're looking for?</h2>
-        <p class="cta-body">We organise tailored group treks, corporate outings, and private expeditions. Tell us where you want to go.</p>
+        <p class="cta-body">We organise tailored group treks, corporate outings, and private expeditions. Tell us where
+          you want to go.</p>
       </div>
       <a routerLink="/contact" class="cta-btn">Get in Touch <span>→</span></a>
     </div>

@@ -85,27 +85,32 @@ export class BlogComponent implements OnInit {
     });
   }
 
-  async loadCategories() {
-    this.blogService.getCategories().subscribe({
-      next: (categories) => {
-        // Map backend categories to frontend format
-        const mappedCategories = categories.map((cat:any) => ({
-          value: cat.slug || cat.name.toLowerCase().replace(/\s+/g, "-"),
-          label: cat.name,
-          icon: this.getCategoryIconByName(cat.name),
-        }));
+async loadCategories() {
+  this.blogService.getCategories().subscribe({
+    next: (response: any) => {
 
-        // Keep "All Posts" at the beginning
-        this.categories = [
-          { value: "all", label: "All Posts", icon: "apps" },
-          ...mappedCategories,
-        ];
-      },
-      error: (error) => {
-        console.error("Error loading categories:", error);
-      },
-    });
-  }
+      // Adjust this line based on your API structure
+      const categoriesArray = Array.isArray(response)
+        ? response
+        : response?.data || [];
+
+      const mappedCategories = categoriesArray.map((cat: any) => ({
+        value: cat.slug || cat.name.toLowerCase().replace(/\s+/g, "-"),
+        label: cat.name,
+        icon: this.getCategoryIconByName(cat.name),
+      }));
+
+      this.categories = [
+        { value: "all", label: "All Posts", icon: "apps" },
+        ...mappedCategories,
+      ];
+    },
+
+    error: (error) => {
+      console.error("Error loading categories:", error);
+    },
+  });
+}
 
   mapPostToBlogPost(post: any): BlogPost {
     return {

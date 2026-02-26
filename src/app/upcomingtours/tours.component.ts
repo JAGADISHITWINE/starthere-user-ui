@@ -20,7 +20,6 @@ export class ToursComponent implements OnInit {
 
   selectedYear: number = new Date().getFullYear();
   selectedMonth: string = '';
-  sortBy: string = 'newest';
 
   years: number[] = [];
   availableYears: number[] = []; // Years with actual trek data
@@ -28,15 +27,6 @@ export class ToursComponent implements OnInit {
   months = [
     'January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'
-  ];
-
-  sortOptions = [
-    { value: 'newest', label: 'Newest First' },
-    { value: 'popular', label: 'Most Popular' },
-    { value: 'price-high', label: 'Highest Price' },
-    { value: 'price-low', label: 'Lowest Price' },
-    { value: 'duration-short', label: 'Shortest First' },
-    { value: 'duration-long', label: 'Longest First' }
   ];
 
   allTreks: TrekListItem[] = [];
@@ -295,46 +285,6 @@ loadTreks() {
    */
   viewDetails(trekId: number) {
     this.router.navigate(['/tour-details', trekId]);
-  }
-
-  /**
-   * Sort treks
-   */
-  sortTreks() {
-    let sortedTreks = [...this.currentMonthTreks];
-
-    switch (this.sortBy) {
-      case 'price-low':
-        sortedTreks.sort((a, b) => a.price - b.price);
-        break;
-
-      case 'price-high':
-        sortedTreks.sort((a, b) => b.price - a.price);
-        break;
-
-      case 'duration-short':
-        sortedTreks.sort((a, b) => this.parseDuration(a.duration) - this.parseDuration(b.duration));
-        break;
-
-      case 'duration-long':
-        sortedTreks.sort((a, b) => this.parseDuration(b.duration) - this.parseDuration(a.duration));
-        break;
-
-      case 'popular':
-        // Sort by status (available last, sold-out first for reverse popularity)
-        const statusOrder = { 'sold-out': 0, 'last-seat': 1, 'selling-fast': 2, 'available': 3 };
-        sortedTreks.sort((a, b) => statusOrder[a.status] - statusOrder[b.status]);
-        break;
-
-      case 'newest':
-      default:
-        sortedTreks.sort((a, b) => {
-          return new Date(b.start_date).getTime() - new Date(a.start_date).getTime();
-        });
-        break;
-    }
-
-    this.monthTreksData[this.selectedMonth] = sortedTreks;
   }
 
   /**

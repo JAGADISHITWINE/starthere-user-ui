@@ -146,7 +146,7 @@ body {
 .sort-select {
   background: rgba(255,255,255,0.06);
   border: 1px solid rgba(255,255,255,0.1);
-  color: #f0e8d8;
+  color: #f8b42c;
   font-family: 'Outfit', sans-serif;
   font-size: 0.78rem;
   padding: 6px 28px 6px 10px;
@@ -278,7 +278,7 @@ body {
   border-bottom: 2px solid transparent;
   margin-bottom: -2px;
   padding: 14px 16px;
-  color: rgba(164,184,200,0.45);
+  color: rgb(255, 255, 255);
   font-family: 'Outfit', sans-serif;
   font-size: 0.78rem;
   font-weight: 500;
@@ -292,7 +292,7 @@ body {
   &:hover:not([disabled]) { color: #a4b8c8; }
 
   &.active {
-    color: #f0e8d8;
+    color: #f5b22d;
     border-bottom-color: #c2603a;
   }
 
