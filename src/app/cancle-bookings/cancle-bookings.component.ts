@@ -32,6 +32,7 @@ export class CancleBookingsComponent {
     'Found alternative trek',
     'Other'
   ];
+  refundedAmount: any;
 
   constructor(private bookingService: CancleBookings) { }
 
@@ -128,12 +129,12 @@ export class CancleBookingsComponent {
     this.bookingService.cancelBooking(this.booking.id, otherData).subscribe({
       next: (response: any) => {
         if (response.success) {
+          this.refundedAmount = response.data.totalRefund
           this.showSuccessScreen = true;
 
-          // Auto close after 4 seconds
           setTimeout(() => {
             this.closeModal(true);
-          }, 4000);
+          }, 1500);
         }
         this.isSubmitting = false;
       },
