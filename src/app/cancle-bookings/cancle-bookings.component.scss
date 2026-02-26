@@ -257,7 +257,6 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 60px 20px;
   text-align: center;
   animation: fadeIn 0.5s ease-out;
 }
@@ -265,7 +264,6 @@
 .success-icon {
   font-size: 80px;
   color: #28a745;
-  margin-bottom: 20px;
   animation: scaleIn 0.5s ease-out;
 }
 
@@ -284,7 +282,7 @@
 }
 
 .refund-info {
-  font-size: 24px;
+  font-size: 15px;
   color: #ffffff;
   margin-bottom: 20px;
 }
@@ -298,7 +296,7 @@
 
 .processing-info,
 .method-info {
-  color: #ffffff;
+  color: #000000;
   margin: 15px 0;
   font-size: 14px;
 }
@@ -306,7 +304,6 @@
 .closing-message {
   color: #6c757d;
   font-size: 12px;
-  margin-top: 30px;
   font-style: italic;
 }
 
