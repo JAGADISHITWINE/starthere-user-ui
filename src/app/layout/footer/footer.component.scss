@@ -30,7 +30,7 @@ a {
 
 // ==================== MAIN FOOTER ====================
 .footer-main {
-  padding: 60px 0 40px;
+  padding: 15px 0 15px;
   border-bottom: 1px solid $border-color;
 }
 
@@ -239,42 +239,6 @@ a {
     width: 16px;
     text-align: center;
     flex-shrink: 0;
-  }
-}
-
-// ==================== CTA STRIP ====================
-.footer-cta {
-  background: $mid-bg;
-  border-top: 1px solid $border-color;
-  border-bottom: 1px solid $border-color;
-}
-
-.single-cta {
-  display: flex;
-  align-items: flex-start;
-  gap: 0;
-
-  i {
-    color: $orange;
-    font-size: 28px;
-    margin-top: 4px;
-    flex-shrink: 0;
-  }
-}
-
-.cta-text {
-  padding-left: 15px;
-
-  h4 {
-    color: #fff;
-    font-size: 17px;
-    font-weight: 600;
-    margin-bottom: 3px;
-  }
-
-  span {
-    color: $text-dim;
-    font-size: 14px;
   }
 }
 

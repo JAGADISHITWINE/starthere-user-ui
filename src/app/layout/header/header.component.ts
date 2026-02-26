@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, HostListener, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { Auth } from 'src/app/core/auth';
 import { TokenService } from 'src/app/core/token.service';
@@ -12,7 +12,7 @@ import { AuthModalService } from 'src/app/auth/auth-modal.service';
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
   standalone: true,
-  imports: [IonicModule, RouterLink, CommonModule, FormsModule]
+  imports: [IonicModule, RouterLink, CommonModule, FormsModule, RouterLinkActive]
 })
 export class HeaderComponent implements OnInit {
 

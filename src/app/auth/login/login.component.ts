@@ -68,7 +68,7 @@ export class LoginComponent implements OnInit {
           localStorage.setItem('userData', JSON.stringify({ email: user.email }));
         }
 
-        this.successMessage = 'Login successful! Redirecting...';
+        this.successMessage = 'Login successful!';
         this.errorMessage = '';
 
         setTimeout(() => {

@@ -1,4 +1,24 @@
-<!-- header.component.html -->
+<!-- ── Top Contact Bar ─────────────────────────────────────────────── -->
+<div class="top-bar">
+  <div class="top-bar-inner">
+    <div class="top-bar-cta">
+      <span class="cta-item">
+        <i class="fas fa-map-marker-alt"></i>
+        <span>Bengaluru, Karnataka</span>
+      </span>
+      <span class="cta-divider"></span>
+      <a class="cta-item" href="tel:+919876543210">
+        <i class="fas fa-phone"></i>
+        <span>+91 98765 43210</span>
+      </a>
+      <span class="cta-divider"></span>
+      <a class="cta-item" href="mailto:info@karnataka-adventures.com">
+        <i class="far fa-envelope-open"></i>
+        <span>info&#64;karnataka-adventures.com</span>
+      </a>
+    </div>
+  </div>
+</div>
 
 <header class="app-header" [class.scrolled]="isScrolled">
   <div class="header-content">
@@ -6,7 +26,6 @@
     <!-- ── Logo Section ─────────────────────────────────────────────── -->
     <div class="header-left">
       <img class="logo" src="../../../assets/assets/logo.png" alt="Logo" routerLink="/" />
-
       <a class="gw-logo logo-dark" routerLink="/">
         <div class="gw-words">
           <div class="gw-top">
@@ -18,101 +37,123 @@
       </a>
     </div>
 
-    <!-- ══════════════════════════════════════════════════════════════
-         ── Right Section ──────────────────────────────────────────
-    ═══════════════════════════════════════════════════════════════ -->
-    <div class="header-right">
-      <div class="header-search" [class.expanded]="isSearchOpen">
-        <!-- Collapsed state: icon button -->
-        <button
-          class="search-icon-btn"
-          [class.hidden]="isSearchOpen"
-          aria-label="Open search"
-          title="Search treks & tours"
-          routerLink="/search">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-            <circle cx="11" cy="11" r="8"/>
-            <path d="M21 21l-4.35-4.35" stroke-linecap="round"/>
-          </svg>
-        </button>
+    <!-- ── Desktop Nav Links ─────────────────────────────────────────── -->
+    <nav class="desktop-nav">
+      <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+        <i class="bi bi-house-door"></i> Home
+      </a>
+      <a class="nav-link" routerLink="/about" routerLinkActive="active">
+        <i class="bi bi-people"></i> About Us
+      </a>
+      <a class="nav-link" routerLink="/blog" routerLinkActive="active">
+        <i class="bi bi-journal-text"></i> Blog
+      </a>
+      <a class="nav-link" routerLink="/faqs" routerLinkActive="active">
+        <i class="bi bi-chat-square-dots"></i> FAQ's
+      </a>
+      <a class="nav-link" routerLink="/cancellation" routerLinkActive="active">
+        <i class="bi bi-shield-check"></i> Cancellation
+      </a>
+      <a class="nav-link" routerLink="/termsandcondition" routerLinkActive="active">
+        <i class="bi bi-file-earmark-text"></i> T&amp;C
+      </a>
+    </nav>
+
+    <!-- ── Right Section ─────────────────────────────────────────────── -->
+<div class="header-right">
+
+  <!-- 🔐 Show Login (only if NOT logged in) -->
+  <button 
+    class="login-btn"
+    *ngIf="!isLoggedIn"
+    (click)="openLoginPanel()">
+    <i class="bi bi-person-fill"></i>
+    <span>Login</span>
+  </button>
+
+  <!-- 👤 Desktop User Dropdown (only desktop + logged in) -->
+  <div class="user-menu desktop-only" *ngIf="isLoggedIn">
+    <button
+      class="user-avatar-btn"
+      [class.show]="isUserDropdownOpen"
+      (click)="toggleUserDropdown()"
+      aria-haspopup="true"
+      [attr.aria-expanded]="isUserDropdownOpen">
+      
+      <div class="user-avatar" *ngIf="!profilePicture">
+        {{ getUserInitials() }}
       </div>
-      <!-- END SEARCH -->
 
-      <!-- LOGIN / USER MENU (unchanged) ──────────────────────────── -->
+      <img *ngIf="profilePicture" 
+           [src]="profilePicture" 
+           alt="Profile" 
+           class="user-avatar-img"/>
 
-      <!-- Logged Out → Login button -->
-      <button class="login-btn" *ngIf="!isLoggedIn" (click)="openLoginPanel()">
-        <i class="bi bi-person-fill"></i>
-        <span>Login</span>
-      </button>
+      <span class="user-name">{{ userName }}</span>
+      <i class="bi bi-chevron-down"></i>
+    </button>
 
-      <!-- Logged In → User Menu -->
-      <div class="user-menu" *ngIf="isLoggedIn">
-        <button
-          class="user-avatar-btn"
-          [class.show]="isUserDropdownOpen"
-          (click)="toggleUserDropdown()"
-          aria-haspopup="true"
-          [attr.aria-expanded]="isUserDropdownOpen">
-          <div class="user-avatar" *ngIf="!profilePicture">{{ getUserInitials() }}</div>
-          <img *ngIf="profilePicture" [src]="profilePicture" alt="Profile" class="user-avatar-img"/>
-          <span class="user-name">{{ userName }}</span>
-          <i class="bi bi-chevron-down"></i>
-        </button>
+    <div class="user-dropdown"
+         [class.show]="isUserDropdownOpen"
+         (clickOutside)="closeUserDropdown()">
+         
+      <a class="dropdown-item" (click)="navigateTo('/my-bookings')">
+        <i class="bi bi-calendar-check"></i> My Bookings
+      </a>
 
-        <!-- Dropdown -->
-        <div class="user-dropdown" [class.show]="isUserDropdownOpen" (clickOutside)="closeUserDropdown()">
-          <div class="dropdown-header">
-            <div class="user-avatar-large" *ngIf="!profilePicture">{{ getUserInitials() }}</div>
-            <img *ngIf="profilePicture" [src]="profilePicture" alt="Profile" class="user-avatar-img-large"/>
-            <div class="user-info">
-              <div class="user-name-large">{{ userName }}</div>
-              <div class="user-email">{{ userEmail }}</div>
-            </div>
-          </div>
-
-          <div class="dropdown-divider"></div>
-
-          <a class="dropdown-item" (click)="navigateTo('/my-bookings')">
-            <i class="bi bi-calendar-check"></i>
-            My Bookings
-          </a>
-
-          <div class="dropdown-divider"></div>
-
-          <a class="dropdown-item text-danger" (click)="logout()">
-            <i class="bi bi-box-arrow-right"></i>
-            Logout
-          </a>
-        </div>
-      </div>
-      <!-- END ③ USER MENU -->
-
+      <a class="dropdown-item text-danger" (click)="logout()">
+        <i class="bi bi-box-arrow-right"></i> Logout
+      </a>
     </div>
-    <!-- END header-right -->
+  </div>
+
+  <!-- 📱 Mobile Hamburger (only if logged in) -->
+  <button 
+    class="mobile-menu-btn mobile-only"
+    *ngIf="isLoggedIn"
+    (click)="isMobileMenuOpen = true"
+    aria-label="Open menu">
+    <i class="bi bi-list"></i>
+  </button>
+
+</div>
 
   </div>
 
-  <!-- ── Mobile Nav (unchanged, search added inside) ──────────────── -->
+  <!-- ── Mobile Drawer ─────────────────────────────────────────────── -->
   <div class="mobile-overlay" [class.show]="isMobileMenuOpen" (click)="closeMobileMenu()"></div>
 
   <nav class="mobile-nav" [class.show]="isMobileMenuOpen">
     <div class="mobile-nav-content">
 
-      <!-- Mobile search at top of drawer -->
-      <div class="mobile-search-row">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mobile-search-icon">
-          <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35" stroke-linecap="round"/>
-        </svg>
-        <input
-          class="mobile-search-input"
-          type="text"
-          placeholder="Search treks & tours…"
-          [(ngModel)]="searchQuery"
-          aria-label="Search"/>
+      <!-- Close btn -->
+      <button class="mobile-close-btn" (click)="closeMobileMenu()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+
+      <!-- Nav links -->
+      <div class="mobile-nav-links">
+        <a class="mobile-nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}" (click)="closeMobileMenu()">
+          <i class="bi bi-house-door"></i> Home
+        </a>
+        <a class="mobile-nav-link" routerLink="/about" routerLinkActive="active" (click)="closeMobileMenu()">
+          <i class="bi bi-people"></i> About Us
+        </a>
+        <a class="mobile-nav-link" routerLink="/blog" routerLinkActive="active" (click)="closeMobileMenu()">
+          <i class="bi bi-journal-text"></i> Blog
+        </a>
+        <a class="mobile-nav-link" routerLink="/faqs" routerLinkActive="active" (click)="closeMobileMenu()">
+          <i class="bi bi-chat-square-dots"></i> FAQ's
+        </a>
+        <a class="mobile-nav-link" routerLink="/cancellation" routerLinkActive="active" (click)="closeMobileMenu()">
+          <i class="bi bi-shield-check"></i> Cancellation
+        </a>
+        <a class="mobile-nav-link" routerLink="/termsandcondition" routerLinkActive="active" (click)="closeMobileMenu()">
+          <i class="bi bi-file-earmark-text"></i> Terms & Conditions
+        </a>
       </div>
 
-      <!-- Logged-in user section -->
+      <!-- Logged-in user -->
       <div class="mobile-user-section" *ngIf="isLoggedIn">
         <div class="mobile-user-avatar" *ngIf="!profilePicture">{{ getUserInitials() }}</div>
         <img *ngIf="profilePicture" [src]="profilePicture" alt="Profile" class="mobile-user-avatar-img"/>
@@ -122,22 +163,37 @@
         </div>
       </div>
 
-      <!-- Logged-in actions -->
       <div class="mobile-user-actions" *ngIf="isLoggedIn">
+        <a class="mobile-nav-link" (click)="navigateTo('/my-bookings'); closeMobileMenu()">
+          <i class="bi bi-calendar-check"></i> My Bookings
+        </a>
         <a class="mobile-nav-link text-danger" (click)="logout(); closeMobileMenu()">
           <i class="bi bi-box-arrow-right"></i> Logout
         </a>
       </div>
 
-      <!-- Logged-out login -->
       <div class="mobile-login-section" *ngIf="!isLoggedIn">
         <button class="mobile-login-btn" (click)="openLoginPanel(); closeMobileMenu()">
-          <i class="bi bi-person-fill"></i>
-          Login to Your Account
+          <i class="bi bi-person-fill"></i> Login to Your Account
         </button>
+      </div>
+
+      <!-- Mobile contact info -->
+      <div class="mobile-contact-strip">
+        <a class="mob-cta" href="tel:+919876543210">
+          <i class="fas fa-phone"></i>
+          <span>+91 98765 43210</span>
+        </a>
+        <a class="mob-cta" href="mailto:info@karnataka-adventures.com">
+          <i class="far fa-envelope-open"></i>
+          <span>info&#64;karnataka-adventures.com</span>
+        </a>
+        <span class="mob-cta">
+          <i class="fas fa-map-marker-alt"></i>
+          <span>Bengaluru, Karnataka</span>
+        </span>
       </div>
 
     </div>
   </nav>
-
 </header>
