@@ -1,39 +1,73 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { BackBlockService } from './core/back-block.service';
-import { Sessionexpired } from './auth/sessionexpired/sessionexpired';
 
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss'],
-  standalone: false, // ← keeps AppModule in charge of imports/declarations
+  standalone: false,
 })
-export class AppComponent {
-  sessionExpired = false;
+export class AppComponent implements OnDestroy {
 
-  private sessionSub?: Subscription;
+  showScrollTop = false;
 
-   constructor(private router: Router, private _backBlock: BackBlockService) {
-    this.router.events
+  private routerSub?: Subscription;
+  private scrollListener: any;
+
+  constructor(
+    private router: Router,
+    private _backBlock: BackBlockService
+  ) {
+
+    // 🔄 Listen to route change
+    this.routerSub = this.router.events
       .pipe(filter((e: any): e is NavigationEnd => e instanceof NavigationEnd))
       .subscribe(() => {
-        try {
-          window.scrollTo(0, 0);
-          const ionContents = document.querySelectorAll('ion-content');
-          ionContents.forEach((c: any) => {
-            try {
-              if (typeof c.scrollToTop === 'function') {
-                c.scrollToTop(0);
-              } else {
-                c.scrollTop = 0;
-              }
-            } catch (e) { /* ignore */ }
-          });
-        } catch (err) { /* no-op in non-browser environments */ }
+
+        setTimeout(() => {
+          const ionContent = document.querySelector('ion-content') as any;
+
+          if (!ionContent) return;
+
+          // 🔼 Reset scroll on page change
+          if (typeof ionContent.scrollToTop === 'function') {
+            ionContent.scrollToTop(0);
+          }
+
+          // 🧹 Remove previous listener if exists
+          if (this.scrollListener) {
+            ionContent.removeEventListener('ionScroll', this.scrollListener);
+          }
+
+          // 👀 Add scroll listener
+          this.scrollListener = (event: any) => {
+            const scrollTop = event.detail.scrollTop;
+            this.showScrollTop = scrollTop > 300;
+          };
+
+          ionContent.addEventListener('ionScroll', this.scrollListener);
+
+          // ⚠️ IMPORTANT: Enable scroll events
+          ionContent.scrollEvents = true;
+
+        }, 150);
+
       });
   }
 
+  // 🔼 Smooth scroll to top
+  scrollToTop() {
+    const ionContent = document.querySelector('ion-content') as any;
+
+    if (ionContent && typeof ionContent.scrollToTop === 'function') {
+      ionContent.scrollToTop(500);
+    }
+  }
+
+  ngOnDestroy() {
+    this.routerSub?.unsubscribe();
+  }
 }

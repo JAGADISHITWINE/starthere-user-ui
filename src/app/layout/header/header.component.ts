@@ -28,7 +28,7 @@ export class HeaderComponent implements OnInit {
   userEmail = '';
   profilePicture: string | null = null;
   isSearchOpen = false;
-  searchQuery  = '';
+  searchQuery = '';
 
   isScrolled = false;
 
@@ -38,7 +38,7 @@ export class HeaderComponent implements OnInit {
     private authService: Auth,
     private authModal: AuthModalService,
     private tokenService: TokenService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.authService.authStatus$.subscribe(isLoggedIn => {
@@ -73,9 +73,9 @@ export class HeaderComponent implements OnInit {
     this.closeUserDropdown();
     this.closeMobileMenu();
 
-    setTimeout(()=>{
-          this.routes.navigateByUrl('/');
-    },500)
+    setTimeout(() => {
+      this.routes.navigateByUrl('/');
+    }, 500)
   }
 
   /* ---------------- USER UI ---------------- */
@@ -124,9 +124,10 @@ export class HeaderComponent implements OnInit {
     this.isLoggedIn = false;
   }
 
+
   @HostListener('window:scroll')
-  onWindowScroll() {
-    this.isScrolled = window.scrollY > 20;
+  onScroll() {
+    this.isScrolled = window.scrollY > 60;
   }
 }
 
