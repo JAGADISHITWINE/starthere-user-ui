@@ -82,3 +82,39 @@
   min-width: 26px;
   text-align: right;
 }
+
+@media (max-width: 480px) {
+  .session-icon {
+    width: 52px;
+    height: 52px;
+
+    svg {
+      width: 22px;
+      height: 22px;
+    }
+  }
+
+  .logo-section img {
+    max-width: 96px;
+  }
+
+  .session-subtitle {
+    font-size: 13px;
+  }
+
+  .countdown-row {
+    flex-wrap: wrap;
+    row-gap: 6px;
+  }
+}
+
+@media (max-width: 360px) {
+  .session-subtitle {
+    font-size: 12.5px;
+  }
+
+  .countdown-text,
+  .countdown-num {
+    font-size: 12px;
+  }
+}

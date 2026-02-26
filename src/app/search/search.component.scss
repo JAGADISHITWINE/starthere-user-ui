@@ -729,8 +729,21 @@ select.field-input {
 
   .results-header { flex-direction: column; align-items: flex-start; }
 
+  .results-sort { flex-wrap: wrap; }
+
   .sort-btn { display: none; }
   .sort-btn.active { display: block; }
 
   .price-input { width: 60px; }
+}
+
+@media (max-width: 480px) {
+  .search-btn { width: 100%; }
+
+  .state-error {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .error-retry { margin-left: 0; }
 }

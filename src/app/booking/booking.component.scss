@@ -949,8 +949,29 @@ label {
   .form-row.three { grid-template-columns: 1fr; }
 }
 
+@media (max-width: 600px) {
+  .bottom-bar {
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .bar-price {
+    width: 100%;
+    order: -1;
+    text-align: left;
+  }
+
+  .btn-back,
+  .btn-next {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
 .error {
   color: #dc2626;
   font-size: 0.8rem;
   margin-top: 4px;
 }
+

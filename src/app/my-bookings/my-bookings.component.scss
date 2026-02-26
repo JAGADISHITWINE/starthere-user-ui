@@ -754,8 +754,46 @@ body {
 }
 
 @media (max-width: 500px) {
+  .nav {
+    height: auto;
+    padding: 8px 4vw;
+    gap: 10px;
+  }
+
+  .nav-title { display: none; }
+
+  .hero-header { padding: 28px 4vw 0; }
+
+  .hero-title { margin-bottom: 24px; }
+
+  .stat-cell {
+    padding: 18px 0 16px;
+    &:not(:first-child) { padding-left: 20px; }
+  }
+
+  .main-content { padding: 24px 4vw 64px; }
+
+  .card-image-strip { height: 160px; }
+
+  .image-overlay { padding: 12px 14px; }
+
+  .badge-stack { gap: 4px; }
+
+  .card-body { padding: 16px 14px 0; }
+
+  .trek-name { font-size: 1.1rem; }
+
+  .card-actions { padding: 12px 14px; }
+
   .info-grid { grid-template-columns: 1fr; }
   .payment-strip { flex-direction: column; }
   .pay-cell { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.6); &:last-child { border-bottom: none; } }
   .card-actions { flex-direction: column; .action-btn { width: 100%; justify-content: center; } .pay-btn { margin-left: 0; } }
+}
+
+@media (max-width: 360px) {
+  .nav-back { padding: 6px 10px; font-size: 0.65rem; }
+  .nav-avatar { width: 30px; height: 30px; }
+  .stat-val { font-size: 1.4rem; }
+  .action-btn { font-size: 0.65rem; }
 }

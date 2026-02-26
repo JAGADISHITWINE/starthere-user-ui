@@ -932,7 +932,26 @@
   .td-facts-strip  .td-fact { padding: 14px 16px; min-width: 110px; }
   .td-content-wrap { padding-left: 12px; padding-right: 12px; }
   .td-card         { padding: 18px 16px; border-radius: 14px; }
-  .td-booking-bar-inner { padding: 10px 16px; }
-  .td-book-btn     { padding: 12px 20px; }
+  .td-booking-bar-inner { padding: 10px 16px; flex-wrap: wrap; }
+  .td-price-block { width: 100%; }
+  .td-book-btn     { padding: 12px 20px; width: 100%; justify-content: center; }
+  .td-sold-out     { width: 100%; justify-content: center; }
   .td-price-val    { font-size: 22px; }
 }
+
+@media (max-width: 480px) {
+  .td-topbar-title { display: none; }
+  .td-topbar-spacer { width: 0; }
+
+  .td-hero-badges { flex-wrap: wrap; }
+  .td-hero-meta { gap: 8px; }
+  .td-meta-sep { display: none; }
+  .td-meta-item { font-size: 12px; }
+
+  .td-tab-bar { gap: 6px; padding: 12px 0 8px; }
+  .td-tab { font-size: 11px; padding: 6px 10px; }
+
+  .td-facts-inner { padding: 0 8px; }
+  .td-fact { min-width: 100px; }
+}
+

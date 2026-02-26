@@ -1,0 +1,135 @@
+:host {
+  display: block;
+  background: #f8faf8;
+}
+
+.px-3 {
+  padding: clamp(16px, 4vw, 32px);
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+ion-header {
+  --background: #ffffff;
+  border-bottom: 1px solid #eef2ee;
+}
+
+.faqs-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: clamp(12px, 3vw, 24px) 0 clamp(16px, 4vw, 28px);
+
+  ion-icon {
+    font-size: clamp(28px, 5vw, 42px);
+    color: #2f6f47;
+    margin-bottom: 10px;
+  }
+
+  h1 {
+    font-size: clamp(22px, 4.5vw, 34px);
+    margin: 0 0 6px;
+    color: #1b2a1f;
+  }
+
+  p {
+    margin: 0;
+    color: #6b7a6d;
+    font-size: clamp(13px, 2.6vw, 16px);
+  }
+}
+
+.filter-section {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #f8faf8;
+  padding: 8px 0 12px;
+}
+
+ion-segment {
+  --background: #ffffff;
+  border: 1px solid #e5ebe5;
+  border-radius: 12px;
+  padding: 6px;
+}
+
+.faqs-list {
+  display: grid;
+  gap: 14px;
+  padding-bottom: 12px;
+}
+
+.faq-card {
+  border-radius: 14px;
+  box-shadow: 0 8px 20px rgba(36, 52, 41, 0.06);
+
+  ion-item {
+    --background: #ffffff;
+    --border-radius: 14px;
+  }
+
+  h3 {
+    font-size: clamp(15px, 2.8vw, 18px);
+    color: #1b2a1f;
+  }
+}
+
+.answer {
+  font-size: clamp(13px, 2.6vw, 15px);
+  color: #4c5a4e;
+  line-height: 1.65;
+}
+
+.no-results {
+  text-align: center;
+  padding: 40px 12px;
+
+  ion-icon {
+    font-size: 40px;
+    color: #99a29a;
+    margin-bottom: 8px;
+  }
+
+  h3 {
+    margin: 0 0 6px;
+    font-size: 18px;
+    color: #1b2a1f;
+  }
+
+  p {
+    margin: 0;
+    color: #6b7a6d;
+  }
+}
+
+.contact-cta {
+  padding: 10px 0 28px;
+
+  ion-card {
+    border-radius: 16px;
+    background: #ffffff;
+  }
+
+  h2 {
+    font-size: clamp(18px, 3.8vw, 24px);
+    margin: 0 0 8px;
+  }
+
+  p {
+    margin: 0 0 16px;
+    color: #5b695d;
+  }
+}
+
+@media (max-width: 600px) {
+  .faqs-header {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .filter-section {
+    padding: 6px 0 10px;
+  }
+}

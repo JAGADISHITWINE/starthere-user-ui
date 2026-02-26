@@ -308,3 +308,53 @@
     }
   }
 }
+
+@media (max-width: 600px) {
+  .article-header {
+    padding: 24px 16px;
+  }
+
+  .article-meta {
+    padding: 16px 0;
+  }
+
+  .author-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+
+    .author-avatar {
+      width: 52px;
+      height: 52px;
+    }
+  }
+
+  .article-content {
+    padding: 0 16px 32px;
+    font-size: 1rem;
+  }
+
+  .article-tags,
+  .author-card,
+  .comments-section,
+  .related-posts {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .author-card .author-card-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 400px) {
+  .comment-actions {
+    flex-wrap: wrap;
+  }
+
+  .article-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

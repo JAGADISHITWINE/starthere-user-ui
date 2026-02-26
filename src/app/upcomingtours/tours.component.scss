@@ -734,3 +734,49 @@ body {
 
   @media (max-width: 640px) { width: 100%; justify-content: center; }
 }
+
+@media (max-width: 900px) {
+  .hero-body { padding: 0 4vw 32px; }
+
+  .control-bar {
+    flex-wrap: wrap;
+    padding: 6px 4vw;
+  }
+
+  .control-left,
+  .control-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .year-nav {
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 16px 4vw;
+  }
+
+  .year-current { font-size: 1.3rem; }
+
+  .content { padding: 0 4vw 64px; }
+
+  .month-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+}
+
+@media (max-width: 600px) {
+  .hero { height: 280px; }
+  .hero-body { padding: 0 4vw 28px; }
+
+  .control-left { flex-wrap: wrap; gap: 10px; }
+  .control-right { flex-wrap: wrap; justify-content: flex-start; }
+  .sort-label { display: none; }
+  .sort-select { width: 100%; }
+
+  .year-current { font-size: 1.1rem; }
+  .year-btn { padding: 7px 14px; }
+
+  .bottom-cta { margin: 0 auto 60px; padding: 0 4vw; }
+}

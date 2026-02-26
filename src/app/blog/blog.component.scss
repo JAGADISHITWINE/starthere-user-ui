@@ -874,5 +874,29 @@ body {
 }
 
 @media (max-width: 480px) {
+  .top-bar {
+    height: auto;
+    padding: 8px 4vw;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .top-bar-left,
+  .top-bar-right {
+    gap: 10px;
+  }
+
+  .top-divider {
+    display: none;
+  }
+
+  .hero-text {
+    padding: 40px 4vw;
+  }
+
+  .ar-body {
+    padding: 16px 16px 18px 4vw;
+  }
+
   .featured-strip  { grid-template-columns: 1fr; }
 }

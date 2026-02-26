@@ -217,6 +217,41 @@
   }
 }
 
+@media (max-width: 600px) {
+  .cancel-modal-content {
+    max-height: 75vh;
+    padding: 16px;
+  }
+
+  .modal-actions {
+    margin: 0 -16px -16px -16px;
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .booking-summary-card,
+  .refund-card,
+  .policy-card,
+  .reason-card,
+  .terms-card {
+    padding: 1.2rem;
+  }
+
+  .success-details {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 400px) {
+  .success-icon {
+    font-size: 64px;
+  }
+
+  .success-screen h2 {
+    font-size: 22px;
+  }
+}
+
 .success-screen {
   display: flex;
   flex-direction: column;
