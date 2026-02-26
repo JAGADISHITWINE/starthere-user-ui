@@ -405,79 +405,94 @@ export class BookingComponent implements OnInit {
     this.initializeParticipants();
   }
 
-  decrementParticipants() {
-    if (this.booking.participants > 1) this.booking.participants--;
+decrementParticipants() {
+  if (this.booking.participants > 1) {
+    this.booking.participants--;
+    this.initializeParticipants();  // ← add this
   }
+}
 
-  incrementParticipants() {
-    if (this.booking.participants < this.selectedBatch.availableSlots) this.booking.participants++;
+incrementParticipants() {
+  if (this.booking.participants < this.selectedBatch.availableSlots) {
+    this.booking.participants++;
+    this.initializeParticipants();  // ← add this
   }
+}
 
 validateId(participant: Participant) {
-
   participant.idError = '';
   if (!participant.idType || !participant.idNumber) return;
 
-  const rawValue = participant.idNumber.replace(/\s/g, '');
+  const raw = participant.idNumber.replace(/\s/g, '');
 
   switch (participant.idType) {
-
-    case 'aadhaar':
-      if (!/^\d{12}$/.test(rawValue)) {
-        participant.idError = 'Aadhaar must be 12 digits';
-      }
+    case 'Aadhar':
+      if (!/^\d{12}$/.test(raw))
+        participant.idError = 'Aadhaar must be exactly 12 digits';
       break;
 
-    case 'pan':
-      if (!/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(rawValue)) {
-        participant.idError = 'Invalid PAN format (ABCDE1234F)';
-      }
+    case 'PAN':
+      if (!/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(raw))
+        participant.idError = 'Invalid PAN format (e.g. ABCDE1234F)';
       break;
 
-    case 'passport':
-      if (!/^[A-Z][0-9]{7}$/.test(rawValue)) {
-        participant.idError = 'Invalid Passport format (A1234567)';
-      }
+    case 'Passport':
+      if (!/^[A-Z][0-9]{7}$/.test(raw))
+        participant.idError = 'Invalid Passport format (e.g. A1234567)';
       break;
 
-    case 'driving':
-      if (rawValue.length < 10) {
-        participant.idError = 'Invalid Driving License number';
-      }
+    case 'Driving License':
+      if (raw.length < 10)
+        participant.idError = 'Driving License must be at least 10 characters';
+      break;
+
+    case 'Voter ID':
+      if (!/^[A-Z]{3}[0-9]{7}$/.test(raw))
+        participant.idError = 'Invalid Voter ID format (e.g. ABC1234567)';
       break;
   }
 }
 
 formatIdInput(participant: Participant) {
-
   if (!participant.idType) return;
-
   let value = participant.idNumber || '';
 
   switch (participant.idType) {
-
-    case 'pan':
-      participant.idNumber = value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-      break;
-
-    case 'aadhaar':
-      // Remove non-digits
-      let digits = value.replace(/\D/g, '').substring(0, 12);
-
-      // Add spaces every 4 digits
+    case 'Aadhar':
+      // Keep only digits, max 12, format as XXXX XXXX XXXX
+      const digits = value.replace(/\D/g, '').substring(0, 12);
       participant.idNumber = digits.replace(/(\d{4})(?=\d)/g, '$1 ');
       break;
 
-    case 'passport':
+    case 'PAN':
+      participant.idNumber = value.toUpperCase().replace(/[^A-Z0-9]/g, '').substring(0, 10);
+      break;
+
+    case 'Passport':
       participant.idNumber = value.toUpperCase().replace(/[^A-Z0-9]/g, '').substring(0, 8);
       break;
 
-    case 'driving':
+    case 'Driving License':
       participant.idNumber = value.toUpperCase().replace(/[^A-Z0-9]/g, '').substring(0, 15);
+      break;
+
+    case 'Voter ID':
+      participant.idNumber = value.toUpperCase().replace(/[^A-Z0-9]/g, '').substring(0, 10);
       break;
   }
 
   this.validateId(participant);
+}
+
+getIdMaxLength(idType: string): number {
+  switch (idType) {
+    case 'Aadhar':          return 14; // 12 digits + 2 spaces
+    case 'PAN':             return 10;
+    case 'Passport':        return 8;
+    case 'Driving License': return 15;
+    case 'Voter ID':        return 10;
+    default:                return 20;
+  }
 }
 
 validateAge(participant: Participant) {
@@ -491,13 +506,4 @@ validateAge(participant: Participant) {
   }
 }
 
-getIdMaxLength(idType: string): number {
-  switch (idType) {
-    case 'aadhaar': return 14; // 12 digits + 2 spaces
-    case 'pan': return 10;
-    case 'passport': return 8;
-    case 'driving': return 15;
-    default: return 20;
-  }
-}
 }

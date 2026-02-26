@@ -280,7 +280,7 @@
             <div class="field">
               <label>ID Proof Type <span class="req">*</span></label>
               <select class="form-select" [(ngModel)]="participant.idType"
-                (change)="participant.idNumber=''; validateId(participant)">
+              (change)="participant.idNumber=''; participant.idError=''; validateId(participant)">
                 <option value="">Select ID</option>
                 <option value="Aadhar">Aadhar Card</option>
                 <option value="PAN">PAN Card</option>
