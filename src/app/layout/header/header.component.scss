@@ -71,7 +71,7 @@
   display: flex;
   align-items: center;
   gap: 7px;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgb(255, 255, 255);
   text-decoration: none;
   padding: 0 20px;
   transition: color 0.2s;
@@ -83,7 +83,7 @@
   }
 
   &:hover {
-    color: rgba(255, 255, 255, 0.9);
+    color: rgb(255, 187, 0);
   }
 }
 
@@ -163,12 +163,12 @@
 
 /* ─── Inner Layout ───────────────────────────────────────────────────── */
 .header-content {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.65rem 1.5rem;
-  margin: 0 auto;
-  gap: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.1rem 0.1rem 0.1rem;
+    margin: 0 auto;
+    gap: 0.1rem;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -183,8 +183,6 @@
   flex-shrink: 0;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.05);
   border-radius: 12px;
   padding: 5px 14px 5px 8px;
   transition:
@@ -384,8 +382,7 @@
     }
 
     &.active {
-      color: #ffffff;
-      background: rgb(14 14 14 / 42%);
+      color: #000000;
       font-weight: 600;
       text-shadow: none;
 
