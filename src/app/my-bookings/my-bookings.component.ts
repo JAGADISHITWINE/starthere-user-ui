@@ -3,7 +3,7 @@ import { Component, OnInit } from "@angular/core";
 import { IonicModule } from "@ionic/angular";
 import { Router, RouterLink } from "@angular/router";
 import { FormsModule } from "@angular/forms";
-import { Auth } from "../core/auth";
+import { Location } from '@angular/common';
 import { MyBookings } from "./my-bookings";
 import { AuthModalService } from "../auth/auth-modal.service";
 import { TokenService } from 'src/app/core/token.service';
@@ -66,7 +66,8 @@ export class MyBookingsComponent implements OnInit {
     private bookingService: MyBookings,
     private authModal: AuthModalService,
     private router: Router,
-  private tokenService: TokenService,
+    private tokenService: TokenService,
+    private location: Location
   ) { }
 
   ngOnInit() {
@@ -377,5 +378,14 @@ export class MyBookingsComponent implements OnInit {
           this.ratingErrorMessage = "Could not submit rating. Please try again.";
         },
       });
+  }
+
+
+  goBack() {
+    if (window.history.length > 1) {
+      this.location.back();
+    } else {
+      this.router.navigate(['/']);
+    }
   }
 }

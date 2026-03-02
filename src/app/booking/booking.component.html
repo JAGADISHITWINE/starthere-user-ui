@@ -265,7 +265,7 @@
             <div class="field">
               <label>Age <span class="req">*</span></label>
               <input class="form-input" type="number" [(ngModel)]="participant.age" placeholder="e.g. 28"
-                (input)="validateAge(participant)" min="18" max="100" />
+                (input)="validateAge(participant)" min="12" max="100" />
               <div class="error" *ngIf="participant.ageError">{{ participant.ageError }}</div>
             </div>
             <div class="field">

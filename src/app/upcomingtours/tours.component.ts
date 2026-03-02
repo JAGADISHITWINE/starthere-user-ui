@@ -6,7 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { TrekListItem, Upcomingtours } from './upcomingtours';
-import { takeUntil } from 'rxjs';
+import { Location } from '@angular/common';
 
 
 @Component({
@@ -36,7 +36,8 @@ export class ToursComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private trekService: Upcomingtours
+    private trekService: Upcomingtours,
+     private location: Location
   ) { }
 
   ngOnInit() {
@@ -312,4 +313,12 @@ loadTreks() {
   getMonthCount(month: string): number {
     return this.monthTreksData[month]?.length || 0;
   }
+
+  goBack() {
+  if (window.history.length > 1) {
+    this.location.back();
+  } else {
+    this.router.navigate(['/']);
+  }
+}
 }

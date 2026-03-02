@@ -4,6 +4,7 @@ import { IonicModule, LoadingController } from "@ionic/angular";
 import { FormsModule } from "@angular/forms";
 import { Router } from "@angular/router";
 import { Blog } from "./blog";
+import { Location } from '@angular/common';
 
 interface BlogPost {
   id: number;
@@ -54,6 +55,7 @@ export class BlogComponent implements OnInit {
     private router: Router,
     private blogService: Blog,
     private loadingController: LoadingController,
+    private location: Location
   ) {}
 
   ngOnInit() {
@@ -278,4 +280,13 @@ async loadCategories() {
   createPost() {
     this.router.navigate(["/blog-post"]);
   }
+
+
+goBack() {
+  if (window.history.length > 1) {
+    this.location.back();
+  } else {
+    this.router.navigate(['/']);
+  }
+}
 }

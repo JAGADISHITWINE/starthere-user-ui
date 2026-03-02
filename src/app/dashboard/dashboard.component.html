@@ -47,23 +47,19 @@
 
   <!-- ── FILTERS ───────────────────────────────────────────── -->
   <section class="filter-section">
-    <button
-      *ngFor="let filter of filters"
-      (click)="setFilter(filter.id)"
-      [class.active]="selectedFilter === filter.id"
-    >
+    <button *ngFor="let filter of filters" (click)="setFilter(filter.id)" [class.active]="selectedFilter === filter.id">
       {{ filter.label }}
     </button>
   </section>
 
   <!-- ── CONTENT HEADER ────────────────────────────────────── -->
-  <div class="content-header" *ngIf="filteredTreks?.length">
+  <div class="content-header" *ngIf="filteredTreks.length">
     <h2 class="content-title">Upcoming <span>Treks</span></h2>
-    <span class="content-meta">{{ filteredTreks?.length }} expeditions available</span>
+    <span class="content-meta">{{ filteredTreks.length }} expeditions available</span>
   </div>
 
   <!-- ── TREK GRID ──────────────────────────────────────────── -->
-  <section class="trek-grid" *ngIf="filteredTreks?.length">
+  <section class="trek-grid" *ngIf="filteredTreks.length">
 
     <div class="trek-card" *ngFor="let trek of filteredTreks">
 
@@ -115,6 +111,18 @@
 
   </section>
 
+  <!-- ── LOAD MORE ─────────────────────────────────────────── -->
+  <!-- ── VIEW ALL ──────────────────────────────────────────── -->
+  <div class="load-more-wrapper" *ngIf="!showAll && filteredTreks.length && totalFilteredCount > this.visibleCount">
+    <div class="load-more-meta">
+      Showing {{ filteredTreks.length }} of {{ totalFilteredCount }} treks
+    </div>
+    <button class="load-more-btn" (click)="viewAll()">
+      <span class="load-more-label">View All Treks</span>
+      <span class="load-more-icon">↓</span>
+    </button>
+  </div>
+
 </div>
 <!-- /page-wrapper -->
 
@@ -128,10 +136,7 @@
 
 
 <!-- ══ EMPTY STATE ═══════════════════════════════════════════ -->
-<div
-  *ngIf="!isLoading && (!filteredTreks || !filteredTreks.length)"
-  class="empty-state"
->
+<div *ngIf="!isLoading && (!filteredTreks || !filteredTreks.length)" class="empty-state">
   <h3>No Treks Found</h3>
   <p>Try adjusting your filters.</p>
 </div>

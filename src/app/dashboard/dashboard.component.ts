@@ -25,6 +25,8 @@ export class DashboardComponent implements OnInit {
   selectedFilter: string = 'all';
   isLoading = false;
   errorMessage = '';
+  showAll: boolean = false;
+  visibleCount = 4;
 
   filters: Filter[] = [
     { id: 'all', label: 'All Treks' },
@@ -107,18 +109,38 @@ export class DashboardComponent implements OnInit {
   }
 
 
-  get filteredTreks() :void | any{
-    if (this.selectedFilter === 'all') {
-      return this.treks;
-    }
-    return this.treks.filter((trek: any) =>
-      trek.difficulty.toLowerCase() === this.selectedFilter
-    );
-  }
 
-  setFilter(filterId: string): void {
-    this.selectedFilter = filterId;
-  }
+get filteredTreks(): any[] {
+  const list = this.selectedFilter === 'all'
+    ? this.treks
+    : this.treks.filter((trek: any) =>
+        trek.difficulty.toLowerCase() === this.selectedFilter
+      );
+  return this.showAll ? list : list.slice(0, this.visibleCount);
+}
+
+get totalFilteredCount(): number {
+  if (this.selectedFilter === 'all') return this.treks.length;
+  return this.treks.filter((trek: any) =>
+    trek.difficulty.toLowerCase() === this.selectedFilter
+  ).length;
+}
+
+setFilter(filterId: string): void {
+  this.selectedFilter = filterId;
+  this.showAll = false; // reset on filter change
+}
+
+viewAll(): void {
+  this.showAll = true;
+  // Scroll to top of trek grid after render
+  setTimeout(() => {
+    const grid = document.querySelector('.content-header');
+    if (grid) {
+      grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, 50);
+}
 
   getDifficultyColor(difficulty: string): string {
     switch (difficulty.toLowerCase()) {

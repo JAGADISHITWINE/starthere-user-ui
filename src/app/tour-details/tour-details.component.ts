@@ -5,6 +5,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { TourDetails } from './tour-details';
 import { AuthModalService } from '../auth/auth-modal.service';
+import { Location } from '@angular/common';
 
 
 interface Activity {
@@ -96,7 +97,8 @@ export class TourDetailsComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private tourDetailsService: TourDetails,
-    private authModal: AuthModalService
+    private authModal: AuthModalService,
+    private location: Location
 
   ) { }
 
@@ -260,5 +262,13 @@ export class TourDetailsComponent implements OnInit {
       this.openDay = day; // Open the selected day
     }
   }
+
+goBack() {
+  if (window.history.length > 1) {
+    this.location.back();
+  } else {
+    this.router.navigate(['/']);
+  }
+}
 
 }
