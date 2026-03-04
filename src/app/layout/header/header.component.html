@@ -2,20 +2,19 @@
 <div class="top-bar">
   <div class="top-bar-inner">
     <div class="top-bar-cta">
-      <span class="cta-item">
-        <i class="fas fa-map-marker-alt"></i>
-        <span>Bengaluru, Karnataka</span>
-      </span>
-      <span class="cta-divider"></span>
-      <a class="cta-item" href="tel:+919876543210">
-        <i class="fas fa-phone"></i>
-        <span>+91 98765 43210</span>
-      </a>
-      <span class="cta-divider"></span>
-      <a class="cta-item" href="mailto:info@karnataka-adventures.com">
-        <i class="far fa-envelope-open"></i>
-        <span>info&#64;karnataka-adventures.com</span>
-      </a>
+      <ng-container *ngFor="let contact of contactItems; let isLast = last">
+        <a *ngIf="contact.href; else textContact" class="cta-item" [href]="contact.href">
+          <i [class]="contact.icon"></i>
+          <span>{{ contact.value }}</span>
+        </a>
+        <ng-template #textContact>
+          <span class="cta-item">
+            <i [class]="contact.icon"></i>
+            <span>{{ contact.value }}</span>
+          </span>
+        </ng-template>
+        <span class="cta-divider" *ngIf="!isLast"></span>
+      </ng-container>
     </div>
   </div>
 </div>
@@ -39,23 +38,13 @@
 
     <!-- ── Desktop Nav Links ─────────────────────────────────────────── -->
     <nav class="desktop-nav">
-      <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
-        <i class="bi bi-house-door"></i> Home
-      </a>
-      <a class="nav-link" routerLink="/about" routerLinkActive="active">
-        <i class="bi bi-people"></i> About Us
-      </a>
-      <a class="nav-link" routerLink="/blog"  routerLinkActive="active">
-        <i class="bi bi-journal-text"></i> Blog
-      </a>
-      <a class="nav-link" routerLink="/faqs" routerLinkActive="active">
-        <i class="bi bi-chat-square-dots"></i> FAQ's
-      </a>
-      <a class="nav-link" routerLink="/cancellation"  routerLinkActive="active">
-        <i class="bi bi-shield-check"></i> Cancellation
-      </a>
-      <a class="nav-link" routerLink="/termsandcondition" routerLinkActive="active">
-        <i class="bi bi-file-earmark-text"></i> T&amp;C
+      <a
+        class="nav-link"
+        *ngFor="let link of navLinks"
+        [routerLink]="link.route"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: !!link.exact }">
+        <i [class]="link.icon"></i> {{ link.label }}
       </a>
     </nav>
 
@@ -107,10 +96,9 @@
     </div>
   </div>
 
-  <!-- 📱 Mobile Hamburger (only if logged in) -->
+  <!-- 📱 Mobile Hamburger -->
   <button 
     class="mobile-menu-btn mobile-only"
-    *ngIf="isLoggedIn"
     (click)="isMobileMenuOpen = true"
     aria-label="Open menu">
     <i class="bi bi-list"></i>
@@ -133,23 +121,14 @@
 
       <!-- Nav links -->
       <div class="mobile-nav-links">
-        <a class="mobile-nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}" (click)="closeMobileMenu()">
-          <i class="bi bi-house-door"></i> Home
-        </a>
-        <a class="mobile-nav-link" routerLink="/about" routerLinkActive="active" (click)="closeMobileMenu()">
-          <i class="bi bi-people"></i> About Us
-        </a>
-        <a class="mobile-nav-link" routerLink="/blog" routerLinkActive="active" (click)="closeMobileMenu()">
-          <i class="bi bi-journal-text"></i> Blog
-        </a>
-        <a class="mobile-nav-link" routerLink="/faqs" routerLinkActive="active" (click)="closeMobileMenu()">
-          <i class="bi bi-chat-square-dots"></i> FAQ's
-        </a>
-        <a class="mobile-nav-link" routerLink="/cancellation" routerLinkActive="active" (click)="closeMobileMenu()">
-          <i class="bi bi-shield-check"></i> Cancellation
-        </a>
-        <a class="mobile-nav-link" routerLink="/termsandcondition" routerLinkActive="active" (click)="closeMobileMenu()">
-          <i class="bi bi-file-earmark-text"></i> Terms & Conditions
+        <a
+          class="mobile-nav-link"
+          *ngFor="let link of navLinks"
+          [routerLink]="link.route"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: !!link.exact }"
+          (click)="closeMobileMenu()">
+          <i [class]="link.icon"></i> {{ link.label }}
         </a>
       </div>
 
@@ -180,18 +159,18 @@
 
       <!-- Mobile contact info -->
       <div class="mobile-contact-strip">
-        <a class="mob-cta" href="tel:+919876543210">
-          <i class="fas fa-phone"></i>
-          <span>+91 98765 43210</span>
-        </a>
-        <a class="mob-cta" href="mailto:info@karnataka-adventures.com">
-          <i class="far fa-envelope-open"></i>
-          <span>info&#64;karnataka-adventures.com</span>
-        </a>
-        <span class="mob-cta">
-          <i class="fas fa-map-marker-alt"></i>
-          <span>Bengaluru, Karnataka</span>
-        </span>
+        <ng-container *ngFor="let contact of contactItems">
+          <a *ngIf="contact.href; else mobileTextContact" class="mob-cta" [href]="contact.href">
+            <i [class]="contact.icon"></i>
+            <span>{{ contact.value }}</span>
+          </a>
+          <ng-template #mobileTextContact>
+            <span class="mob-cta">
+              <i [class]="contact.icon"></i>
+              <span>{{ contact.value }}</span>
+            </span>
+          </ng-template>
+        </ng-container>
       </div>
 
     </div>

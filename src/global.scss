@@ -5,6 +5,7 @@
 // Learn more about theming and how to use it for your application's
 // custom components at https://material.angular.dev/guide/theming
 @use '@angular/material' as mat;
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,500;9..144,700&display=swap');
 
 html {
   @include mat.theme((
@@ -17,22 +18,90 @@ html {
   ));
 }
 
-body {
-  // Default the application to a light color theme. This can be changed to
-  // `dark` to enable the dark color theme, or to `light dark` to defer to the
-  // user's system settings.
-  color-scheme: light;
+:root {
+  /* Standard app palette */
+  --app-bg: #f5f7f6;
+  --app-surface: #ffffff;
+  --app-surface-elevated: #fbfdfb;
+  --app-text: #1f2a24;
+  --app-muted: #5f6f66;
+  --app-primary: #2f6b4f;
+  --app-primary-strong: #24553e;
+  --app-accent: #d9772a;
+  --app-border: #d9e2dc;
+  --app-success: #2f8f55;
+  --app-danger: #c94040;
+  --app-warning: #c9851f;
 
-  // Set a default background, font and text colors for the application using
-  // Angular Material's system-level CSS variables. Learn more about these
-  // variables at https://material.angular.dev/guide/system-variables
-  background-color: var(--mat-sys-surface);
-  color: var(--mat-sys-on-surface);
-  font: var(--mat-sys-body-medium);
+  /* Legacy token aliases used by components */
+  --color-bg: var(--app-bg);
+  --color-surface: var(--app-surface);
+  --color-surface-elevated: var(--app-surface-elevated);
+  --color-text-primary: var(--app-text);
+  --color-text-muted: var(--app-muted);
+  --color-brand: var(--app-primary);
+  --color-brand-strong: var(--app-primary-strong);
+  --color-accent: var(--app-accent);
+  --color-border: var(--app-border);
+  --body: var(--app-text);
+  --muted: var(--app-muted);
+  --bg: var(--app-bg);
+  --text1: var(--app-text);
+  --text2: var(--app-muted);
+  --accent: var(--app-primary);
+  --accent-2: var(--app-accent);
+  --text-primary: var(--app-text);
+  --text-muted-local: var(--app-muted);
+  --text-dark: var(--app-text);
+  --forest: var(--app-primary);
+  --forest-lt: #5f8f74;
+  --hdr-border: rgba(31, 42, 36, 0.14);
+  --hdr-bg: rgba(255, 255, 255, 0.92);
+  --hdr-glow: 0 8px 24px rgba(25, 55, 41, 0.12);
+  --transition: 220ms ease;
+  --ease: cubic-bezier(0.23, 1, 0.32, 1);
 
-  // Reset the user agent margin.
-  margin: 0;
+  /* Ionic theme tokens */
+  --ion-background-color: var(--app-bg);
+  --ion-text-color: var(--app-text);
+  --ion-color-primary: var(--app-primary);
+  --ion-color-primary-rgb: 47, 107, 79;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-shade: #295e46;
+  --ion-color-primary-tint: #467a62;
+  --ion-color-success: var(--app-success);
+  --ion-color-success-rgb: 47, 143, 85;
+  --ion-color-danger: var(--app-danger);
+  --ion-color-danger-rgb: 201, 64, 64;
+  --ion-color-warning: var(--app-warning);
+  --ion-color-warning-rgb: 201, 133, 31;
+
+  --shadow-soft: 0 10px 30px rgba(17, 24, 39, 0.08);
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --layout-max: 1200px;
 }
+
+body {
+  color-scheme: light;
+  background: radial-gradient(circle at top, #ffffff 0%, var(--app-bg) 58%);
+  color: var(--color-text-primary);
+  font-family: 'Manrope', sans-serif;
+  margin: 0;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Fraunces', serif;
+  letter-spacing: 0.01em;
+}
+
+a {
+  color: inherit;
+}
+
 /* Import Bootstrap and center Ionic modal content vertically and constrain width */
 .custom-center .modal-wrapper {
 	height: 100vh !important;
@@ -77,7 +146,7 @@ body {
 
 
 html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+body { margin: 0; font-family: 'Manrope', sans-serif; }
 
 *,
 *::before,
@@ -92,4 +161,32 @@ canvas {
   height: auto;
 }
 
+ion-app,
+ion-content {
+  --background: var(--app-bg);
+  color: var(--app-text);
+}
 
+ion-toolbar,
+ion-header,
+ion-footer {
+  --background: var(--app-surface);
+  --color: var(--app-text);
+}
+
+button,
+.btn,
+ion-button {
+  --color: #ffffff;
+  --background: var(--app-primary);
+  --border-color: var(--app-primary);
+}
+
+input,
+select,
+textarea,
+ion-input,
+ion-textarea,
+ion-select {
+  color: var(--app-text);
+}

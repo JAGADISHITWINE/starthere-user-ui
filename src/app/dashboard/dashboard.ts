@@ -23,4 +23,16 @@ export class Dashboard {
       })
     )
   }
+
+  getTrekByIdOrUuid(idOrUuid: string) {
+    return this.http.get(`${this.API}/getTrekByUuid/${idOrUuid}`).pipe(
+      map((res: any) => {
+        const decrypted = this.crypto.decrypt(res.data);
+        return {
+          ...res,
+          data: decrypted
+        };
+      })
+    );
+  }
 }

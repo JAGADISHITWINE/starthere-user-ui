@@ -326,6 +326,15 @@ export class MyBookingsComponent implements OnInit {
     return rating >= 1 && rating <= 5;
   }
 
+  canRateBooking(booking: Booking): boolean {
+    if (booking.booking_status !== "completed") return false;
+    const endDate = new Date(booking.end_date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    endDate.setHours(0, 0, 0, 0);
+    return endDate <= today;
+  }
+
   openRatingModal(booking: Booking) {
     this.selectedBookingForRating = booking;
     this.selectedRating = Number(booking.user_rating || 0);
@@ -372,6 +381,7 @@ export class MyBookingsComponent implements OnInit {
           this.selectedBookingForRating.rated_at = new Date().toISOString();
           this.isSubmittingRating = false;
           this.closeRatingModal();
+          this.loadBookings();
         },
         error: () => {
           this.isSubmittingRating = false;

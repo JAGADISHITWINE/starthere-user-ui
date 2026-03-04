@@ -709,6 +709,74 @@
 .td-note-bullet { font-size: 13px; flex-shrink: 0; }
 
 // ─────────────────────────────────────────────────────────────────────────────
+//  SAFETY + FAQ
+// ─────────────────────────────────────────────────────────────────────────────
+.td-safety-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+
+  @media (max-width: 800px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.td-safety-item {
+  border: 1px solid #e8e0d4;
+  border-radius: 12px;
+  padding: 14px;
+  background: #fcfaf5;
+
+  h3 {
+    margin: 0 0 6px;
+    font-size: 14px;
+    color: #2d4a22;
+  }
+
+  p {
+    margin: 0;
+    font-size: 12px;
+    color: #5a6e4a;
+    line-height: 1.5;
+  }
+}
+
+.td-faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.td-faq-item {
+  border: 1px solid #e8e0d4;
+  border-radius: 12px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.td-faq-question {
+  width: 100%;
+  border: none;
+  background: #f8f4ed;
+  color: #1e2b18;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.td-faq-answer {
+  margin: 0;
+  padding: 12px 14px;
+  font-size: 12px;
+  color: #5a6e4a;
+  line-height: 1.55;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 //  STICKY BOOKING FOOTER
 // ─────────────────────────────────────────────────────────────────────────────
 .td-booking-bar {
@@ -788,6 +856,17 @@
   }
 
   &:active { transform: translateY(0); }
+}
+
+.td-book-btn--ghost {
+  background: #fff;
+  color: #2d4a22;
+  border: 1px solid rgba(45, 74, 34, 0.3);
+  box-shadow: none;
+
+  &:hover {
+    background: #f3f8f1;
+  }
 }
 
 .td-sold-out {
@@ -1140,4 +1219,14 @@
   // Larger book button for thumb reach
   .td-book-btn { padding: 15px 28px; min-height: 48px; }
   .td-back-btn { padding: 8px 14px 8px 10px; }
+}
+
+@media (max-width: 720px) {
+  .td-booking-bar-inner {
+    flex-wrap: wrap;
+  }
+
+  .td-price-block {
+    width: 100%;
+  }
 }

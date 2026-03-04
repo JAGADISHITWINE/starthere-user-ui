@@ -24,6 +24,7 @@ export interface BookingData {
   price: any;
   availableSlots: any;
   participants: any;
+  couponCode?: string;
   selectedAddOns: any[];
   personalInfo: {
     name: string;
@@ -71,6 +72,39 @@ export class Booking {
       );
   }
 
+  validateCoupon(payload: {
+    userId: any;
+    trekId: any;
+    participants: number;
+    price: number;
+    couponCode: string;
+    selectedAddOns: any[];
+  }) {
+    const encryptedPayload = this.crypto.encrypt(payload);
+    return this.http.post<any>(`${this.API}/coupon/validate`, { encryptedPayload })
+      .pipe(
+        map((res: any) => {
+          try {
+            const decrypted = this.crypto.decrypt(res.data);
+            return {
+              ...res,
+              data: decrypted
+            };
+          } catch (error) {
+            console.error('Coupon validation decrypt error:', error);
+            throw error;
+          }
+        }),
+      );
+  }
+
+  getAvailableCoupons(trekId: number, userId?: any) {
+    const query = userId ? `?userId=${encodeURIComponent(String(userId))}` : "";
+    return this.http.get<{ success: boolean; data: any[] }>(
+      `${this.API}/coupons/trek/${trekId}${query}`
+    );
+  }
+
   // Get current booking data
   getBookingData(): BookingData | null {
     return this.bookingDataSubject.value;
@@ -85,8 +119,11 @@ export class Booking {
   calculateTotal(basePrice: number, participants: number, addOns: any[]): number {
     const baseTotal = basePrice * participants;
     const addOnsTotal = addOns
-      .filter(addon => addon.selected)
-      .reduce((sum, addon) => sum + addon.price, 0);
+      .filter(addon => addon.selected || Number(addon.quantity) > 0)
+      .reduce((sum, addon) => {
+        const quantity = Number(addon.quantity) > 0 ? Number(addon.quantity) : 0;
+        return sum + (Number(addon.price) * quantity);
+      }, 0);
     return baseTotal + addOnsTotal;
   }
 }

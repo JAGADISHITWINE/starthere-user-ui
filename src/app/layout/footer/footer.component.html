@@ -9,8 +9,7 @@
         <!-- Col 1: Logo + About -->
         <div class="col-12 col-lg-4">
           <div class="footer-logo mb-4">
-            <img src="../../../assets/assets/logo.png" alt="Karnataka Adventures"
-              onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='flex'">
+            <img src="../../../assets/assets/logo.png" alt="Karnataka Adventures">
             <a class="gw-logo logo-dark" routerLink="/">
               <div class="gw-words">
                 <div class="gw-top">
@@ -34,17 +33,14 @@
           <div class="footer-social mt-4">
             <span class="social-label">Follow our adventures</span>
             <div class="social-icons mt-2">
-              <a href="#" class="social-icon si-facebook" title="Facebook" aria-label="Facebook">
-                <i class="fab fa-facebook-f"></i>
-              </a>
-              <a href="#" class="social-icon si-instagram" title="Instagram" aria-label="Instagram">
-                <i class="fab fa-instagram"></i>
-              </a>
-              <a href="#" class="social-icon si-youtube" title="YouTube" aria-label="YouTube">
-                <i class="fab fa-youtube"></i>
-              </a>
-              <a href="#" class="social-icon si-whatsapp" title="WhatsApp" aria-label="WhatsApp">
-                <i class="fab fa-whatsapp"></i>
+              <a
+                *ngFor="let social of socialLinks"
+                [href]="social.href"
+                class="social-icon"
+                [ngClass]="social.styleClass"
+                [title]="social.label"
+                [attr.aria-label]="social.label">
+                <i [class]="social.iconClass"></i>
               </a>
             </div>
           </div>
@@ -55,12 +51,9 @@
           <div class="footer-widget">
             <h5 class="footer-widget-title">Quick Links</h5>
             <ul class="footer-links">
-              <li><a routerLink="/">Home</a></li>
-              <li><a routerLink="about">About Us</a></li>
-              <li><a routerLink="blog">Blog</a></li>
-              <li><a routerLink="faqs">FAQ's</a></li>
-              <li><a routerLink="cancellation">Cancellation</a></li>
-              <li><a routerLink="termsandcondition">Terms & Conditions</a></li>
+              <li *ngFor="let link of navLinks">
+                <a [routerLink]="link.route">{{ link.label }}</a>
+              </li>
             </ul>
           </div>
         </div>
@@ -70,17 +63,9 @@
         <div class="col-6 col-md-6 col-lg-3">
           <div class="footer-widget">
             <div class="trust-badges mt-4">
-              <div class="trust-item">
-                <i class="fas fa-shield-alt"></i>
-                <span>100% Safe Treks</span>
-              </div>
-              <div class="trust-item">
-                <i class="fas fa-certificate"></i>
-                <span>Certified Guides</span>
-              </div>
-              <div class="trust-item">
-                <i class="fas fa-star"></i>
-                <span>4.9★ Rated on Google</span>
+              <div class="trust-item" *ngFor="let trust of trustItems">
+                <i [class]="trust.icon"></i>
+                <span>{{ trust.label }}</span>
               </div>
             </div>
           </div>
@@ -96,16 +81,14 @@
       <div class="row align-items-center gy-2">
         <div class="col-12 col-lg-6 text-center text-lg-start">
           <p class="copyright-text mb-0">
-            Copyright &copy; 2026 <a href="#">goWILDKarunadu</a>. All rights reserved.
+            Copyright &copy; {{ currentYear }} <a routerLink="/">goWILDKarunadu</a>. All rights reserved.
           </p>
         </div>
         <div class="col-12 col-lg-6 text-center text-lg-end">
           <ul class="footer-menu">
-            <li><a routerLink="about">About</a></li>
-            <li><a routerLink="faqs">FAQ's</a></li>
-            <li><a routerLink="blog">Blog</a></li>
-            <li><a routerLink="termsandcondition">Terms & Conditions</a></li>
-            <li><a routerLink="cancellation">Cancellation</a></li>
+            <li *ngFor="let link of navLinks">
+              <a [routerLink]="link.route">{{ link.label }}</a>
+            </li>
           </ul>
         </div>
       </div>

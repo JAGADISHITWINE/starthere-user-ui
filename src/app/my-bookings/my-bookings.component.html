@@ -105,6 +105,9 @@
             <div class="user-rating-chip" *ngIf="hasUserRated(booking)">
               Your rating: {{ booking.user_rating }} / 5
             </div>
+            <div class="user-review-chip" *ngIf="booking.user_review">
+              “{{ booking.user_review }}”
+            </div>
 
             <div class="info-grid">
               <div class="info-cell">
@@ -169,7 +172,7 @@
             </button>
             <button
               class="action-btn"
-              *ngIf="activeTab === 'past' && booking.booking_status === 'completed'"
+              *ngIf="activeTab === 'past' && canRateBooking(booking)"
               (click)="openRatingModal(booking)"
             >
               ⭐ {{ hasUserRated(booking) ? 'Update Rating' : 'Rate Trek' }}

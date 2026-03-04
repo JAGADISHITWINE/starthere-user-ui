@@ -8,6 +8,7 @@ import { IonicModule } from '@ionic/angular';
 import { SearchService } from './search.service';
 import { AuthModalService } from '../auth/auth-modal.service';
 import { Router } from '@angular/router';
+import { DropdownService } from '../core/dropdown.service';
 
 export interface TrekTour {
   id?: number;
@@ -35,6 +36,11 @@ export interface SearchParams {
   date: string;
 }
 
+interface SearchDifficultyOption {
+  value: string;
+  label: string;
+}
+
 @Component({
   selector: 'app-search',
   templateUrl: './search.component.html',
@@ -43,14 +49,19 @@ export interface SearchParams {
   imports: [CommonModule, IonicModule, ReactiveFormsModule, FormsModule],
 })
 export class SearchComponent implements OnInit {
-
-  constructor(private searchService: SearchService, private authModal: AuthModalService, private router: Router,) { }
+  constructor(
+    private searchService: SearchService,
+    private authModal: AuthModalService,
+    private router: Router,
+    private dropdownService: DropdownService,
+  ) { }
 
   loading = false;
   error: string | null = null;
 
   allTreks: TrekTour[] = [];
   treksTours: TrekTour[] = [];
+  difficultyOptions: SearchDifficultyOption[] = [];
 
   searchParams: SearchParams = {
     location: '',
@@ -59,7 +70,19 @@ export class SearchComponent implements OnInit {
   };
 
   ngOnInit() {
+    this.loadDifficultyOptions();
     this.loadInitial();
+  }
+
+  private loadDifficultyOptions() {
+    this.dropdownService.getOptions('trek-difficulty', []).subscribe((options) => {
+      if (options.length > 0) {
+        this.difficultyOptions = options.map((opt) => ({
+          value: (opt.value || '').toLowerCase(),
+          label: this.diffLabel(opt.label || opt.value || ''),
+        }));
+      }
+    });
   }
 
   // ===============================
@@ -117,6 +140,9 @@ export class SearchComponent implements OnInit {
         // Only show available treks
         this.allTreks = mapped.filter(t => t.has_available_slots);
         this.treksTours = [...this.allTreks];
+        if (this.difficultyOptions.length === 0) {
+          this.buildDifficultyOptions();
+        }
 
         this.loading = false;
       },
@@ -214,6 +240,19 @@ export class SearchComponent implements OnInit {
     };
 
     return map[d?.toLowerCase()] ?? d;
+  }
+
+  private buildDifficultyOptions() {
+    const uniqueDifficulties = new Set(
+      this.allTreks
+        .map((trek) => (trek.difficulty || '').trim().toLowerCase())
+        .filter(Boolean)
+    );
+
+    this.difficultyOptions = Array.from(uniqueDifficulties).map((difficulty) => ({
+      value: difficulty,
+      label: this.diffLabel(difficulty),
+    }));
   }
 
   // ===============================

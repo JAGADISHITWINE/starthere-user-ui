@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { Component, OnInit } from "@angular/core";
+import { Component, OnDestroy, OnInit } from "@angular/core";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { ActivatedRoute, Router, RouterLink } from "@angular/router";
 import { IonicModule } from "@ionic/angular";
@@ -10,6 +10,7 @@ import { TokenService } from 'src/app/core/token.service';
 import { AuthModalService } from "../auth/auth-modal.service";
 import { Sessionexpired } from "../auth/sessionexpired/sessionexpired";
 import { OnlyNumberDirective } from "../shared/Only number.directive";
+import { DropdownOption, DropdownService } from "../core/dropdown.service";
 
 // Participant interface
 interface Participant {
@@ -22,6 +23,28 @@ interface Participant {
   medicalInfo: string;
   idError?: string;
   ageError?: string;
+  phoneError?: string;
+}
+
+interface BookingAddOn {
+  id: number;
+  name: string;
+  price: number;
+  selected: boolean;
+  quantity: number;
+}
+
+interface AvailableCoupon {
+  id: number;
+  code: string;
+  discountType: "percentage" | "flat";
+  discountValue: number;
+  minBookingAmount: number;
+  maxDiscountAmount: number | null;
+  endDate: string | null;
+  usageLimit: number | null;
+  usageCount: number;
+  isUsedByUser?: boolean;
 }
 
 @Component({
@@ -38,11 +61,19 @@ interface Participant {
     OnlyNumberDirective
   ],
 })
-export class BookingComponent implements OnInit {
+export class BookingComponent implements OnInit, OnDestroy {
   trekId: number = 0;
   currentStep: number = 1;
   isLoading: boolean = true;
   termsAccepted: boolean = true;
+  couponCode: string = "";
+  couponValidationError: string = "";
+  couponValidationSuccess: string = "";
+  couponDiscountAmount: number = 0;
+  isCouponValidating: boolean = false;
+  availableCoupons: AvailableCoupon[] = [];
+  couponListError: string = "";
+  private couponValidationTimer: ReturnType<typeof setTimeout> | null = null;
 
   // Trek data from API
   trek: any = null;
@@ -65,16 +96,16 @@ export class BookingComponent implements OnInit {
   participants: Participant[] = [];
 
   // Add-ons
-  addOns = [
-    { id: 1, name: "Trekking Poles", price: 200, selected: false },
-    { id: 2, name: "Sleeping Bag", price: 300, selected: false },
-    { id: 3, name: "Travel Insurance", price: 500, selected: false },
-  ];
+  addOns: BookingAddOn[] = [];
 
   userId: any;
   successMessage: any;
   errorMessage: any;
   isSubmitting: boolean = false;
+  private successMessageTimer: ReturnType<typeof setTimeout> | null = null;
+  private errorMessageTimer: ReturnType<typeof setTimeout> | null = null;
+  genderOptions: DropdownOption[] = [];
+  idTypeOptions: DropdownOption[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -85,9 +116,12 @@ export class BookingComponent implements OnInit {
     private router: Router,
     private tokenService: TokenService,
     private sessionService: Sessionexpired,
+    private dropdownService: DropdownService,
   ) { }
 
   ngOnInit() {
+    this.loadDropdownOptions();
+
     // Get trek ID from route
     this.route.params.subscribe((params) => {
       this.trekId = +params["id"];
@@ -100,6 +134,45 @@ export class BookingComponent implements OnInit {
     }
   }
 
+  ngOnDestroy() {
+    if (this.couponValidationTimer) {
+      clearTimeout(this.couponValidationTimer);
+      this.couponValidationTimer = null;
+    }
+    if (this.successMessageTimer) {
+      clearTimeout(this.successMessageTimer);
+      this.successMessageTimer = null;
+    }
+    if (this.errorMessageTimer) {
+      clearTimeout(this.errorMessageTimer);
+      this.errorMessageTimer = null;
+    }
+  }
+
+  private loadDropdownOptions() {
+    const genderFallback: DropdownOption[] = [
+      { value: 'Male', label: 'Male' },
+      { value: 'Female', label: 'Female' },
+      { value: 'Other', label: 'Other' },
+    ];
+
+    const idTypeFallback: DropdownOption[] = [
+      { value: 'Aadhar', label: 'Aadhar Card' },
+      { value: 'PAN', label: 'PAN Card' },
+      { value: 'Passport', label: 'Passport' },
+      { value: 'Driving License', label: 'Driving License' },
+      { value: 'Voter ID', label: 'Voter ID' },
+    ];
+
+    this.dropdownService.getOptions('gender', genderFallback).subscribe((options) => {
+      this.genderOptions = options;
+    });
+
+    this.dropdownService.getOptions('id-types', idTypeFallback).subscribe((options) => {
+      this.idTypeOptions = options;
+    });
+  }
+
 
   loadTrekData() {
     this.isLoading = true;
@@ -108,7 +181,6 @@ export class BookingComponent implements OnInit {
       next: (response: any) => {
         if (response.success) {
           this.trek = response.data || [];
-          console.log("Trek data loaded:", this.trek);
 
           // Convert single batch to array for consistent handling
           if (this.trek.batch && !Array.isArray(this.trek.batch)) {
@@ -135,7 +207,10 @@ export class BookingComponent implements OnInit {
           this.booking.name = decoded?.name || "";
           this.booking.email = decoded?.email || "";
           this.booking.phone = decoded?.phone || "";
+          this.userId = this.tokenService.getUserId();
 
+          this.initializeAddOns();
+          this.loadAvailableCoupons();
           // Initialize participants array
           this.initializeParticipants();
         }
@@ -145,6 +220,21 @@ export class BookingComponent implements OnInit {
         console.error('Load trek error:', error);
         this.isLoading = false;
       },
+    });
+  }
+
+  private loadAvailableCoupons() {
+    if (!this.trekId) return;
+
+    this.bookingService.getAvailableCoupons(this.trekId, this.userId).subscribe({
+      next: (res: any) => {
+        this.availableCoupons = Array.isArray(res?.data) ? res.data : [];
+        this.couponListError = "";
+      },
+      error: () => {
+        this.availableCoupons = [];
+        this.couponListError = "Unable to load coupons right now";
+      }
     });
   }
 
@@ -160,6 +250,8 @@ export class BookingComponent implements OnInit {
       this.booking.date = this.selectedBatch.startDate;
       this.booking.batchId =
         this.selectedBatch.batchId || this.selectedBatch.id;
+      this.initializeAddOns();
+      this.scheduleCouponValidation();
     }
   }
 
@@ -196,6 +288,36 @@ export class BookingComponent implements OnInit {
     }
   }
 
+  initializeAddOns() {
+    const rawAddOns =
+      this.selectedBatch?.addOns ||
+      this.selectedBatch?.addons ||
+      this.selectedBatch?.add_ons ||
+      this.trek?.addOns ||
+      this.trek?.addons ||
+      this.trek?.add_ons ||
+      [];
+
+    if (Array.isArray(rawAddOns) && rawAddOns.length > 0) {
+      this.addOns = rawAddOns
+        .map((item: any, index: number) => ({
+          id: Number(item.id || item.addon_id || index + 1),
+          name: String(item.name || item.addon_name || item.title || "").trim(),
+          price: Number(item.price || item.unit_price || 0),
+          selected: false,
+          quantity: 0,
+        }))
+        .filter((addon: BookingAddOn) => addon.name && addon.price > 0);
+      return;
+    }
+
+    this.addOns = [
+      { id: 1, name: "Trekking Poles", price: 200, selected: false, quantity: 0 },
+      { id: 2, name: "Sleeping Bag", price: 300, selected: false, quantity: 0 },
+      { id: 3, name: "Travel Insurance", price: 500, selected: false, quantity: 0 },
+    ];
+  }
+
   /**
    * Update participants array when number changes
    */
@@ -217,6 +339,8 @@ export class BookingComponent implements OnInit {
 
     // Reinitialize participants array
     this.initializeParticipants();
+    this.syncAddOnQuantitiesWithParticipants();
+    this.scheduleCouponValidation();
   }
 
   /**
@@ -233,13 +357,16 @@ export class BookingComponent implements OnInit {
    * Check if all participants have required fields filled
    */
   areAllParticipantsValid(): boolean {
-    return this.participants.every(participant =>
+    return this.participants.every((participant, index) =>
       participant.name.trim() !== '' &&
       participant.age !== null &&
       participant.age > 0 &&
       participant.gender !== '' &&
       participant.idType !== '' &&
-      participant.idNumber.trim() !== ''
+      participant.idNumber.trim() !== '' &&
+      !participant.idError &&
+      !participant.ageError &&
+      (index === 0 || this.isValidPhone(participant.phone))
     );
   }
 
@@ -273,16 +400,18 @@ export class BookingComponent implements OnInit {
   }
 
   get addOnsPrice(): number {
-    return (
-      this.addOns
-        .filter((addon) => addon.selected)
-        .reduce((sum, addon) => sum + addon.price, 0) *
-      this.booking.participants
+    return this.addOns.reduce(
+      (sum, addon) => sum + addon.price * (addon.quantity || 0),
+      0
     );
   }
 
   get totalPrice(): number {
     return this.basePrice + this.addOnsPrice;
+  }
+
+  get payablePrice(): number {
+    return Math.max(0, this.totalPrice - this.couponDiscountAmount);
   }
 
   nextStep() {
@@ -330,6 +459,9 @@ export class BookingComponent implements OnInit {
 
     if (this.currentStep < 4) {
       this.currentStep++;
+      if (this.currentStep === 4) {
+        this.scheduleCouponValidation();
+      }
     }
   }
 
@@ -340,6 +472,16 @@ export class BookingComponent implements OnInit {
   }
 
   proceedToPayment() {
+    if (this.isCouponValidating) {
+      this.showTransientMessage("error", "Please wait, validating coupon...", 1800);
+      return;
+    }
+
+    if (this.couponCode.trim() && this.couponValidationError) {
+      this.showTransientMessage("error", this.couponValidationError, 2200);
+      return;
+    }
+
     this.successMessage = "";
     this.errorMessage = "";
     this.isSubmitting = true;
@@ -357,7 +499,16 @@ export class BookingComponent implements OnInit {
       price: this.selectedBatch.price,
       availableSlots: this.selectedBatch.availableSlots,
       participants: this.booking.participants,
-      selectedAddOns: this.addOns.filter((addon) => addon.selected),
+      couponCode: this.couponCode.trim() ? this.couponCode.trim().toUpperCase() : undefined,
+      selectedAddOns: this.addOns
+        .filter((addon) => addon.quantity > 0)
+        .map((addon) => ({
+          id: addon.id,
+          name: addon.name,
+          price: addon.price,
+          quantity: addon.quantity,
+          selected: true,
+        })),
       personalInfo: {
         name: this.booking.name,
         email: this.booking.email,
@@ -369,24 +520,56 @@ export class BookingComponent implements OnInit {
     };
 
     // Save to service
-    this.bookingService.setBookingData(bookingData).subscribe((res: any) => {
-      if (res.success == true) {
-        this.successMessage = res.message || "Booking successful 🎉";
+    this.bookingService.setBookingData(bookingData).subscribe({
+      next: async (res: any) => {
+        if (res.success == true) {
+          this.showTransientMessage("success", res.message || "Booking successful", 2000);
 
-        setTimeout(() => {
-          this.resetBooking();
-          this.successMessage = "";
-          this.isSubmitting = false;
-          this.router.navigateByUrl("");
-        }, 1500);
-      } else {
-        this.errorMessage = res.message || "Booking failed";
-        setTimeout(() => {
-          this.errorMessage = "";
-          this.isSubmitting = false;
-        }, 1500);
+          setTimeout(() => {
+            this.resetBooking();
+            this.successMessage = "";
+            this.isSubmitting = false;
+            this.router.navigateByUrl("");
+          }, 1500);
+          return;
+        }
+
+        const message = String(res?.message || "Booking failed");
+        this.showTransientMessage("error", message, 2500);
+        this.isSubmitting = false;
+      },
+      error: async () => {
+        this.isSubmitting = false;
+        this.showTransientMessage(
+          "error",
+          "Something went wrong while booking. Please try again.",
+          2500
+        );
       }
     });
+  }
+
+  private showTransientMessage(
+    type: "success" | "error",
+    message: string,
+    durationMs: number = 2500
+  ) {
+    if (type === "success") {
+      this.successMessage = message;
+      this.errorMessage = "";
+      if (this.successMessageTimer) clearTimeout(this.successMessageTimer);
+      this.successMessageTimer = setTimeout(() => {
+        this.successMessage = "";
+      }, durationMs);
+      return;
+    }
+
+    this.errorMessage = message;
+    this.successMessage = "";
+    if (this.errorMessageTimer) clearTimeout(this.errorMessageTimer);
+    this.errorMessageTimer = setTimeout(() => {
+      this.errorMessage = "";
+    }, durationMs);
   }
 
   resetBooking() {
@@ -403,12 +586,24 @@ export class BookingComponent implements OnInit {
     };
     this.participants = [];
     this.initializeParticipants();
+    this.addOns = this.addOns.map((addon) => ({
+      ...addon,
+      selected: false,
+      quantity: 0,
+    }));
+    this.couponCode = "";
+    this.couponValidationError = "";
+    this.couponValidationSuccess = "";
+    this.couponDiscountAmount = 0;
+    this.isCouponValidating = false;
   }
 
 decrementParticipants() {
   if (this.booking.participants > 1) {
     this.booking.participants--;
     this.initializeParticipants();  // ← add this
+    this.syncAddOnQuantitiesWithParticipants();
+    this.scheduleCouponValidation();
   }
 }
 
@@ -416,7 +611,155 @@ incrementParticipants() {
   if (this.booking.participants < this.selectedBatch.availableSlots) {
     this.booking.participants++;
     this.initializeParticipants();  // ← add this
+    this.syncAddOnQuantitiesWithParticipants();
+    this.scheduleCouponValidation();
   }
+}
+
+get participantCountOptions(): number[] {
+  return Array.from(
+    { length: (this.booking.participants || 1) + 1 },
+    (_, index) => index
+  );
+}
+
+onAddonQuantityChange(addon: BookingAddOn, value: string | number) {
+  const numericValue = Math.max(0, Math.min(this.booking.participants, Number(value) || 0));
+  addon.quantity = numericValue;
+  addon.selected = numericValue > 0;
+  this.scheduleCouponValidation();
+}
+
+private syncAddOnQuantitiesWithParticipants() {
+  this.addOns.forEach((addon) => {
+    if (addon.quantity > this.booking.participants) {
+      addon.quantity = this.booking.participants;
+    }
+    addon.selected = addon.quantity > 0;
+  });
+  this.scheduleCouponValidation();
+}
+
+private isValidPhone(phone: string): boolean {
+  const digits = String(phone || "").replace(/\D/g, "");
+  return digits.length === 10;
+}
+
+validateParticipantPhone(participant: Participant, isPrimary: boolean = false) {
+  participant.phoneError = "";
+
+  // Primary participant phone is auto-filled from contact info in Step 2.
+  if (isPrimary) return;
+
+  if (!this.isValidPhone(participant.phone)) {
+    participant.phoneError = "Phone number must be exactly 10 digits";
+  }
+}
+
+onCouponCodeInput(value: string) {
+  this.couponCode = String(value || "").toUpperCase().replace(/\s+/g, "");
+  this.couponValidationError = "";
+  this.couponValidationSuccess = "";
+  this.couponDiscountAmount = 0;
+  this.scheduleCouponValidation();
+}
+
+private scheduleCouponValidation() {
+  if (this.couponValidationTimer) {
+    clearTimeout(this.couponValidationTimer);
+    this.couponValidationTimer = null;
+  }
+
+  if (this.currentStep !== 4 || !this.couponCode.trim()) {
+    this.isCouponValidating = false;
+    if (!this.couponCode.trim()) {
+      this.couponValidationError = "";
+      this.couponValidationSuccess = "";
+      this.couponDiscountAmount = 0;
+    }
+    return;
+  }
+
+  this.couponValidationTimer = setTimeout(() => {
+    this.validateCouponRealtime();
+  }, 450);
+}
+
+async copyCouponCode(code: string) {
+  const value = String(code || "").trim().toUpperCase();
+  if (!value) return;
+
+  try {
+    if (navigator?.clipboard?.writeText) {
+      await navigator.clipboard.writeText(value);
+    } else {
+      const input = document.createElement("input");
+      input.value = value;
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand("copy");
+      document.body.removeChild(input);
+    }
+    this.onCouponCodeInput(value);
+    this.showTransientMessage("success", `Coupon ${value} copied`, 1800);
+  } catch {
+    this.showTransientMessage("error", "Unable to copy coupon", 1800);
+  }
+}
+
+getCouponLabel(coupon: AvailableCoupon): string {
+  if (coupon.discountType === "percentage") {
+    return `${Number(coupon.discountValue)}% OFF`;
+  }
+  return `₹${Number(coupon.discountValue)} OFF`;
+}
+
+private validateCouponRealtime() {
+  if (!this.selectedBatch || !this.couponCode.trim()) return;
+
+  this.isCouponValidating = true;
+  this.couponValidationError = "";
+  this.couponValidationSuccess = "";
+
+  const userId = this.tokenService.getUserId();
+  const payload = {
+    userId,
+    trekId: this.trekId,
+    participants: this.booking.participants,
+    price: Number(this.selectedBatch.price || 0),
+    couponCode: this.couponCode.trim().toUpperCase(),
+    selectedAddOns: this.addOns
+      .filter((addon) => addon.quantity > 0)
+      .map((addon) => ({
+        id: addon.id,
+        price: addon.price,
+        quantity: addon.quantity,
+        selected: addon.quantity > 0,
+      })),
+  };
+
+  this.bookingService.validateCoupon(payload).subscribe({
+    next: (res: any) => {
+      this.isCouponValidating = false;
+      const valid = !!res?.data?.valid;
+      if (!res?.success || !valid) {
+        this.couponDiscountAmount = 0;
+        this.couponValidationError = String(res?.data?.message || res?.message || "Invalid coupon");
+        return;
+      }
+
+      this.couponDiscountAmount = Number(res?.data?.discountAmount || 0);
+      this.couponValidationSuccess = this.couponDiscountAmount > 0
+        ? `Coupon applied. You save ₹${this.couponDiscountAmount.toFixed(0)}`
+        : String(res?.data?.message || "Coupon applied");
+      this.couponValidationError = "";
+    },
+    error: () => {
+      this.isCouponValidating = false;
+      this.couponDiscountAmount = 0;
+      this.couponValidationError = "Unable to validate coupon right now";
+    }
+  });
 }
 
 validateId(participant: Participant) {
@@ -424,8 +767,9 @@ validateId(participant: Participant) {
   if (!participant.idType || !participant.idNumber) return;
 
   const raw = participant.idNumber.replace(/\s/g, '');
+  const idType = this.normalizeIdType(participant.idType);
 
-  switch (participant.idType) {
+  switch (idType) {
     case 'Aadhar':
       if (!/^\d{12}$/.test(raw))
         participant.idError = 'Aadhaar must be exactly 12 digits';
@@ -456,8 +800,9 @@ validateId(participant: Participant) {
 formatIdInput(participant: Participant) {
   if (!participant.idType) return;
   let value = participant.idNumber || '';
+  const idType = this.normalizeIdType(participant.idType);
 
-  switch (participant.idType) {
+  switch (idType) {
     case 'Aadhar':
       // Keep only digits, max 12, format as XXXX XXXX XXXX
       const digits = value.replace(/\D/g, '').substring(0, 12);
@@ -485,7 +830,7 @@ formatIdInput(participant: Participant) {
 }
 
 getIdMaxLength(idType: string): number {
-  switch (idType) {
+  switch (this.normalizeIdType(idType)) {
     case 'Aadhar':          return 14; // 12 digits + 2 spaces
     case 'PAN':             return 10;
     case 'Passport':        return 8;
@@ -493,6 +838,18 @@ getIdMaxLength(idType: string): number {
     case 'Voter ID':        return 10;
     default:                return 20;
   }
+}
+
+private normalizeIdType(idType: string): string {
+  const value = (idType || '').trim().toLowerCase();
+
+  if (value === 'aadhar' || value === 'aadhaar') return 'Aadhar';
+  if (value === 'pan' || value === 'pan card') return 'PAN';
+  if (value === 'passport') return 'Passport';
+  if (value === 'driving license' || value === 'driving licence') return 'Driving License';
+  if (value === 'voter id' || value === 'voterid') return 'Voter ID';
+
+  return idType;
 }
 
 validateAge(participant: Participant) {

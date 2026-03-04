@@ -1,11 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, DestroyRef, HostListener, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Auth } from 'src/app/core/auth';
 import { TokenService } from 'src/app/core/token.service';
 import { AuthModalService } from 'src/app/auth/auth-modal.service';
+import { SITE_CONTACT_ITEMS, SITE_NAV_LINKS } from '../site.config';
 
 @Component({
   selector: 'app-header',
@@ -15,6 +17,7 @@ import { AuthModalService } from 'src/app/auth/auth-modal.service';
   imports: [IonicModule, RouterLink, CommonModule, FormsModule, RouterLinkActive]
 })
 export class HeaderComponent implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
 
   // Auth state
   isLoggedIn = false;
@@ -31,6 +34,8 @@ export class HeaderComponent implements OnInit {
   searchQuery = '';
 
   isScrolled = false;
+  readonly navLinks = SITE_NAV_LINKS;
+  readonly contactItems = SITE_CONTACT_ITEMS;
 
 
   constructor(
@@ -41,7 +46,9 @@ export class HeaderComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.authService.authStatus$.subscribe(isLoggedIn => {
+    this.authService.authStatus$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(isLoggedIn => {
       this.isLoggedIn = isLoggedIn;
 
       if (isLoggedIn) {
@@ -130,4 +137,3 @@ export class HeaderComponent implements OnInit {
     this.isScrolled = window.scrollY > 60;
   }
 }
-

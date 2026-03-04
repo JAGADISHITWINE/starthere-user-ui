@@ -382,6 +382,17 @@ body {
   text-transform: uppercase;
 }
 
+.user-review-chip {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(77, 142, 248, 0.2);
+  background: rgba(77, 142, 248, 0.08);
+  color: #dbe7ff;
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
 // INFO GRID
 .info-grid {
   display: grid;

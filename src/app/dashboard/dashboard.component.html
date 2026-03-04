@@ -27,17 +27,17 @@
         </button>
       </div>
 
-      <div class="hero-stats">
-        <div class="stat-item">
-          <strong>48+</strong>
+      <div class="hero-stats" *ngIf="activeRoutes > 0 || averageRating > 0 || trekkersThisYear > 0">
+        <div class="stat-item" *ngIf="activeRoutes > 0">
+          <strong>{{ activeRoutes }}</strong>
           <small>Active Routes</small>
         </div>
-        <div class="stat-item">
-          <strong>4.9★</strong>
+        <div class="stat-item" *ngIf="averageRating > 0">
+          <strong>{{ averageRating | number:'1.1-1' }}★</strong>
           <small>Avg Rating</small>
         </div>
-        <div class="stat-item">
-          <strong>3.2k</strong>
+        <div class="stat-item" *ngIf="trekkersThisYear > 0">
+          <strong>{{ trekkersThisYear }}</strong>
           <small>Trekkers / yr</small>
         </div>
       </div>
@@ -46,9 +46,43 @@
   </section>
 
   <!-- ── FILTERS ───────────────────────────────────────────── -->
-  <section class="filter-section">
+  <section class="filter-section" *ngIf="filters.length">
     <button *ngFor="let filter of filters" (click)="setFilter(filter.id)" [class.active]="selectedFilter === filter.id">
       {{ filter.label }}
+    </button>
+  </section>
+
+  <!-- ── DISCOVERY TOOLS ───────────────────────────────────── -->
+  <section class="discovery-tools">
+    <div class="search-wrap">
+      <i class="bi bi-search"></i>
+      <input
+        type="text"
+        [(ngModel)]="searchQuery"
+        placeholder="Search by trek name, location, or highlight"
+        aria-label="Search treks" />
+    </div>
+
+    <div class="sort-wrap">
+      <label for="sortBy">Sort</label>
+      <select id="sortBy" [(ngModel)]="sortBy">
+        <option *ngFor="let option of sortOptions" [value]="option.value">
+          {{ option.label }}
+        </option>
+      </select>
+    </div>
+
+    <button class="clear-filters-btn" *ngIf="hasActiveDiscoveryFilters" (click)="clearDiscoveryFilters()">
+      Reset Filters
+    </button>
+  </section>
+
+  <section class="collection-chips mt-1">
+    <button
+      *ngFor="let collection of collections"
+      (click)="setCollection(collection.id)"
+      [class.active]="selectedCollection === collection.id">
+      {{ collection.label }}
     </button>
   </section>
 
@@ -61,17 +95,17 @@
   <!-- ── TREK GRID ──────────────────────────────────────────── -->
   <section class="trek-grid" *ngIf="filteredTreks.length">
 
-    <div class="trek-card" *ngFor="let trek of filteredTreks">
+    <div class="trek-card" *ngFor="let trek of filteredTreks; trackBy: trackByTrek">
 
       <!-- IMAGE -->
       <div class="trek-image-container">
         <img [src]="trek.image" [alt]="trek.name" loading="lazy" />
-        <span class="difficulty-badge" [class]="trek.difficulty?.toLowerCase()">
+        <span class="difficulty-badge" [class]="trek.difficulty.toLowerCase()">
           {{ trek.difficulty }}
         </span>
-        <!-- <div class="card-rating">
-          <span class="star">★</span> {{ trek.rating }}
-        </div> -->
+        <span class="availability-badge" [ngClass]="getAvailabilityClass(trek)">
+          {{ getAvailabilityLabel(trek) }}
+        </span>
       </div>
 
       <!-- HEADER -->
@@ -86,6 +120,9 @@
         <div class="trek-details">
           <span>⏱ {{ trek.duration }}</span>
           <span>👥 {{ trek.groupSize }}</span>
+          <span *ngIf="trek.rating > 0">
+            ⭐ {{ trek.rating | number:'1.1-1' }}<ng-container *ngIf="trek.reviews > 0"> ({{ trek.reviews }})</ng-container>
+          </span>
         </div>
 
         <div class="trek-date">
@@ -98,11 +135,24 @@
 
         <div class="trek-footer">
           <div class="price">
-            <span class="price-amount">{{ trek.price }}</span>
+            <span class="price-amount">₹{{ trek.price }}</span>
             <span class="price-label">/ person</span>
           </div>
+        </div>
+
+        <div class="card-actions">
           <button class="book-btn" (click)="viewDetails(trek)">
-            Book Now <span class="btn-arrow">→</span>
+            View Details <span class="btn-arrow">→</span>
+          </button>
+          <button
+            class="secondary-btn"
+            [class.active]="isCompared(trek.id)"
+            [disabled]="!canAddToCompare(trek)"
+            (click)="toggleCompare(trek)">
+            {{ isCompared(trek.id) ? 'Compared' : (!canAddToCompare(trek) ? 'Max 3' : 'Compare') }}
+          </button>
+          <button class="secondary-btn" (click)="openTrekEnquiry(trek)">
+            WhatsApp
           </button>
         </div>
 
@@ -113,18 +163,100 @@
 
   <!-- ── LOAD MORE ─────────────────────────────────────────── -->
   <!-- ── VIEW ALL ──────────────────────────────────────────── -->
-  <div class="load-more-wrapper" *ngIf="!showAll && filteredTreks.length && totalFilteredCount > this.visibleCount">
+  <div class="load-more-wrapper" *ngIf="filteredTreks.length && totalFilteredCount > initialVisibleCount">
     <div class="load-more-meta">
       Showing {{ filteredTreks.length }} of {{ totalFilteredCount }} treks
     </div>
-    <button class="load-more-btn" (click)="viewAll()">
-      <span class="load-more-label">View All Treks</span>
+    <button class="load-more-btn" *ngIf="hasMoreTreks" (click)="showMoreTreks()">
+      <span class="load-more-label">Show More Treks</span>
       <span class="load-more-icon">↓</span>
+    </button>
+    <button class="load-more-btn" *ngIf="!hasMoreTreks && totalFilteredCount > initialVisibleCount" (click)="showLessTreks()">
+      <span class="load-more-label">Show Less</span>
+      <span class="load-more-icon">↑</span>
     </button>
   </div>
 
+  <aside class="compare-bar" *ngIf="compareTreks.length">
+    <div class="compare-meta">
+      <strong>{{ compareTreks.length }}/{{ maxCompareCount }}</strong> selected for compare
+    </div>
+    <div class="compare-note" *ngIf="compareNotice">{{ compareNotice }}</div>
+    <div class="compare-list">
+      <div class="compare-item" *ngFor="let trek of compareTreks">
+        <span>{{ trek.name }}</span>
+        <button (click)="removeCompared(trek.id)" aria-label="Remove from compare">✕</button>
+      </div>
+    </div>
+    <div class="compare-actions">
+      <button class="book-btn" [disabled]="compareTreks.length < 2" (click)="openComparePanel()">Compare Now</button>
+      <button class="secondary-btn" (click)="clearCompare()">Clear</button>
+      <button class="book-btn" (click)="openCompareInWhatsApp()">Compare with Expert</button>
+    </div>
+  </aside>
+
 </div>
 <!-- /page-wrapper -->
+
+<div class="compare-overlay" *ngIf="showComparePanel" (click)="closeComparePanel()">
+  <section class="compare-panel" (click)="$event.stopPropagation()">
+    <header class="compare-panel-header">
+      <h3>Trek Comparison</h3>
+      <button class="secondary-btn" (click)="closeComparePanel()">Close</button>
+    </header>
+
+    <div class="compare-loading" *ngIf="isCompareLoading">
+      Loading latest trek details for comparison...
+    </div>
+
+    <div class="compare-columns" *ngIf="!isCompareLoading">
+      <article class="compare-column" *ngFor="let trek of compareTreks">
+        <div class="compare-title-row">
+          <h4>{{ trek.name }}</h4>
+          <button class="remove-btn" (click)="removeCompared(trek.id)">✕</button>
+        </div>
+        <p class="compare-location">📍 {{ trek.location }}</p>
+        <ul class="compare-points">
+          <li><span>Price</span><strong>₹{{ trek.price }}</strong></li>
+          <li><span>Duration</span><strong>{{ trek.duration }}</strong></li>
+          <li><span>Difficulty</span><strong>{{ trek.difficulty }}</strong></li>
+          <li><span>Group Size</span><strong>{{ trek.groupSize }}</strong></li>
+          <li><span>Date</span><strong>{{ trek.date }}</strong></li>
+          <li><span>Availability</span><strong>{{ getAvailabilityLabel(trek) }}</strong></li>
+        </ul>
+
+        <div class="compare-rich-section">
+          <h5>Highlights</h5>
+          <ul>
+            <li *ngFor="let item of trek.highlights">{{ item }}</li>
+            <li class="empty-line" *ngIf="!trek.highlights.length">Not available</li>
+          </ul>
+        </div>
+
+        <div class="compare-rich-section">
+          <h5>Included</h5>
+          <ul>
+            <li *ngFor="let item of trek.inclusions">{{ item }}</li>
+            <li class="empty-line" *ngIf="!trek.inclusions.length">Not available</li>
+          </ul>
+        </div>
+
+        <div class="compare-rich-section danger">
+          <h5>Excluded</h5>
+          <ul>
+            <li *ngFor="let item of trek.exclusions">{{ item }}</li>
+            <li class="empty-line" *ngIf="!trek.exclusions.length">Not available</li>
+          </ul>
+        </div>
+
+        <div class="compare-column-actions">
+          <button class="book-btn" (click)="viewDetails(trek)">View Details</button>
+          <button class="secondary-btn" (click)="openTrekEnquiry(trek)">Ask on WhatsApp</button>
+        </div>
+      </article>
+    </div>
+  </section>
+</div>
 
 
 <!-- ══ LOADING STATE ═════════════════════════════════════════ -->

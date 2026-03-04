@@ -72,9 +72,9 @@
             [(ngModel)]="searchParams.difficulty"
             aria-label="Difficulty level">
             <option value="">Any level</option>
-            <option value="easy">🟢 Easy</option>
-            <option value="moderate">🟡 Moderate</option>
-            <option value="hard">🔴 Hard</option>
+            <option *ngFor="let option of difficultyOptions" [value]="option.value">
+              {{ option.label }}
+            </option>
           </select>
         </div>
       </div>

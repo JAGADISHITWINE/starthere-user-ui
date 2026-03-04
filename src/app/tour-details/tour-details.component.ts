@@ -59,6 +59,7 @@ interface MappedTour {
   price: number;
   rating: number;
   reviewCount: number;
+  views: number;
   image: string;
   gallery: string[];
   overview: string;
@@ -78,6 +79,16 @@ interface MappedTour {
   maxAge: number;
 }
 
+interface SafetyPoint {
+  title: string;
+  detail: string;
+}
+
+interface TrekFaq {
+  question: string;
+  answer: string;
+}
+
 @Component({
   selector: 'app-tour-details',
   templateUrl: './tour-details.component.html',
@@ -90,8 +101,48 @@ export class TourDetailsComponent implements OnInit {
   isLoading = true;
   tourUuid: string = '';
   selectedSegment: string = 'overview';
+  openFaqIndex = -1;
 
   baseUrl = 'http://localhost:4001/';
+  readonly supportPhone = '+919876543210';
+  readonly prepChecklist = [
+    'Walk 4-5 km daily for at least 2 weeks before the trek',
+    'Stay hydrated and avoid heavy meals before ascent day',
+    'Carry one reusable bottle and avoid single-use plastics',
+    'Keep emergency contacts saved and accessible offline',
+  ];
+  readonly safetyPoints: SafetyPoint[] = [
+    {
+      title: 'Certified Trek Leads',
+      detail: 'Every batch is led by trained trek captains with wilderness first-aid basics.',
+    },
+    {
+      title: 'Emergency Support',
+      detail: 'Each route includes evacuation fallback points and nearest hospital mapping.',
+    },
+    {
+      title: 'Weather Monitoring',
+      detail: 'Route plans are adjusted using live weather windows to reduce risk.',
+    },
+  ];
+  readonly trekFaqs: TrekFaq[] = [
+    {
+      question: 'Can beginners join this trek?',
+      answer: 'Yes, if the fitness level is Easy/Moderate and you complete basic pre-trek walking practice.',
+    },
+    {
+      question: 'Will transport be arranged?',
+      answer: 'Transport availability depends on the selected batch plan. Please check inclusions for your batch.',
+    },
+    {
+      question: 'What if weather conditions are unsafe?',
+      answer: 'The route can be modified or postponed for safety. You will be informed in advance.',
+    },
+    {
+      question: 'How early should I reach the pickup point?',
+      answer: 'Reach at least 20-30 minutes before the reporting time to avoid delays.',
+    },
+  ];
 
   constructor(
     private route: ActivatedRoute,
@@ -135,10 +186,9 @@ export class TourDetailsComponent implements OnInit {
       fitnessLevel: result.fitness_level,
       duration: firstBatch?.duration || 'N/A',
       price: firstBatch ? Number(firstBatch.price) : 0,
-
-      // Mock data for rating/reviews (replace with real data if available)
-      rating: 4.8,
-      reviewCount: 145,
+      rating: Number(result.rating || 0),
+      reviewCount: Number(result.reviewCount || 0),
+      views: Number(result.views || 0),
 
       // Images
       image: result.cover_image,
@@ -217,6 +267,16 @@ export class TourDetailsComponent implements OnInit {
     }
   }
 
+  toggleFaq(index: number): void {
+    this.openFaqIndex = this.openFaqIndex === index ? -1 : index;
+  }
+
+  openWhatsAppEnquiry(tour: MappedTour): void {
+    const message = `Hi, I want to know more about ${tour.name} trek. Please share batch options and preparation guidance.`;
+    const url = `https://wa.me/${this.supportPhone.replace('+', '')}?text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank');
+  }
+
   async openLoginPanel() {
     try {
       const res = await this.authModal.openLogin();
@@ -263,12 +323,8 @@ export class TourDetailsComponent implements OnInit {
     }
   }
 
-goBack() {
-  if (window.history.length > 1) {
-    this.location.back();
-  } else {
+  goBack() {
     this.router.navigate(['/']);
   }
-}
 
 }

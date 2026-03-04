@@ -44,14 +44,7 @@ export class BlogPostComponent implements OnInit {
   imagePreview: string | null = null;
   existingImageUrl: string | null = null;
 
-  categories = [
-    "Trek Guides",
-    "Tips & Tricks",
-    "Gear Reviews",
-    "Travel Stories",
-    "Safety",
-    "Destinations",
-  ];
+  categories: string[] = [];
 
   // Section types available
   sectionTypes = [
@@ -302,6 +295,7 @@ export class BlogPostComponent implements OnInit {
 
   ngOnInit() {
     this.initForm();
+    this.loadCategories();
     this.route.params.subscribe((params) => {
       if (params["id"]) {
         this.postId = +params["id"];
@@ -334,6 +328,35 @@ export class BlogPostComponent implements OnInit {
   const ampm = now.getHours() >= 12 ? 'PM' : 'AM';
   return `${h}:${m} ${ampm}`;
 }
+
+  private loadCategories() {
+    const fallback = [
+      "Trek Guides",
+      "Tips & Tricks",
+      "Gear Reviews",
+      "Travel Stories",
+      "Safety",
+      "Destinations",
+    ];
+
+    this.postEditorService.getCategories().subscribe({
+      next: (response: any) => {
+        const categoriesArray = Array.isArray(response)
+          ? response
+          : response?.data || [];
+
+        const mapped = categoriesArray
+          .map((category: any) => category?.name || category?.label || category?.value || category)
+          .filter((name: any) => typeof name === 'string' && !!name.trim())
+          .map((name: string) => name.trim());
+
+        this.categories = mapped.length ? mapped : fallback;
+      },
+      error: () => {
+        this.categories = fallback;
+      },
+    });
+  }
 
 
   // ==================== SECTION MANAGEMENT ====================

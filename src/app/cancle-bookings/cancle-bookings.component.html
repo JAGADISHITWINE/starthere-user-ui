@@ -100,8 +100,8 @@
 
       <select class="form-select mb-3" [(ngModel)]="cancellationReason">
         <option value="" disabled selected>Select a reason</option>
-        <option *ngFor="let reason of cancellationReasons" [value]="reason">
-          {{ reason }}
+        <option *ngFor="let reason of cancellationReasons" [value]="reason.value">
+          {{ reason.label }}
         </option>
       </select>
 

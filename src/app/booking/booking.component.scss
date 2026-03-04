@@ -296,6 +296,7 @@ body {
   flex: 1;
   // padding: 48px 56px 140px;
   max-width: 680px;
+  padding-bottom: 190px !important;
 }
 
 .step-headline { margin-bottom: 36px; }
@@ -822,19 +823,149 @@ label {
   a { color: #3d6b4a; text-decoration: none; font-weight: 600; &:hover { text-decoration: underline; } }
 }
 
+.coupon-list-block {
+  background: #ffffff;
+  border: 1.5px solid #e4ddd3;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 16px;
+}
+
+.coupon-list-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #6a746b;
+  margin-bottom: 10px;
+}
+
+.coupon-list-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.coupon-chip {
+  border: 1px dashed #cfd8cf;
+  background: #f7fbf8;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.coupon-chip.used {
+  opacity: 0.6;
+}
+
+.coupon-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.coupon-code {
+  font-size: 0.86rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #1f3225;
+}
+
+.coupon-badge {
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: #e8f2ea;
+  color: #2f6a43;
+  border-radius: 999px;
+  padding: 3px 7px;
+  white-space: nowrap;
+}
+
+.coupon-meta {
+  margin-top: 6px;
+  font-size: 0.7rem;
+  color: #6a746b;
+}
+
+.coupon-copy-btn {
+  margin-top: 8px;
+  width: 100%;
+  border: 1px solid #b8c9bb;
+  background: #fff;
+  color: #2a5c3a;
+  border-radius: 7px;
+  padding: 8px 10px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.coupon-copy-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
 // ─── BOTTOM BAR ───────────────────────────────────────────────
 .bottom-bar {
+  position: fixed;
   bottom: 0;
   left: 380px;   // matches default left panel width
   right: 0;
-  background: rgba(250,246,240,0.92);
+  width: auto !important; // prevents utility classes like w-75 from clipping the floating bar
+  max-width: none !important;
+  margin: 0 16px 14px 16px;
+  background: rgba(250,246,240,0.96);
   backdrop-filter: blur(16px);
-  border-top: 1px solid #e4ddd3;
-  padding: 16px 56px;
+  border: 1px solid #e4ddd3;
+  border-radius: 14px;
+  padding: 12px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 10px 35px rgba(24, 33, 26, 0.12);
+  z-index: 50;
+}
+
+.bottom-bar-main {
   display: flex;
   align-items: center;
   gap: 16px;
-  z-index: 50;
+  width: 100%;
+  flex-wrap: nowrap;
+}
+
+.bottom-error {
+  width: 100%;
+  font-size: 0.78rem;
+  color: #c94040;
+  background: rgba(201,64,64,0.08);
+  border: 1px solid rgba(201,64,64,0.18);
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+.bottom-flash {
+  width: 100%;
+  font-size: 0.76rem;
+  border-radius: 8px;
+  padding: 7px 10px;
+  line-height: 1.4;
+}
+
+.bottom-flash.success {
+  color: #22633a;
+  background: rgba(61,107,74,0.1);
+  border: 1px solid rgba(61,107,74,0.22);
+}
+
+.bottom-flash.error {
+  color: #c94040;
+  background: rgba(201,64,64,0.08);
+  border: 1px solid rgba(201,64,64,0.18);
 }
 
 .bar-price {
@@ -873,6 +1004,7 @@ label {
   border-radius: 8px;
   cursor: pointer;
   white-space: nowrap;
+  flex-shrink: 0;
   transition: all 0.2s;
   &:hover { border-color: #3d6b4a; color: #2d5038; }
 }
@@ -893,6 +1025,7 @@ label {
   border: none;
   cursor: pointer;
   white-space: nowrap;
+  flex-shrink: 0;
   transition: background 0.2s, transform 0.2s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.2s;
   box-shadow: 0 4px 16px rgba(22,35,24,0.25);
 
@@ -952,6 +1085,7 @@ label {
   .form-row       { grid-template-columns: 1fr; gap: 12px; margin-bottom: 12px; }
   .form-row.three { grid-template-columns: 1fr; }
   .addons-grid    { grid-template-columns: 1fr; }
+  .coupon-list-grid { grid-template-columns: 1fr; }
   .participant-fields { grid-template-columns: 1fr; padding: 12px; gap: 12px; }
 
   .batch-option   { flex-wrap: wrap; gap: 8px; padding: 12px; }
@@ -960,6 +1094,8 @@ label {
   .batch-status   { font-size: 0.56rem; padding: 3px 6px; }
 
   .bottom-bar     { left: 0; padding: 10px 12px; gap: 8px; }
+  .bottom-bar-main { gap: 8px; }
+  .btn-pay        { width: 100%; justify-content: center; }
   .bar-price-amount { font-size: 1.05rem; }
   .btn-back       { padding: 8px 10px; font-size: 0.7rem; }
   .btn-next       { padding: 10px 12px; font-size: 0.7rem; letter-spacing: 0.04em; }
@@ -987,11 +1123,14 @@ label {
   .form-row       { grid-template-columns: 1fr; gap: 14px; margin-bottom: 14px; }
   .form-row.three { grid-template-columns: 1fr; }
   .addons-grid    { grid-template-columns: 1fr; }
+  .coupon-list-grid { grid-template-columns: 1fr; }
   .participant-fields { grid-template-columns: 1fr; padding: 14px; gap: 14px; }
 
   .batch-option   { flex-wrap: wrap; gap: 8px; padding: 12px 14px; }
 
   .bottom-bar     { left: 0; gap: 10px;  padding: 10px 14px; }
+  .bottom-bar-main { gap: 10px; }
+  .btn-pay        { width: 100%; justify-content: center; }
   .bar-price-amount { font-size: 1.1rem; }
   .btn-back       { padding: 9px 12px; font-size: 0.72rem; }
   .btn-next       { padding: 10px 14px; font-size: 0.72rem; }
@@ -1010,9 +1149,11 @@ label {
   .form-row       { grid-template-columns: 1fr; }
   .form-row.three { grid-template-columns: 1fr 1fr; }
   .addons-grid    { grid-template-columns: 1fr; }
+  .coupon-list-grid { grid-template-columns: 1fr; }
   .participant-fields { grid-template-columns: 1fr; }
 
   .bottom-bar     { left: 0; padding: 12px 20px; }
+  .btn-pay        { width: 100%; justify-content: center; }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1186,4 +1327,3 @@ label {
   font-size: 0.8rem;
   margin-top: 4px;
 }
-

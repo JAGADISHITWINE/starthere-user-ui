@@ -53,7 +53,10 @@ submitTrekRating(
 ) {
   const encryptedPayload = this.crypto.encrypt(payload);
   return this.http
-    .post(`${this.API}/bookings/${userId}/${bookingId}/rating`, { encryptedPayload })
+    .post(`${this.API}/bookings/${userId}/${bookingId}/rating`, {
+      ...payload,
+      encryptedPayload
+    })
     .pipe(
       map((res: any) => {
         if (!res?.data) return res;

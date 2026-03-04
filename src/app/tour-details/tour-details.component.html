@@ -72,13 +72,28 @@
           </svg>
           {{ tour.location }}
         </span>
-        <div class="td-meta-sep"></div>
-        <span class="td-meta-item">
-          <svg viewBox="0 0 16 16" fill="#ffb250" width="12" height="12">
-            <path d="M8 1l2 4.5H15l-4 3.5 1.5 5L8 11l-4.5 3 1.5-5-4-3.5H6z"/>
-          </svg>
-          {{ tour.rating }} · <span style="opacity:.65">{{ tour.reviewCount }} reviews</span>
-        </span>
+
+        <ng-container *ngIf="tour.rating > 0">
+          <div class="td-meta-sep"></div>
+          <span class="td-meta-item">
+            <svg viewBox="0 0 16 16" fill="#ffb250" width="12" height="12">
+              <path d="M8 1l2 4.5H15l-4 3.5 1.5 5L8 11l-4.5 3 1.5-5-4-3.5H6z"/>
+            </svg>
+            {{ tour.rating }}<ng-container *ngIf="tour.reviewCount > 0"> · <span style="opacity:.65">{{ tour.reviewCount }} reviews</span></ng-container>
+          </span>
+        </ng-container>
+
+        <ng-container *ngIf="tour.views > 0">
+          <div class="td-meta-sep"></div>
+          <span class="td-meta-item">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13">
+              <path d="M1.2 8s2.4-4 6.8-4 6.8 4 6.8 4-2.4 4-6.8 4-6.8-4-6.8-4z"/>
+              <circle cx="8" cy="8" r="1.8"/>
+            </svg>
+            {{ tour.views }} views
+          </span>
+        </ng-container>
+
         <div class="td-meta-sep"></div>
         <span class="td-meta-item">
           <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13">
@@ -339,6 +354,19 @@
     ═════════════════════════════════════════════════════════════════ -->
     <div *ngIf="selectedSegment === 'info'" class="td-tab-panel">
 
+      <div class="td-card">
+        <h2 class="td-section-title">
+          <span class="td-section-icon">✓</span>
+          Pre-Trek Preparation
+        </h2>
+        <ul class="td-carry-list carry-list" role="list">
+          <li class="td-carry-item" *ngFor="let item of prepChecklist">
+            <span class="td-carry-dot" aria-hidden="true">•</span>
+            <span>{{ item }}</span>
+          </li>
+        </ul>
+      </div>
+
       <!-- Things to Carry -->
       <div class="td-card">
         <h2 class="td-section-title">
@@ -377,6 +405,35 @@
         </ul>
       </div>
 
+      <div class="td-card">
+        <h2 class="td-section-title">
+          <span class="td-section-icon">🛡</span>
+          Safety Protocol
+        </h2>
+        <div class="td-safety-grid">
+          <article class="td-safety-item" *ngFor="let point of safetyPoints">
+            <h3>{{ point.title }}</h3>
+            <p>{{ point.detail }}</p>
+          </article>
+        </div>
+      </div>
+
+      <div class="td-card">
+        <h2 class="td-section-title">
+          <span class="td-section-icon">?</span>
+          Frequently Asked Questions
+        </h2>
+        <div class="td-faq-list">
+          <article class="td-faq-item" *ngFor="let faq of trekFaqs; let i = index">
+            <button class="td-faq-question" (click)="toggleFaq(i)" [attr.aria-expanded]="openFaqIndex === i">
+              <span>{{ faq.question }}</span>
+              <span>{{ openFaqIndex === i ? '−' : '+' }}</span>
+            </button>
+            <p class="td-faq-answer" *ngIf="openFaqIndex === i">{{ faq.answer }}</p>
+          </article>
+        </div>
+      </div>
+
     </div><!-- /info -->
 
   </div><!-- td-content-wrap -->
@@ -406,6 +463,13 @@
         <path d="M7 7h6M7 11h4" stroke-linecap="round"/>
       </svg>
       Book Now
+    </button>
+    <button
+      class="td-book-btn td-book-btn--ghost"
+      *ngIf="tour.availableSlots != 0"
+      (click)="openWhatsAppEnquiry(tour)"
+      aria-label="Enquire on WhatsApp">
+      Ask Expert
     </button>
     <div class="td-sold-out" *ngIf="tour.availableSlots == 0" aria-label="Sold out">
       <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" width="16">

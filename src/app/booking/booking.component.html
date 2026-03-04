@@ -65,9 +65,9 @@
         <span class="price-amt">₹{{ basePrice | number:'1.0-0' }}</span>
       </div>
       <ng-container *ngFor="let addon of addOns">
-        <div class="price-row" *ngIf="addon.selected">
-          <span class="price-label">{{ addon.name }} × {{ booking.participants }}</span>
-          <span class="price-amt">₹{{ addon.price * booking.participants | number:'1.0-0' }}</span>
+        <div class="price-row" *ngIf="addon.quantity > 0">
+          <span class="price-label">{{ addon.name }} × {{ addon.quantity }}</span>
+          <span class="price-amt">₹{{ addon.price * addon.quantity | number:'1.0-0' }}</span>
         </div>
       </ng-container>
       <div class="price-row total">
@@ -101,18 +101,6 @@
       </div>
       <div class="mob-step" [class.active]="currentStep === 4">
         <div class="mob-num">4</div>Review
-      </div>
-    </div>
-
-    <!-- Alerts -->
-    <div class="form-area" style="padding-bottom:0; padding-top:20px" *ngIf="successMessage || errorMessage">
-      <div class="success-bar" *ngIf="successMessage">
-        ✓ {{ successMessage }}
-        <button class="alert-close" (click)="successMessage = ''">✕</button>
-      </div>
-      <div class="error-bar" *ngIf="errorMessage">
-        ⚠ {{ errorMessage }}
-        <button class="alert-close" (click)="errorMessage = ''">✕</button>
       </div>
     </div>
 
@@ -185,13 +173,23 @@
           Add-ons (Optional)
         </div>
         <div class="addons-grid">
-          <label class="addon-card" *ngFor="let addon of addOns" [class.checked]="addon.selected">
-            <input type="checkbox" [(ngModel)]="addon.selected" />
+          <label class="addon-card" *ngFor="let addon of addOns" [class.checked]="addon.quantity > 0">
             <div class="addon-top">
               <div class="addon-name">{{ addon.name }}</div>
-              <div class="addon-check">{{ addon.selected ? '✓' : '' }}</div>
+              <div class="addon-check">{{ addon.quantity > 0 ? '✓' : '' }}</div>
             </div>
             <div class="addon-price">₹{{ addon.price }} / person</div>
+            <div class="field" style="margin-top:10px">
+              <label style="margin-bottom:6px">Participants</label>
+              <select
+                class="form-select"
+                [ngModel]="addon.quantity"
+                (ngModelChange)="onAddonQuantityChange(addon, $event)">
+                <option *ngFor="let count of participantCountOptions" [ngValue]="count">
+                  {{ count === 0 ? 'None' : count + ' participant' + (count > 1 ? 's' : '') }}
+                </option>
+              </select>
+            </div>
           </label>
         </div>
       </ng-container>
@@ -272,9 +270,9 @@
               <label>Gender <span class="req">*</span></label>
               <select class="form-select" [(ngModel)]="participant.gender">
                 <option value="">Select Gender</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-                <option value="Other">Other</option>
+                <option *ngFor="let option of genderOptions" [value]="option.value">
+                  {{ option.label }}
+                </option>
               </select>
             </div>
             <div class="field">
@@ -282,11 +280,9 @@
               <select class="form-select" [(ngModel)]="participant.idType"
               (change)="participant.idNumber=''; participant.idError=''; validateId(participant)">
                 <option value="">Select ID</option>
-                <option value="Aadhar">Aadhar Card</option>
-                <option value="PAN">PAN Card</option>
-                <option value="Passport">Passport</option>
-                <option value="Driving License">Driving License</option>
-                <option value="Voter ID">Voter ID</option>
+                <option *ngFor="let option of idTypeOptions" [value]="option.value">
+                  {{ option.label }}
+                </option>
               </select>
             </div>
             <div class="field">
@@ -299,8 +295,13 @@
             <div class="field">
               <label>Phone</label>
               <input class="form-input" type="tel" [(ngModel)]="participant.phone" placeholder="+91 XXXXX XXXXX"
-                [disabled]="i === 0" />
+                [disabled]="i === 0"
+                minlength="10"
+                maxlength="10"
+                onlyNumber
+                (input)="validateParticipantPhone(participant, i === 0)" />
               <div class="field-hint" *ngIf="i === 0">Auto-filled from contact info</div>
+              <div class="error" *ngIf="participant.phoneError">{{ participant.phoneError }}</div>
             </div>
             <div class="field full">
               <label>Medical Conditions / Allergies</label>
@@ -389,9 +390,9 @@
             <span class="pb-val">₹{{ basePrice | number:'1.0-0' }}</span>
           </div>
           <ng-container *ngFor="let addon of addOns">
-            <div class="pb-row" *ngIf="addon.selected">
-              <span class="pb-label">{{ addon.name }} ({{ booking.participants }} × ₹{{ addon.price }})</span>
-              <span class="pb-val">₹{{ addon.price * booking.participants | number:'1.0-0' }}</span>
+            <div class="pb-row" *ngIf="addon.quantity > 0">
+              <span class="pb-label">{{ addon.name }} ({{ addon.quantity }} × ₹{{ addon.price }})</span>
+              <span class="pb-val">₹{{ addon.price * addon.quantity | number:'1.0-0' }}</span>
             </div>
           </ng-container>
           <div class="pb-row total">
@@ -399,6 +400,46 @@
             <span class="pb-val">₹{{ totalPrice | number:'1.0-0' }}</span>
           </div>
         </div>
+
+        <div class="form-row" style="margin-top:16px">
+          <div class="field">
+            <label>Coupon Code</label>
+            <input
+              class="form-input"
+              [(ngModel)]="couponCode"
+              (ngModelChange)="onCouponCodeInput($event)"
+              placeholder="Enter coupon code (optional)"
+              style="text-transform:uppercase" />
+            <div class="field-hint" *ngIf="isCouponValidating">Validating coupon...</div>
+            <div class="field-hint" *ngIf="!isCouponValidating && couponValidationSuccess" style="color:#2d7a43">
+              {{ couponValidationSuccess }}
+            </div>
+          </div>
+        </div>
+
+        <div class="coupon-list-block" *ngIf="availableCoupons.length > 0">
+          <div class="coupon-list-title">Available Coupons</div>
+          <div class="coupon-list-grid">
+            <div class="coupon-chip" *ngFor="let coupon of availableCoupons" [class.used]="coupon.isUsedByUser">
+              <div class="coupon-top">
+                <span class="coupon-code">{{ coupon.code }}</span>
+                <span class="coupon-badge">{{ getCouponLabel(coupon) }}</span>
+              </div>
+              <div class="coupon-meta">
+                Min booking ₹{{ coupon.minBookingAmount || 0 }}
+                <span *ngIf="coupon.endDate"> · Expires {{ coupon.endDate | date:'MMM dd' }}</span>
+              </div>
+              <button
+                class="coupon-copy-btn"
+                type="button"
+                [disabled]="coupon.isUsedByUser"
+                (click)="copyCouponCode(coupon.code)">
+                {{ coupon.isUsedByUser ? 'Already used' : 'Copy & Apply' }}
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="field-hint" *ngIf="couponListError">{{ couponListError }}</div>
 
         <label class="terms-check">
           <input type="checkbox" [(ngModel)]="termsAccepted" />
@@ -413,22 +454,33 @@
     <!-- /form-area -->
 
     <!-- Bottom bar -->
-    <div class="bottom-bar w-100">
-      <button class="btn-back" *ngIf="currentStep > 1" (click)="prevStep()">← Back</button>
+    <div class="bottom-bar">
+      <div class="bottom-bar-main">
+        <button class="btn-back" *ngIf="currentStep > 1" (click)="prevStep()">← Back</button>
 
-      <div class="bar-price" *ngIf="selectedBatch">
-        <div class="bar-price-label">Total</div>
-        <div class="bar-price-amount">₹{{ totalPrice | number:'1.0-0' }}</div>
+        <div class="bar-price" *ngIf="selectedBatch">
+          <div class="bar-price-label">Total</div>
+          <div class="bar-price-amount">₹{{ payablePrice | number:'1.0-0' }}</div>
+        </div>
+
+        <button class="btn-next" *ngIf="currentStep < 4" (click)="nextStep()" [disabled]="!canProceedToNextStep()">
+          Continue →
+        </button>
+
+        <button class="btn-next btn-pay" *ngIf="currentStep === 4" [disabled]="isSubmitting || !termsAccepted || isCouponValidating"
+          (click)="proceedToPayment()">
+          {{ isSubmitting ? 'Processing…' : '💳 Pay Now' }}
+        </button>
       </div>
-
-      <button class="btn-next" *ngIf="currentStep < 4" (click)="nextStep()" [disabled]="!canProceedToNextStep()">
-        Continue →
-      </button>
-
-      <button class="btn-next btn-pay" *ngIf="currentStep === 4" [disabled]="isSubmitting || !termsAccepted"
-        (click)="proceedToPayment()">
-        {{ isSubmitting ? 'Processing…' : '💳 Pay Now' }}
-      </button>
+      <div class="bottom-error" *ngIf="currentStep === 4 && couponValidationError">
+        {{ couponValidationError }}
+      </div>
+      <div class="bottom-flash success" *ngIf="successMessage">
+        ✓ {{ successMessage }}
+      </div>
+      <div class="bottom-flash error" *ngIf="errorMessage">
+        ⚠ {{ errorMessage }}
+      </div>
     </div>
 
   </div>

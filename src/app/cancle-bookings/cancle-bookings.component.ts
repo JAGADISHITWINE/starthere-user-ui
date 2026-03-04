@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { CancleBookings } from './cancle-bookings';
+import { DropdownOption, DropdownService } from '../core/dropdown.service';
 
 @Component({
   selector: 'app-cancle-bookings',
@@ -11,7 +12,7 @@ import { CancleBookings } from './cancle-bookings';
   standalone: true,
   imports: [CommonModule, FormsModule, IonicModule]
 })
-export class CancleBookingsComponent {
+export class CancleBookingsComponent implements OnInit {
 
   @Input() booking: any;
   @Input() isOpen = false;
@@ -23,18 +24,33 @@ export class CancleBookingsComponent {
   errorMessage = '';
   showSuccessScreen: boolean = false;
 
-  cancellationReasons = [
-    'Change of plans',
-    'Medical emergency',
-    'Work commitments',
-    'Weather concerns',
-    'Financial reasons',
-    'Found alternative trek',
-    'Other'
-  ];
+  cancellationReasons: DropdownOption[] = [];
   refundedAmount: any;
 
-  constructor(private bookingService: CancleBookings) { }
+  constructor(
+    private bookingService: CancleBookings,
+    private dropdownService: DropdownService
+  ) { }
+
+  ngOnInit() {
+    this.loadCancellationReasons();
+  }
+
+  private loadCancellationReasons() {
+    const fallback: DropdownOption[] = [
+      { value: 'Change of plans', label: 'Change of plans' },
+      { value: 'Medical emergency', label: 'Medical emergency' },
+      { value: 'Work commitments', label: 'Work commitments' },
+      { value: 'Weather concerns', label: 'Weather concerns' },
+      { value: 'Financial reasons', label: 'Financial reasons' },
+      { value: 'Found alternative trek', label: 'Found alternative trek' },
+      { value: 'Other', label: 'Other' },
+    ];
+
+    this.dropdownService.getOptions('cancellation-reasons', fallback).subscribe((options) => {
+      this.cancellationReasons = options;
+    });
+  }
 
   /**
    * Close modal
