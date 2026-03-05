@@ -5,9 +5,9 @@
 
     <div class="trek-thumb" style="position:relative">
       <div class="panel-nav">
-        <a class="back-btn" [routerLink]="['/tour-details', trekId]">← Trek Details</a>
+        <a class="back-btn" [routerLink]="['/tour-details', tourDetailsRouteRef]">← Trek Details</a>
       </div>
-      <img [src]="'http://localhost:4001/' + trek.cover_image" [alt]="trek.name" />
+      <img [src]="mediaBaseUrl + trek.cover_image" [alt]="trek.name" />
     </div>
 
     <div class="trek-info">
@@ -83,7 +83,7 @@
 
     <!-- Mobile nav -->
     <div class="mobile-nav">
-      <a class="mobile-back" [routerLink]="['/tour-details', trekId]">← Back</a>
+      <a class="mobile-back" [routerLink]="['/tour-details', tourDetailsRouteRef]">← Back</a>
       <div class="mobile-title">Book Your Trek</div>
       <div style="width:60px"></div>
     </div>

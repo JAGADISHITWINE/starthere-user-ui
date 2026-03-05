@@ -5,6 +5,8 @@ import { IonicModule } from '@ionic/angular';
 import { Dashboard } from './dashboard';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DropdownOption, DropdownService } from '../core/dropdown.service';
+import { PublicRouteIdService } from '../core/public-route-id.service';
+import { environment } from 'src/environments/environment';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
@@ -51,7 +53,8 @@ export class DashboardComponent implements OnInit {
   constructor(
     private router: Router,
     private dashboardService: Dashboard,
-    private dropdownService: DropdownService
+    private dropdownService: DropdownService,
+    private publicRouteId: PublicRouteIdService
   ) { }
 
   treks: TrekCard[] = [];
@@ -67,7 +70,7 @@ export class DashboardComponent implements OnInit {
   compareTreks: TrekCard[] = [];
   readonly maxCompareCount = 3;
   readonly supportPhone = '+919876543210';
-  readonly mediaBaseUrl = (window as any)?.__env?.MEDIA_BASE_URL || 'http://localhost:4001/';
+  readonly mediaBaseUrl = (environment.mediaBaseUrl || '').replace(/\/?$/, '/');
   sortOptions: DropdownOption[] = [];
   showComparePanel = false;
   compareNotice = '';
@@ -97,8 +100,6 @@ export class DashboardComponent implements OnInit {
             : [];
 
         this.treks = trekRows.map((trek: any) => this.mapTourData(trek));
-        console.log(this.treks)
-
         const summary = payload?.summary || {};
         this.averageRating = Number(summary.averageRating || 0);
         this.trekkersThisYear = Number(summary.trekkersThisYear || 0);
@@ -207,7 +208,7 @@ export class DashboardComponent implements OnInit {
       : null;
 
     return {
-      id: String(result.uuid || result.id || result.trekId || ''),
+      id: String(result.public_ref || result.uuid || result.id || result.trekId || ''),
       name: result.name,
       category: result.category || '',
       location: result.location,
@@ -617,6 +618,7 @@ showLessTreks(): void {
   }
 
   viewDetails(trek: TrekCard): void {
-      this.router.navigate(['/tour-details', trek.id]);
+      const publicRef = this.publicRouteId.encode(trek.id) || trek.id;
+      this.router.navigate(['/tour-details', publicRef]);
   }
 }

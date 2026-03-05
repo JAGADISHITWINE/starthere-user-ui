@@ -9,9 +9,12 @@ import { SearchService } from './search.service';
 import { AuthModalService } from '../auth/auth-modal.service';
 import { Router } from '@angular/router';
 import { DropdownService } from '../core/dropdown.service';
+import { PublicRouteIdService } from '../core/public-route-id.service';
+import { environment } from 'src/environments/environment';
 
 export interface TrekTour {
   id?: number;
+  publicId?: string;
   name: string;
   description: string;
   location: string;
@@ -49,11 +52,14 @@ interface SearchDifficultyOption {
   imports: [CommonModule, IonicModule, ReactiveFormsModule, FormsModule],
 })
 export class SearchComponent implements OnInit {
+  private readonly mediaBaseUrl = (environment.mediaBaseUrl || '').replace(/\/?$/, '/');
+
   constructor(
     private searchService: SearchService,
     private authModal: AuthModalService,
     private router: Router,
     private dropdownService: DropdownService,
+    private publicRouteId: PublicRouteIdService,
   ) { }
 
   loading = false;
@@ -114,6 +120,7 @@ export class SearchComponent implements OnInit {
 
           return {
             id: t.id,
+            publicId: String(t.detail_public_ref || t.public_ref || t.uuid || t.trek_uuid || t.id || ''),
             name: t.name,
             description: t.description,
             location: t.location,
@@ -131,7 +138,7 @@ export class SearchComponent implements OnInit {
             has_available_slots: t.has_available_slots,
             remainingSlots: firstBatch?.remainingSlots ?? 0,
             cover_image: t.cover_image
-              ? `http://localhost:4001/${t.cover_image}`
+              ? `${this.mediaBaseUrl}${String(t.cover_image).replace(/^\/+/, '')}`
               : null,
             landscapePath: t.landscape_path ?? null,
           };
@@ -208,7 +215,9 @@ export class SearchComponent implements OnInit {
   // ACTIONS
   // ===============================
   onSelectTrek(trek: TrekTour) {
-    this.router.navigate(['/tour-details', trek.id]);
+    const rawId = trek.publicId || String(trek.id ?? '');
+    const publicRef = this.publicRouteId.encode(rawId) || rawId;
+    this.router.navigate(['/tour-details', publicRef]);
   }
 
   onBook(trek: TrekTour) {
@@ -218,7 +227,9 @@ export class SearchComponent implements OnInit {
       return;
     }
     else {
-      this.router.navigate(['/booking', trek.id]);
+      const rawId = trek.publicId || String(trek.id ?? '');
+      const publicRef = this.publicRouteId.encode(rawId) || rawId;
+      this.router.navigate(['/booking', publicRef]);
     }
   }
 

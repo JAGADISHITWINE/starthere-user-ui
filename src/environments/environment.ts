@@ -9,6 +9,7 @@ export const environment = {
   production: false,
   // Allow overriding at runtime via a global (optional). Falls back to localhost for dev.
   baseUrl: (window as any)?.__env?.API_BASE_URL || 'http://localhost:4002/api/auth',
+  mediaBaseUrl: (window as any)?.__env?.MEDIA_BASE_URL || 'http://localhost:4001/',
 
   // These values should NOT contain real secrets in the repository.
   // Provide them at runtime instead (window.__env) or, better, move sensitive

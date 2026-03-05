@@ -2,6 +2,7 @@
 export const environment = {
   production: true,
   baseUrl: (window as any)?.__env?.API_BASE_URL || '',
+  mediaBaseUrl: (window as any)?.__env?.MEDIA_BASE_URL || '',
   encryptionKey: (window as any)?.__env?.ENCRYPTION_KEY || '',
   encryptionSalt: (window as any)?.__env?.ENCRYPTION_SALT || 'start-here-salt',
 };

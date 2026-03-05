@@ -207,7 +207,7 @@
   <ion-card
     *ngFor="let relatedPost of relatedPosts"
     button
-    (click)="viewRelatedPost(relatedPost.id)"
+    (click)="viewRelatedPost(relatedPost)"
   >
     <img [src]="relatedPost.image" [alt]="relatedPost.title" />
     <ion-card-content>

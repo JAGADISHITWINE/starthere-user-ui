@@ -5,9 +5,11 @@ import { FormsModule } from "@angular/forms";
 import { Router } from "@angular/router";
 import { Blog } from "./blog";
 import { Location } from '@angular/common';
+import { environment } from "src/environments/environment";
 
 interface BlogPost {
   id: number;
+  publicRef?: string;
   title: string;
   excerpt: string;
   content: string;
@@ -35,7 +37,7 @@ export class BlogComponent implements OnInit {
   selectedCategory: string = "all";
   searchQuery: string = "";
   isLoading: boolean = false;
-  readonly imageBaseUrl = "http://localhost:4001";
+  readonly imageBaseUrl = (environment.mediaBaseUrl || '').replace(/\/?$/, '/');
   readonly fallbackImage = "assets/assets/logo.png";
 
   categories = [
@@ -117,6 +119,7 @@ async loadCategories() {
   mapPostToBlogPost(post: any): BlogPost {
     return {
       id: post.id,
+      publicRef: post.public_ref || undefined,
       title: post.title,
       excerpt: post.excerpt,
       content: post.content,
@@ -226,11 +229,12 @@ async loadCategories() {
     return posts;
   }
 
-  viewPost(postId: number) {
+  viewPost(post: BlogPost) {
     // Increment view count
-    this.blogService.incrementViews(postId).subscribe({
+    this.blogService.incrementViews(post.publicRef || post.id).subscribe({
       next: () => {
-        this.router.navigate(["/blog-details", postId]);
+        const publicRef = String(post.publicRef || post.id);
+        this.router.navigate(["/blog-details", publicRef]);
       },
     });
   }

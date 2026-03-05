@@ -7,6 +7,8 @@ import { Router, RouterLink } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { TrekListItem, Upcomingtours } from './upcomingtours';
 import { Location } from '@angular/common';
+import { PublicRouteIdService } from '../core/public-route-id.service';
+import { environment } from 'src/environments/environment';
 
 
 @Component({
@@ -17,6 +19,7 @@ import { Location } from '@angular/common';
   imports: [CommonModule, FormsModule, IonicModule, RouterLink],
 })
 export class ToursComponent implements OnInit {
+  readonly mediaBaseUrl = (environment.mediaBaseUrl || '').replace(/\/?$/, '/');
 
   selectedYear: number = new Date().getFullYear();
   selectedMonth: string = '';
@@ -37,7 +40,8 @@ export class ToursComponent implements OnInit {
   constructor(
     private router: Router,
     private trekService: Upcomingtours,
-     private location: Location
+     private location: Location,
+     private publicRouteId: PublicRouteIdService
   ) { }
 
   ngOnInit() {
@@ -284,8 +288,10 @@ loadTreks() {
   /**
    * Navigate to trek details
    */
-  viewDetails(trekId: number) {
-    this.router.navigate(['/tour-details', trekId]);
+  viewDetails(trek: TrekListItem) {
+    const rawId = String(trek.batch_public_ref || trek.trek_uuid || trek.id || '');
+    const publicRef = this.publicRouteId.encode(rawId) || rawId;
+    this.router.navigate(['/tour-details', publicRef]);
   }
 
   /**

@@ -93,7 +93,7 @@ export class Blog {
     );
   }
 
-  incrementViews(postId: number): Observable<any> {
+  incrementViews(postId: number | string): Observable<any> {
     return this.http.post(`${this.API}/blog/posts/${postId}/view`, {}).pipe(
       map((res: any) => {
         const decrypted = this.crypto.decrypt(res.data);

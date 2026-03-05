@@ -7,6 +7,8 @@ import { Location } from '@angular/common';
 import { MyBookings } from "./my-bookings";
 import { AuthModalService } from "../auth/auth-modal.service";
 import { TokenService } from 'src/app/core/token.service';
+import { PublicRouteIdService } from '../core/public-route-id.service';
+import { environment } from 'src/environments/environment';
 
 interface Booking {
   id: number;
@@ -39,6 +41,7 @@ interface Booking {
   imports: [CommonModule, IonicModule, RouterLink, FormsModule],
 })
 export class MyBookingsComponent implements OnInit {
+  readonly mediaBaseUrl = (environment.mediaBaseUrl || '').replace(/\/?$/, '/');
   activeTab: "upcoming" | "past" | "cancelled" = "upcoming";
 
   upcomingBookings: Booking[] = [];
@@ -67,7 +70,8 @@ export class MyBookingsComponent implements OnInit {
     private authModal: AuthModalService,
     private router: Router,
     private tokenService: TokenService,
-    private location: Location
+    private location: Location,
+    private publicRouteId: PublicRouteIdService
   ) { }
 
   ngOnInit() {
@@ -180,7 +184,9 @@ export class MyBookingsComponent implements OnInit {
   }
 
   viewBookingDetails(booking: any) {
-    this.router.navigate(['/tour-details', booking.trek_id]);
+    const rawId = String(booking?.public_ref || booking?.trek_uuid || booking?.trek_id || '');
+    const publicRef = this.publicRouteId.encode(rawId) || rawId;
+    this.router.navigate(['/tour-details', publicRef]);
   }
 
 

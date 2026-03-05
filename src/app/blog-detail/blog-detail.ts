@@ -15,7 +15,7 @@ export class BlogDetail {
 
   // ==================== GET METHODS ====================
 
-  getPostById(id: number): Observable<any> {
+  getPostById(id: number | string): Observable<any> {
     return this.http.get(`${this.API}/blog/posts/${id}`).pipe(
       map((res: any) => {
         const decrypted = this.crypto.decrypt(res.data);
@@ -24,7 +24,7 @@ export class BlogDetail {
     );
   }
 
-  getRelatedPosts(categoryId: number, excludePostId: number): Observable<any> {
+  getRelatedPosts(categoryId: number, excludePostId: number | string): Observable<any> {
     return this.http.get(`${this.API}/blog/posts/related`, {
       params: {
         category_id: categoryId.toString(),
@@ -39,7 +39,7 @@ export class BlogDetail {
     );
   }
 
-  getComments(postId: number): Observable<any> {
+  getComments(postId: number | string): Observable<any> {
     return this.http.get(`${this.API}/blog/posts/${postId}/comments`).pipe(
       map((res: any) => {
         const decrypted = this.crypto.decrypt(res.data);
@@ -65,7 +65,7 @@ export class BlogDetail {
     );
   }
 
-  likePost(postId: number): Observable<any> {
+  likePost(postId: number | string): Observable<any> {
     const encryptedPayload = this.crypto.encrypt({ postId });
     return this.http.post(`${this.API}/blog/posts/${postId}/like`, { encryptedPayload }).pipe(
       map((res: any) => {

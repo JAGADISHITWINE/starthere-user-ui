@@ -6,6 +6,7 @@ import { BlogDetail } from "./blog-detail";
 import { TokenService } from 'src/app/core/token.service';
 import { FormsModule } from "@angular/forms";
 import { AuthModalService } from "../auth/auth-modal.service";
+import { environment } from "src/environments/environment";
 
 interface Comment {
   id: number;
@@ -21,6 +22,7 @@ interface Comment {
 
 interface RelatedPost {
   id: number;
+  publicRef?: string;
   title: string;
   image: string;
   category: string;
@@ -36,12 +38,14 @@ interface RelatedPost {
 })
 export class BlogDetailComponent implements OnInit {
   postId: any;
+  postRef: string = "";
   newComment: string = "";
   isSubmittingComment: boolean = false;
   currentUserId: any | null = null;
   editingCommentId: any | null = null;
   editedContent: string = "";
   Loading = false;
+  private readonly mediaBaseUrl = (environment.mediaBaseUrl || '').replace(/\/?$/, '/');
 
   post!: {
     id: number;
@@ -76,7 +80,9 @@ export class BlogDetailComponent implements OnInit {
 
   ngOnInit() {
     this.route.params.subscribe((params) => {
-      this.postId = +params["id"];
+      this.postRef = String(params["id"] || "");
+      this.postId = Number(this.postRef || 0);
+      if (!this.postRef) return;
       this.loadPost();
       this.loadComments();
       this.setCurrentUser();
@@ -94,12 +100,13 @@ export class BlogDetailComponent implements OnInit {
   }
 
   loadPost() {
-    this.blogDetailService.getPostById(this.postId).subscribe((result: any) => {
+    this.blogDetailService.getPostById(this.postRef).subscribe((result: any) => {
       const res = result.data;
+      this.postId = Number(res.id || this.postId || 0);
       this.post = {
         id: res.id,
         title: res.title,
-        image: `http://localhost:4001/${res.featured_image}`,
+        image: this.resolveMediaUrl(res.featured_image),
         author: {
           name: res.author_name || "Admin",
           avatar: res.author_avatar || "https://ui-avatars.com/api/?name=Admin",
@@ -124,7 +131,7 @@ export class BlogDetailComponent implements OnInit {
   }
 
   loadComments() {
-    this.blogDetailService.getComments(this.postId).subscribe(
+    this.blogDetailService.getComments(this.postRef).subscribe(
       (res: any) => {
         const commentsData = res.data || [];
 
@@ -152,15 +159,16 @@ export class BlogDetailComponent implements OnInit {
 
   loadRelated(categoryId: number) {
     this.blogDetailService
-      .getRelatedPosts(categoryId, this.postId)
+      .getRelatedPosts(categoryId, this.postRef)
       .subscribe((res: any) => {
         if (res.success == true) {
           this.Loading = false;
           const relatedData = res.data || [];
           this.relatedPosts = relatedData.map((post: any) => ({
             id: post.id,
+            publicRef: post.public_ref || undefined,
             title: post.title,
-            image: `http://localhost:4001/${post.featured_image}`,
+            image: this.resolveMediaUrl(post.featured_image),
             category: post.category,
             readTime: post.read_time || "5 min",
           }));
@@ -228,7 +236,7 @@ export class BlogDetailComponent implements OnInit {
   }
 
   likePost() {
-    this.blogDetailService.likePost(this.postId).subscribe(
+    this.blogDetailService.likePost(this.postRef).subscribe(
       (res: any) => {
         this.post.likes = res.data.likes;
       },
@@ -252,8 +260,9 @@ export class BlogDetailComponent implements OnInit {
     );
   }
 
-  viewRelatedPost(postId: number) {
-    this.router.navigate(["/blog", postId]).then(() => {
+  viewRelatedPost(post: RelatedPost) {
+    const publicRef = String(post.publicRef || post.id);
+    this.router.navigate(["/blog-details", publicRef]).then(() => {
       // Reload the page to fetch new data
       window.location.reload();
     });
@@ -330,5 +339,12 @@ export class BlogDetailComponent implements OnInit {
 
   createPost() {
     this.router.navigate(["/blog-post"]);
+  }
+
+  private resolveMediaUrl(path: string | null | undefined): string {
+    if (!path) return '';
+    const value = String(path);
+    if (/^https?:\/\//i.test(value)) return value;
+    return `${this.mediaBaseUrl}${value.replace(/^\/+/, '')}`;
   }
 }

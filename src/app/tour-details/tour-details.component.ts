@@ -6,6 +6,8 @@ import { IonicModule } from '@ionic/angular';
 import { TourDetails } from './tour-details';
 import { AuthModalService } from '../auth/auth-modal.service';
 import { Location } from '@angular/common';
+import { PublicRouteIdService } from '../core/public-route-id.service';
+import { environment } from 'src/environments/environment';
 
 
 interface Activity {
@@ -100,10 +102,11 @@ export class TourDetailsComponent implements OnInit {
   tour: MappedTour | null = null;
   isLoading = true;
   tourUuid: string = '';
+  routeRef: string = '';
   selectedSegment: string = 'overview';
   openFaqIndex = -1;
 
-  baseUrl = 'http://localhost:4001/';
+  baseUrl = (environment.mediaBaseUrl || '').replace(/\/?$/, '/');
   readonly supportPhone = '+919876543210';
   readonly prepChecklist = [
     'Walk 4-5 km daily for at least 2 weeks before the trek',
@@ -149,15 +152,21 @@ export class TourDetailsComponent implements OnInit {
     private router: Router,
     private tourDetailsService: TourDetails,
     private authModal: AuthModalService,
-    private location: Location
+    private location: Location,
+    private publicRouteId: PublicRouteIdService
 
   ) { }
 
   ngOnInit() {
     this.route.paramMap.subscribe(params => {
-      const uuid = params.get('uuid');
-      if (!uuid) return;
-      this.tourUuid = uuid;
+      const ref = params.get('uuid');
+      if (!ref) return;
+
+      const resolvedUuid = this.publicRouteId.resolve(ref);
+      if (!resolvedUuid) return;
+
+      this.routeRef = ref;
+      this.tourUuid = resolvedUuid;
       this.isLoading = true;
       this.tour = null;
       this.loadTrekDetails();
@@ -263,7 +272,8 @@ export class TourDetailsComponent implements OnInit {
       return;
     }
     else {
-      this.router.navigate(['/booking', tour.id]);
+      const bookingRef = this.routeRef || (this.publicRouteId.encode(tour.id) || String(tour.id));
+      this.router.navigate(['/booking', bookingRef]);
     }
   }
 

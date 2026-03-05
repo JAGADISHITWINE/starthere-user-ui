@@ -48,6 +48,8 @@ export interface TrekBatch {
 
 export interface TrekListItem {
   id: number;
+  trek_uuid?: string;
+  batch_public_ref?: string;
   name: string;
   location: string;
   date: string;
@@ -275,6 +277,7 @@ export class Upcomingtours {
 
     return {
       id: trek.id,
+      trek_uuid: trek.uuid || trek.trek_uuid || trek.trekUuid || undefined,
       name: trek.name,
       location: trek.location,
       date: this.formatDate(startDate),
@@ -285,6 +288,7 @@ export class Upcomingtours {
       status: trek.batch_status,
       category: trek.category,
       batch_id: trek.batch_id,
+      batch_public_ref: trek.batch_public_ref || undefined,
       start_date: trek.start_date,
       end_date: trek.end_date
     };
@@ -298,6 +302,7 @@ export class Upcomingtours {
 
     return {
       id: trek.id,
+      trek_uuid: trek.uuid || trek.trek_uuid || trek.trekUuid || batch?.trek_uuid || undefined,
       name: trek.name,
       location: trek.location,
       date: this.formatDate(startDate),
@@ -308,6 +313,7 @@ export class Upcomingtours {
       status: batch.batch_status,
       category: trek.category,
       batch_id: batch.id,
+      batch_public_ref: batch.public_ref || undefined,
       start_date: batch.start_date,
       end_date: batch.end_date
     };

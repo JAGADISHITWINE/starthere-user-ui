@@ -11,6 +11,8 @@ import { AuthModalService } from "../auth/auth-modal.service";
 import { Sessionexpired } from "../auth/sessionexpired/sessionexpired";
 import { OnlyNumberDirective } from "../shared/Only number.directive";
 import { DropdownOption, DropdownService } from "../core/dropdown.service";
+import { PublicRouteIdService } from "../core/public-route-id.service";
+import { environment } from "src/environments/environment";
 
 // Participant interface
 interface Participant {
@@ -62,7 +64,9 @@ interface AvailableCoupon {
   ],
 })
 export class BookingComponent implements OnInit, OnDestroy {
+  readonly mediaBaseUrl = (environment.mediaBaseUrl || '').replace(/\/?$/, '/');
   trekId: number = 0;
+  routeRef: string = "";
   currentStep: number = 1;
   isLoading: boolean = true;
   termsAccepted: boolean = true;
@@ -117,6 +121,7 @@ export class BookingComponent implements OnInit, OnDestroy {
     private tokenService: TokenService,
     private sessionService: Sessionexpired,
     private dropdownService: DropdownService,
+    private publicRouteId: PublicRouteIdService,
   ) { }
 
   ngOnInit() {
@@ -124,8 +129,11 @@ export class BookingComponent implements OnInit, OnDestroy {
 
     // Get trek ID from route
     this.route.params.subscribe((params) => {
-      this.trekId = +params["id"];
-      if (this.trekId) {
+      const ref = String(params["id"] || "");
+      this.routeRef = ref;
+      const resolvedId = this.publicRouteId.resolve(ref);
+      this.trekId = Number(resolvedId || 0);
+      if (this.routeRef) {
         this.loadTrekData();
       }
     });
@@ -177,10 +185,11 @@ export class BookingComponent implements OnInit, OnDestroy {
   loadTrekData() {
     this.isLoading = true;
 
-    this.trekService.getTrekById(this.trekId).subscribe({
+    this.trekService.getTrekById(this.routeRef || this.trekId).subscribe({
       next: (response: any) => {
         if (response.success) {
           this.trek = response.data || [];
+          this.trekId = Number(this.trek?.batch?.batchId || this.trek?.batch?.id || this.trekId || 0);
 
           // Convert single batch to array for consistent handling
           if (this.trek.batch && !Array.isArray(this.trek.batch)) {
@@ -621,6 +630,10 @@ get participantCountOptions(): number[] {
     { length: (this.booking.participants || 1) + 1 },
     (_, index) => index
   );
+}
+
+get tourDetailsRouteRef(): string {
+  return this.routeRef || (this.publicRouteId.encode(this.trekId) || String(this.trekId || ''));
 }
 
 onAddonQuantityChange(addon: BookingAddOn, value: string | number) {
