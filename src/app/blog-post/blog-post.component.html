@@ -383,7 +383,7 @@
       <ion-card-content>
         <!-- Image Preview -->
         <div *ngIf="imagePreview" class="image-preview-container">
-          <img [src]="imagePreview" alt="Preview" class="image-preview" />
+          <img loading="lazy" decoding="async" [src]="imagePreview" alt="Preview" class="image-preview" />
           <ion-button
             expand="block"
             fill="clear"

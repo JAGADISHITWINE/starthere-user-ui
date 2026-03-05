@@ -83,7 +83,7 @@
         <div class="booking-card" *ngFor="let booking of currentBookings">
 
           <div class="card-image-strip">
-            <img [src]="mediaBaseUrl + booking.cover_image"
+            <img loading="lazy" decoding="async" [src]="resolveImageUrl(booking.cover_image)"
               [alt]="booking.trek_name"
               onerror="this.src='assets/default-trek.jpg'" />
             <div class="image-overlay">

@@ -7,7 +7,7 @@
       <div class="panel-nav">
         <a class="back-btn" [routerLink]="['/tour-details', tourDetailsRouteRef]">← Trek Details</a>
       </div>
-      <img [src]="mediaBaseUrl + trek.cover_image" [alt]="trek.name" />
+      <img loading="lazy" decoding="async" [src]="resolveImageUrl(trek.cover_image)" [alt]="trek.name" />
     </div>
 
     <div class="trek-info">

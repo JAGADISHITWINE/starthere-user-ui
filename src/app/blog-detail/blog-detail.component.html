@@ -1,6 +1,6 @@
 <!-- Featured Image -->
 <div class="post-hero">
-  <img [src]="post.image" [alt]="post.title" />
+  <img loading="lazy" decoding="async" [src]="post.image" [alt]="post.title" />
 </div>
 
 <!-- Article Header -->
@@ -14,7 +14,7 @@
 
   <div class="article-meta">
     <div class="author-section">
-      <img
+      <img loading="lazy" decoding="async"
         [src]="post.author.avatar"
         [alt]="post.author.name"
         class="author-avatar"
@@ -74,7 +74,7 @@
   <ion-card>
     <ion-card-content>
       <div class="author-card-content">
-        <img
+        <img loading="lazy" decoding="async"
           [src]="post.author.avatar"
           [alt]="post.author.name"
           class="author-avatar-large"
@@ -115,7 +115,7 @@
   <ion-card *ngFor="let comment of comments" class="comment-card">
     <ion-card-content>
       <div class="comment-header">
-        <img
+        <img loading="lazy" decoding="async"
           [src]="comment.author.avatar"
           [alt]="comment.author.name"
           class="comment-avatar"
@@ -191,7 +191,7 @@
   style="min-height: 80vh"
 >
   <div class="text-center">
-    <img
+    <img loading="lazy" decoding="async"
       src="../../assets/assets/Bus vehicle.gif"
       width="180"
       alt="Loading"
@@ -209,7 +209,7 @@
     button
     (click)="viewRelatedPost(relatedPost)"
   >
-    <img [src]="relatedPost.image" [alt]="relatedPost.title" />
+    <img loading="lazy" decoding="async" [src]="relatedPost.image" [alt]="relatedPost.title" />
     <ion-card-content>
       <ion-chip size="small" color="success" outline="true">
         <ion-label>

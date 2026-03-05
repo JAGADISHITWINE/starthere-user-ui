@@ -2,7 +2,7 @@
 
   <!-- HERO -->
   <section class="hero">
-    <img class="hero-img" src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1400&q=80"
+    <img loading="eager" fetchpriority="high" decoding="async" class="hero-img" src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1400&q=80"
       alt="Treks Banner" />
     <div class="hero-body">
       <div class="hero-breadcrumb">
@@ -97,7 +97,7 @@
 
       <div class="col-trek">
         <div class="trek-thumb">
-          <img [src]="mediaBaseUrl + trek.image" [alt]="trek.name"
+          <img loading="lazy" decoding="async" [src]="resolveImageUrl(trek.image)" [alt]="trek.name"
             onerror="this.src='assets/default-trek.jpg'" />
         </div>
         <div class="trek-info-text">

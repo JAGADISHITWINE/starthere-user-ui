@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { catchError, map, shareReplay } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { EncryptionService } from './encryption.service';
 
@@ -15,14 +15,32 @@ export interface DropdownOption {
 })
 export class DropdownService {
   private readonly API = environment.baseUrl;
+  private readonly optionsCache = new Map<string, Observable<DropdownOption[]>>();
 
   constructor(private http: HttpClient, private crypto: EncryptionService) {}
 
   getOptions(type: string, fallback: DropdownOption[] = []): Observable<DropdownOption[]> {
-    return this.http.get(`${this.API}/meta/dropdowns/${type}`).pipe(
-      map((res: any) => this.extractOptions(res, type, fallback)),
-      catchError(() => of(fallback))
+    const normalizedType = String(type || '').trim().toLowerCase();
+    if (!normalizedType) {
+      return of(fallback);
+    }
+
+    const cached = this.optionsCache.get(normalizedType);
+    if (cached) {
+      return cached;
+    }
+
+    const request$ = this.http.get(`${this.API}/meta/dropdowns/${normalizedType}`).pipe(
+      map((res: any) => this.extractOptions(res, normalizedType, fallback)),
+      catchError(() => {
+        this.optionsCache.delete(normalizedType);
+        return of(fallback);
+      }),
+      shareReplay({ bufferSize: 1, refCount: false })
     );
+
+    this.optionsCache.set(normalizedType, request$);
+    return request$;
   }
 
   private extractOptions(res: any, type: string, fallback: DropdownOption[]): DropdownOption[] {

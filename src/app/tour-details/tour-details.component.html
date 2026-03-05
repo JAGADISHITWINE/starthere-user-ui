@@ -21,7 +21,7 @@
   <!-- ── HERO ──────────────────────────────────────────────────────── -->
   <section class="td-hero" aria-label="Trek hero image">
     <div class="td-hero-img-wrap">
-      <img
+      <img loading="eager" fetchpriority="high" decoding="async"
         class="td-hero-img"
         [src]="getImageUrl(tour.image)"
         [alt]="tour.name"
@@ -486,7 +486,7 @@
 ═════════════════════════════════════════════════════════════════════ -->
 <div *ngIf="isLoading" class="td-loading" role="status" aria-label="Loading trek details">
   <div class="td-loading-inner">
-    <img src="../../assets/assets/Bus vehicle.gif" width="160" alt="Loading…" aria-hidden="true"/>
+    <img loading="eager" decoding="async" src="../../assets/assets/Bus vehicle.gif" width="160" alt="Loading…" aria-hidden="true"/>
     <div class="td-loading-dots" aria-hidden="true">
       <span></span><span></span><span></span>
     </div>

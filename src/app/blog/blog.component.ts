@@ -139,8 +139,9 @@ async loadCategories() {
 
   resolveImageUrl(imagePath: string | null | undefined): string {
     if (!imagePath) return this.fallbackImage;
-    if (/^https?:\/\//i.test(imagePath)) return imagePath;
-    return `${this.imageBaseUrl}/${String(imagePath).replace(/^\/+/, "")}`;
+    if (/^(https?:)?\/\//i.test(imagePath)) return imagePath;
+    if (String(imagePath).startsWith("data:") || String(imagePath).startsWith("blob:")) return String(imagePath);
+    return `${this.imageBaseUrl}${String(imagePath).replace(/^\/+/, "")}`;
   }
 
   slugify(text: string): string {

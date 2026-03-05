@@ -65,6 +65,7 @@ interface AvailableCoupon {
 })
 export class BookingComponent implements OnInit, OnDestroy {
   readonly mediaBaseUrl = (environment.mediaBaseUrl || '').replace(/\/?$/, '/');
+  readonly fallbackImage = "assets/default-trek.jpg";
   trekId: number = 0;
   routeRef: string = "";
   currentStep: number = 1;
@@ -77,6 +78,7 @@ export class BookingComponent implements OnInit, OnDestroy {
   isCouponValidating: boolean = false;
   availableCoupons: AvailableCoupon[] = [];
   couponListError: string = "";
+  private hasLoadedCoupons: boolean = false;
   private couponValidationTimer: ReturnType<typeof setTimeout> | null = null;
 
   // Trek data from API
@@ -133,6 +135,9 @@ export class BookingComponent implements OnInit, OnDestroy {
       this.routeRef = ref;
       const resolvedId = this.publicRouteId.resolve(ref);
       this.trekId = Number(resolvedId || 0);
+      this.hasLoadedCoupons = false;
+      this.availableCoupons = [];
+      this.couponListError = "";
       if (this.routeRef) {
         this.loadTrekData();
       }
@@ -219,7 +224,6 @@ export class BookingComponent implements OnInit, OnDestroy {
           this.userId = this.tokenService.getUserId();
 
           this.initializeAddOns();
-          this.loadAvailableCoupons();
           // Initialize participants array
           this.initializeParticipants();
         }
@@ -233,12 +237,13 @@ export class BookingComponent implements OnInit, OnDestroy {
   }
 
   private loadAvailableCoupons() {
-    if (!this.trekId) return;
+    if (!this.trekId || this.hasLoadedCoupons) return;
 
     this.bookingService.getAvailableCoupons(this.trekId, this.userId).subscribe({
       next: (res: any) => {
         this.availableCoupons = Array.isArray(res?.data) ? res.data : [];
         this.couponListError = "";
+        this.hasLoadedCoupons = true;
       },
       error: () => {
         this.availableCoupons = [];
@@ -469,6 +474,7 @@ export class BookingComponent implements OnInit, OnDestroy {
     if (this.currentStep < 4) {
       this.currentStep++;
       if (this.currentStep === 4) {
+        this.loadAvailableCoupons();
         this.scheduleCouponValidation();
       }
     }
@@ -630,6 +636,15 @@ get participantCountOptions(): number[] {
     { length: (this.booking.participants || 1) + 1 },
     (_, index) => index
   );
+}
+
+resolveImageUrl(imagePath: string | null | undefined): string {
+  const value = String(imagePath || "").trim();
+  if (!value) return this.fallbackImage;
+  if (/^(https?:)?\/\//i.test(value) || value.startsWith("data:") || value.startsWith("blob:")) {
+    return value;
+  }
+  return `${this.mediaBaseUrl}${value.replace(/^\/+/, "")}`;
 }
 
 get tourDetailsRouteRef(): string {

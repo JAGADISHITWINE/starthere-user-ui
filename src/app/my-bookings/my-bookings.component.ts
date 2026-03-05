@@ -42,6 +42,7 @@ interface Booking {
 })
 export class MyBookingsComponent implements OnInit {
   readonly mediaBaseUrl = (environment.mediaBaseUrl || '').replace(/\/?$/, '/');
+  readonly fallbackImage = "assets/default-trek.jpg";
   activeTab: "upcoming" | "past" | "cancelled" = "upcoming";
 
   upcomingBookings: Booking[] = [];
@@ -403,5 +404,14 @@ export class MyBookingsComponent implements OnInit {
     } else {
       this.router.navigate(['/']);
     }
+  }
+
+  resolveImageUrl(imagePath: string | null | undefined): string {
+    const value = String(imagePath || "").trim();
+    if (!value) return this.fallbackImage;
+    if (/^(https?:)?\/\//i.test(value) || value.startsWith("data:") || value.startsWith("blob:")) {
+      return value;
+    }
+    return `${this.mediaBaseUrl}${value.replace(/^\/+/, "")}`;
   }
 }
