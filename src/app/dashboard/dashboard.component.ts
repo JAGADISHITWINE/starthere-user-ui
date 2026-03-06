@@ -116,12 +116,11 @@ export class DashboardComponent implements OnInit {
       { value: 'duration_short', label: 'Duration: Shortest' },
     ];
 
-    this.dropdownService.getOptions('trek-sort', fallback).subscribe((options) => {
-      this.sortOptions = options;
-      if (!this.sortOptions.some((option) => option.value === this.sortBy)) {
-        this.sortBy = this.sortOptions[0]?.value || 'recommended';
-      }
-    });
+    // Keep sort options local until backend exposes a stable dropdown key for this.
+    this.sortOptions = fallback;
+    if (!this.sortOptions.some((option) => option.value === this.sortBy)) {
+      this.sortBy = this.sortOptions[0]?.value || 'recommended';
+    }
   }
 
   private loadDifficultyFilters() {
